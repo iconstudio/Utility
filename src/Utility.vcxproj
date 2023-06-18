@@ -168,7 +168,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\DataPacker.ixx" />
-    <ClCompile Include="..\DataUnit.ixx" />
     <ClCompile Include="..\Deserialization.ixx" />
     <ClCompile Include="..\Object.cc" />
     <ClCompile Include="..\Serialization.ixx" />

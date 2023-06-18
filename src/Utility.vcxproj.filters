@@ -104,9 +104,6 @@
     <ClCompile Include="..\DataPacker.ixx">
       <Filter>헤더 파일\Specifics</Filter>
     </ClCompile>
-    <ClCompile Include="..\DataUnit.ixx">
-      <Filter>헤더 파일\Specifics</Filter>
-    </ClCompile>
     <ClCompile Include="..\Deserialization.ixx">
       <Filter>헤더 파일\Specifics</Filter>
     </ClCompile>
