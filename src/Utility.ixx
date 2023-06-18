@@ -8,14 +8,14 @@ module;
 #include <string_view>
 export module Utility;
 
-__forceinline constexpr double sqrtNewtonRaphson(double x, double curr, double prev) noexcept
+constexpr double sqrtNewtonRaphson(double x, double curr, double prev) noexcept
 {
 	return curr == prev
 		? curr
 		: sqrtNewtonRaphson(x, 0.5 * (curr + x / curr), curr);
 }
 
-__forceinline constexpr float sqrtNewtonRaphson(float x, float curr, float prev) noexcept
+constexpr float sqrtNewtonRaphson(float x, float curr, float prev) noexcept
 {
 	return curr == prev
 		? curr
@@ -97,7 +97,7 @@ export extern "C++" namespace util
 	/// <param name="value"></param>
 	/// <returns> For a finite and non-negative value, returns an approximation for the square root of value. Otherwise, returns NaN.</returns>
 	[[nodiscard]]
-	__forceinline constexpr double sqrt(const double value) noexcept
+	constexpr double sqrt(const double value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
@@ -117,7 +117,7 @@ export extern "C++" namespace util
 	/// <param name="value"></param>
 	/// <returns> For a finite and non-negative value, an approximation for the square root of value. Otherwise, NaN.</returns>
 	[[nodiscard]]
-	__forceinline constexpr float sqrt(const float value) noexcept
+	constexpr float sqrt(const float value) noexcept
 	{
 		if (is_constant_evaluated())
 		{
