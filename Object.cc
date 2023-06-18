@@ -1,5 +1,3 @@
-#include "Reflection.cc"
-
 import <string>;
 import <string_view>;
 import <vector>;
