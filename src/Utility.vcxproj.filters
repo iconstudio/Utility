@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
+    <Filter Include="헤더 파일\Specifics">
+      <UniqueIdentifier>{397eb9da-6c73-420a-b219-e61052e08b1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="functional\Expected.ixx">
@@ -92,8 +95,40 @@
     <ClCompile Include="Tools\Utility.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="..\ThreadUnit.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Time.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DataPacker.ixx">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\DataUnit.ixx">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Deserialization.ixx">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Object.cc">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Serialization.ixx">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Testbed.cpp">
+      <Filter>헤더 파일\Specifics</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Deserialization.inl">
+      <Filter>헤더 파일\Specifics</Filter>
+    </None>
+    <None Include="..\Serialization.inl">
+      <Filter>헤더 파일\Specifics</Filter>
+    </None>
   </ItemGroup>
 </Project>
