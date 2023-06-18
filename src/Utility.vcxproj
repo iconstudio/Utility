@@ -135,6 +135,32 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="concurrency\Locks.ixx" />
+    <ClCompile Include="concurrency\Spinlock.ixx" />
+    <ClCompile Include="concurrency\Thread.ixx" />
+    <ClCompile Include="containers\Array.ixx" />
+    <ClCompile Include="Error.ixx" />
+    <ClCompile Include="FixedString.ixx" />
+    <ClCompile Include="functional\Expected.ixx" />
+    <ClCompile Include="functional\Identity.ixx" />
+    <ClCompile Include="functional\LooseMonad.ixx" />
+    <ClCompile Include="functional\Monad.ixx" />
+    <ClCompile Include="functional\Option.ixx" />
+    <ClCompile Include="functional\Union.ixx" />
+    <ClCompile Include="memory\Atomic.ixx" />
+    <ClCompile Include="memory\Memory.ixx" />
+    <ClCompile Include="memory\MemoryWatcher.ixx" />
+    <ClCompile Include="meta\Constraints.ixx" />
+    <ClCompile Include="meta\Meta.ixx" />
+    <ClCompile Include="meta\Traits.ixx" />
+    <ClCompile Include="Print.ixx" />
+    <ClCompile Include="reflection\Classifier.ixx" />
+    <ClCompile Include="reflection\Indexer.ixx" />
+    <ClCompile Include="reflection\Named.ixx" />
+    <ClCompile Include="reflection\Reflection.ixx" />
+    <ClCompile Include="reflection\Singleton.ixx" />
+    <ClCompile Include="Utility.ixx" />
+    <ClCompile Include="wrappers\String.ixx" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
