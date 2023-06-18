@@ -13,7 +13,7 @@ int main()
 
 	constexpr auto sqrt1 = util::sqrt(25.0);
 	constexpr auto sqrt2 = util::sqrt(25.0f);
-	constexpr auto sqrt3 = util::sqrt(16.0);
+	constexpr auto sqrt3 = util::sqrt(1676.0);
 	constexpr auto sqrt4 = util::sqrt(16.0f);
 	util::Println("Testing square roots: {}, {}, {}, {}", sqrt1, sqrt2, sqrt3, sqrt4);
 
