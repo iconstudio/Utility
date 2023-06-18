@@ -167,6 +167,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\DataPacker.ixx" />
+    <ClCompile Include="..\DataUnit.ixx" />
+    <ClCompile Include="..\Deserialization.ixx" />
+    <ClCompile Include="..\Object.cc" />
+    <ClCompile Include="..\Serialization.ixx" />
+    <ClCompile Include="..\Testbed.cpp" />
+    <ClCompile Include="..\ThreadUnit.ixx" />
+    <ClCompile Include="..\Time.ixx" />
     <ClCompile Include="concurrency\Locks.ixx" />
     <ClCompile Include="concurrency\Spinlock.ixx" />
     <ClCompile Include="concurrency\Thread.ixx" />
@@ -197,6 +205,10 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\Deserialization.inl" />
+    <None Include="..\Serialization.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
