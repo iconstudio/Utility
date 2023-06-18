@@ -7,7 +7,6 @@ import Utility.Constraints;
 import Utility.Memory;
 import Utility.Array;
 import Utility.Monad;
-import Utility.Datagram.Unit;
 import Utility.Datagram.Serialization;
 
 export namespace util::datagram
