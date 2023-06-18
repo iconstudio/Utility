@@ -11,18 +11,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="FixedString.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Error.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Print.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="Utility.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="functional\Expected.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
@@ -36,9 +24,6 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="functional\Option.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="functional\Union.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="concurrency\Locks.ixx">
@@ -62,15 +47,6 @@
     <ClCompile Include="memory\MemoryWatcher.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="meta\Constraints.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="meta\Meta.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="meta\Traits.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="reflection\Classifier.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
@@ -91,6 +67,30 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="containers\Union.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="generic\Constraints.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="generic\Traits.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="meta\FixedString.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="meta\Meta.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Error.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Print.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Utility.ixx">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

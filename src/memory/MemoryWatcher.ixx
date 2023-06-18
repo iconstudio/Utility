@@ -10,12 +10,15 @@ export namespace util
 			: handle(ptr)
 		{}
 
+		constexpr Watcher(T* && ptr) noexcept
+			: handle(static_cast<T* &&>(ptr))
+		{}
+
 		constexpr ~Watcher() noexcept(util::trivially_destructibles<T>)
 		{
 			if (!ok && handle)
 			{
 				delete handle;
-
 			}
 		}
 
@@ -30,5 +33,5 @@ export namespace util
 	};
 
 	template<typename T>
-	Watcher(util::add_pointer_t<T>) -> Watcher<T>;
+	Watcher(add_pointer_t<T>) -> Watcher<T>;
 }

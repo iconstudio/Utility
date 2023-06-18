@@ -306,7 +306,6 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() &&
-			//noexcept(nothrowMovePursuer<Index, value_type>)
 			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
@@ -321,7 +320,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -336,7 +334,6 @@ namespace util::detail
 		[[nodiscard]]
 		constexpr decltype(auto)
 			get() const&&
-			//noexcept(nothrowMovePursuer<Index, const_value_type>)
 			noexcept(Index == Place)
 		{
 			if constexpr (Index == Place)
@@ -351,7 +348,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -380,7 +376,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -409,7 +404,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -438,7 +432,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
@@ -467,7 +460,6 @@ namespace util::detail
 				}
 				else
 				{
-					//std::unreachable();
 					throw std::bad_variant_access{};
 				}
 			}
