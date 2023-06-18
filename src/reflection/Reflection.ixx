@@ -171,6 +171,16 @@ export MAKE_REFLECTION_NO_HIERACHY(std::string_view, ::reflex::LastTypeIndex, "s
 export namespace reflex
 {
 	template<typename T>
+	concept reflected = requires
+	{
+		reflect_traits<T>::type;
+		reflect_traits<T>::parents;
+		reflect_traits<T>::children;
+		reflect_traits<T>::type_id;
+		reflect_traits<T>::name;
+	};
+
+	template<typename T>
 	using reflect_t = typename reflect_traits<T>::template type;
 
 	template<typename T>
