@@ -15,61 +15,61 @@ export namespace util
 			mySwitch.clear();
 		}
 
-		inline void lock(const memory_order& order = memory_order_acquire) &
+		inline void lock(const std::memory_order& order = std::memory_order_acquire) &
 			noexcept
 		{
 			while (mySwitch.test_and_set(order));
 		}
 
-		inline void lock(const memory_order& order = memory_order_acquire) volatile&
+		inline void lock(const std::memory_order& order = std::memory_order_acquire) volatile&
 			noexcept
 		{
 			while (mySwitch.test_and_set(order));
 		}
 
-		inline void unlock(const memory_order& order = memory_order_release) &
+		inline void unlock(const std::memory_order& order = std::memory_order_release) &
 			noexcept
 		{
 			mySwitch.clear(order);
 		}
 
-		inline void unlock(const memory_order& order = memory_order_release) volatile&
+		inline void unlock(const std::memory_order& order = std::memory_order_release) volatile&
 			noexcept
 		{
 			mySwitch.clear(order);
 		}
 
-		inline bool try_lock(const memory_order& order = memory_order_relaxed) &
+		inline bool try_lock(const std::memory_order& order = std::memory_order_relaxed) &
 			noexcept
 		{
 			return !mySwitch.test_and_set(order);
 		}
 
-		inline bool try_lock(const memory_order& order = memory_order_relaxed) volatile&
+		inline bool try_lock(const std::memory_order& order = std::memory_order_relaxed) volatile&
 			noexcept
 		{
 			return !mySwitch.test_and_set(order);
 		}
 
-		inline void wait_lock(const memory_order& order = memory_order_relaxed) &
+		inline void wait_lock(const std::memory_order& order = std::memory_order_relaxed) &
 			noexcept
 		{
 			return mySwitch.wait(true, order);
 		}
 
-		inline void wait_lock(const memory_order& order = memory_order_relaxed) volatile&
+		inline void wait_lock(const std::memory_order& order = std::memory_order_relaxed) volatile&
 			noexcept
 		{
 			return mySwitch.wait(true, order);
 		}
 
-		inline void wait_unlock(const memory_order& order = memory_order_relaxed) &
+		inline void wait_unlock(const std::memory_order& order = std::memory_order_relaxed) &
 			noexcept
 		{
 			return mySwitch.wait(false, order);
 		}
 
-		inline void wait_unlock(const memory_order& order = memory_order_relaxed) volatile&
+		inline void wait_unlock(const std::memory_order& order = std::memory_order_relaxed) volatile&
 			noexcept
 		{
 			return mySwitch.wait(false, order);
@@ -97,12 +97,12 @@ export namespace util
 
 		inline bool is_locked() const& noexcept
 		{
-			return mySwitch.test(memory_order_relaxed);
+			return mySwitch.test(std::memory_order_relaxed);
 		}
 
 		inline bool is_locked() const volatile& noexcept
 		{
-			return mySwitch.test(memory_order_relaxed);
+			return mySwitch.test(std::memory_order_relaxed);
 		}
 
 		Spinlock(const Spinlock&) = delete;
@@ -113,6 +113,14 @@ export namespace util
 	private:
 		std::atomic_flag mySwitch;
 	};
+
+	using ::std::memory_order;
+	using ::std::memory_order_relaxed;
+	using ::std::memory_order_consume;
+	using ::std::memory_order_acquire;
+	using ::std::memory_order_release;
+	using ::std::memory_order_acq_rel;
+	using ::std::memory_order_seq_cst;
 }
 
 export using std::memory_order;

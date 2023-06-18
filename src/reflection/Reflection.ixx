@@ -1,5 +1,6 @@
 export module Utility.Reflection;
 import <string>;
+import Utility.Meta;
 import Utility.FixedString;
 
 namespace reflex
@@ -179,10 +180,10 @@ export namespace reflex
 	using children = typename reflect_traits<T>::template children;
 
 	template<typename T, size_t I>
-	using parent = meta::at<typename parents<T>, I>;
+	using parent = meta::at<parents<T>, I>;
 
 	template<typename T, size_t I>
-	using child = meta::at<typename children<T>, I>;
+	using child = meta::at<children<T>, I>;
 
 	template<typename T>
 	inline constexpr size_t type_id = reflect_traits<T>::template type_id;

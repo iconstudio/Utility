@@ -1,11 +1,11 @@
 export module Utility.Print;
 import <cstdio>;
-import <mutex>;
 export import <string>;
 export import <string_view>;
 export import <format>;
 import Utility;
 import Utility.String;
+import Utility.Concurrency.Locks;
 
 #define FORCEIN __forceinline
 
@@ -72,7 +72,7 @@ static FORCEIN void
 internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
-extern std::mutex* syncedIo{};
+extern util::mutex* syncedIo{};
 
 export namespace util
 {
@@ -80,7 +80,7 @@ export namespace util
 	{
 		inline void Initialize() noexcept
 		{
-			syncedIo = new std::mutex{};
+			syncedIo = new mutex{};
 		}
 	}
 
@@ -443,14 +443,14 @@ noexcept
 		{
 			std::string_view buffer = fmt.get();
 
-			util::lock_guard guard{ syncedIo };
+			util::lock_guard guard{ *syncedIo };
 			std::fputs(buffer.data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
 		{
 			std::wstring_view buffer = fmt.get();
 
-			util::lock_guard guard{ syncedIo };
+			util::lock_guard guard{ *syncedIo };
 			std::fputws(buffer.data(), stream);
 		}
 	}
@@ -459,7 +459,7 @@ noexcept
 		std::string_view buff = fmt.get();
 		std::format_args pack = std::make_format_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ syncedIo };
+		util::lock_guard guard{ *syncedIo };
 		return internal_vprint(stream, buff, std::move(pack));
 	}
 	else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -467,7 +467,7 @@ noexcept
 		std::wstring_view buff = fmt.get();
 		std::wformat_args pack = std::make_wformat_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ syncedIo };
+		util::lock_guard guard{ *syncedIo };
 		return internal_wprint(stream, buff, std::move(pack));
 	}
 }
@@ -484,7 +484,7 @@ internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args
 			std::string_view fwd = fmt.get();
 			const std::string& buffer = std::string{ fwd.cbegin(), fwd.cend() } + '\n';
 
-			util::lock_guard guard{ syncedIo };
+			util::lock_guard guard{ *syncedIo };
 			std::fputs(buffer.data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -492,7 +492,7 @@ internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args
 			std::wstring_view fwd = fmt.get();
 			const std::wstring& buffer = std::wstring{ fwd.cbegin(), fwd.cend() } + L'\n';
 
-			util::lock_guard guard{ syncedIo };
+			util::lock_guard guard{ *syncedIo };
 			std::fputws(buffer.data(), stream);
 		}
 	}
@@ -501,7 +501,7 @@ internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args
 		std::string_view buff = fmt.get();
 		std::format_args pack = std::make_format_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ syncedIo };
+		util::lock_guard guard{ *syncedIo };
 		return internal_vprintln(stream, buff, std::move(pack));
 	}
 	else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -509,7 +509,7 @@ internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args
 		std::wstring_view buff = fmt.get();
 		std::wformat_args pack = std::make_wformat_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ syncedIo };
+		util::lock_guard guard{ *syncedIo };
 		return internal_wprintln(stream, buff, std::move(pack));
 	}
 }
