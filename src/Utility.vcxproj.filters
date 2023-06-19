@@ -93,4 +93,7 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Utility.natvis" />
+  </ItemGroup>
 </Project>

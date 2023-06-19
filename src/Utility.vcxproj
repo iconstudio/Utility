@@ -195,6 +195,9 @@
     <ClCompile Include="Tools\Utility.ixx" />
     <ClCompile Include="wrappers\String.ixx" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\Utility.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

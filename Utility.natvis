@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="util::Singleton&lt;*&gt;">
+		<DisplayString>싱글톤 객체 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Intrinsic Category="Method" Name="__UnwrapTy" Expression="&quot;$T1&quot;"/>
+	
+	<Type Name="util::Array&lt;*&gt;">
+		<Intrinsic Category="Property" Name="__AcqType" Expression="__UnwrapTy()"/>
+		<Intrinsic Category="Property" Name="__AcqLen" Expression="static_cast&lt;size_t&gt;($T2)"/>
+		<Intrinsic Category="Data" Name="__Dots" Expression="&quot;...&quot;"/>
+		<Intrinsic Category="Method" Name="__CheckSize" Expression="10 &lt;= $T2"/>
+
+		<DisplayString>배열 &lt;{&quot;$T1&quot;}, {$T2}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Synthetic Name="[자료형]">
+				<DisplayString>{"$T1"}</DisplayString>
+			</Synthetic>
+			<Item Name="[길이]">__AcqLen()</Item>
+
+			<Synthetic Name="[버퍼]">
+				<DisplayString>첫 원소 10개</DisplayString>
+				<Expand>
+					<Synthetic Name="원소 [0]" Condition="0 &lt; $T2">
+						<DisplayString>{*myData[0]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[0]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [1]" Condition="1 &lt; $T2">
+						<DisplayString>{*myData[1]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[1]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [2]" Condition="2 &lt; $T2">
+						<DisplayString>{*myData[2]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[2]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [3]" Condition="3 &lt; $T2">
+						<DisplayString>{*myData[3]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[3]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [4]" Condition="4 &lt; $T2">
+						<DisplayString>{*myData[4]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[4]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [5]" Condition="5 &lt; $T2">
+						<DisplayString>{*myData[5]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[5]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [6]" Condition="6 &lt; $T2">
+						<DisplayString>{*myData[6]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[6]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [7]" Condition="7 &lt; $T2">
+						<DisplayString>{*myData[7]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[7]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [8]" Condition="8 &lt; $T2">
+						<DisplayString>{*myData[8]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[8]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name="원소 [9]" Condition="9 &lt; $T2">
+						<DisplayString>{*myData[9]}</DisplayString>
+						<Expand>
+							<ExpandedItem>myData[9]</ExpandedItem>
+						</Expand>
+					</Synthetic>
+					<Synthetic Name=" ">
+						<DisplayString>...</DisplayString>
+					</Synthetic>
+				</Expand>
+			</Synthetic>
+
+			<Synthetic Name="[버퍼]" Condition="10 &lt; $T2">
+				<DisplayString>(나머지 원소 {$T2 - 10}개)</DisplayString>
+
+				<Expand>
+					<IndexListItems>
+						<Size>$T2 - 10</Size>
+						<ValueNode>*(myData[10 + $i])</ValueNode>
+					</IndexListItems>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+	<Type Name="std::monostate">
+		<DisplayString>단일원</DisplayString>
+	</Type>
+
+	<Type Name="util::Identity&lt;*&gt;">
+		<Intrinsic Category="Data" Name="__AcqValue" Expression="myValue"/>
+
+		<DisplayString>항등원 {__UnwrapTy()}</DisplayString>
+		<Expand HideRawView="true">
+			<Item Name="[값]">myValue</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="util::Identity&lt;void, *&gt;" Priority="High">
+		<DisplayString>void 항등원</DisplayString>
+	</Type>
+
+	<Type Name="util::detail::PlacedVariant&lt;std::integral_constant&lt;*&gt;, util::Identity&lt;*&gt;,*&gt;">
+		<AlternativeType Name="util::detail::PlacedVariant&lt;std::integral_constant&lt;*&gt;,*&gt;"/>
+		
+		<Intrinsic Category="Property" Name="__AcqType" Expression="&quot;$T3&quot;"/>
+		<Intrinsic Category="Property" Name="__AcqPlace" Expression="$T2 + 1"/>
+		<Intrinsic Category="Property" Name="__AcqValue" Expression="myValue"/>
+		<Intrinsic Category="Property" Name="__HasValue" Expression="hasValue"/>
+		<Intrinsic Category="Property" Name="__IsExtended" Expression="isExtended"/>
+
+		<DisplayString Condition="__HasValue()">합동체 &lt;{__AcqType()}&gt;</DisplayString>
+		<DisplayString Condition="!__HasValue()">비활성화된 합동체 &lt;{__AcqType()}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<ExpandedItem Condition="__HasValue()">myValue</ExpandedItem>
+			<Item Name="[크기]">mySize</Item>
+			<Item Name="[순서]">myPlace</Item>
+			<Item Name="[확장]" Condition="__IsExtended()">_Tail</Item>
+			<Item Name="[노드 순서]">__AcqPlace()</Item>
+			<Item Name="[소유 여부]">__HasValue()</Item>
+			<Item Name="[확장 여부]">__IsExtended()</Item>
+
+			<Synthetic Name="다음 노드" Optional="true">
+				<DisplayString>{_Tail}</DisplayString>
+				<Expand HideRawView="true">
+					<ExpandedItem Condition="__IsExtended()" Optional="true">_Tail</ExpandedItem>
+				</Expand>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+	<Type Name="util::Union&lt;*&gt;">
+		<DisplayString>합동체 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::DerivedUnion&lt;*&gt;">
+		<DisplayString>합동체 {&quot;$T2&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::LooseMonad&lt;util::Identity&lt;*&gt;, *&gt;">
+		<AlternativeType Name="util::LooseMonad&lt;util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, *&gt;"/>
+		<AlternativeType Name="util::LooseMonad&lt;util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, *&gt;"/>
+		<AlternativeType Name="util::LooseMonad&lt;util::Identity&lt;*&gt;, util::Identity&lt;*&gt;, *&gt;"/>
+
+		<DisplayString Condition="myStorage.mySize == 1">느슨한 모나드 {{ {"$T1"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 2">느슨한 모나드 {{ {"$T1"}, {"$T3"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 3">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 4">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"}, {"$T7"} }}</DisplayString>
+		<DisplayString Condition="4 &lt; myStorage.mySize">느슨한 모나드 {{ {"$T1"}, {"$T3"}, {"$T5"}, {"$T7"}, ... }}</DisplayString>
+
+		<Expand HideRawView="true">
+			<ExpandedItem>myStorage</ExpandedItem>
+		</Expand>
+	</Type>
+	
+	<Type Name="util::LooseMonad&lt;*&gt;">
+		<DisplayString Condition="myStorage.mySize == 1">느슨한 모나드 {{ {"$T1"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 2">느슨한 모나드 {{ {"$T1"}, {"$T2"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 3">느슨한 모나드 {{ {"$T1"}, {"$T2"}, {"$T3"} }}</DisplayString>
+		<DisplayString Condition="myStorage.mySize == 4">느슨한 모나드 {{ {"$T1"}, {"$T2"}, {"$T3"}, {"$T4"} }}</DisplayString>
+		<DisplayString Condition="4 &lt; myStorage.mySize">느슨한 모나드 {{ {"$T1"}, {"$T2"}, {"$T3"}, {"$T4"}, ... }}</DisplayString>
+	</Type>
+
+	<Type Name="util::Option&lt;*&gt;">
+		<DisplayString>선택지 &lt;{"$T1"}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="값">myOption</Item>
+			<Item Name="이벤트 처리기">myHandlers</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="util::Option&lt;*&amp;&gt;">
+		<DisplayString>선택지 &lt;{"$T1"}&amp;&gt;</DisplayString>
+		
+		<Expand HideRawView="true">
+			<Item Name="이벤트 처리기">myHandlers</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>
