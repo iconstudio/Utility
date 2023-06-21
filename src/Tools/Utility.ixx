@@ -247,7 +247,7 @@ export extern "C++" namespace util
 		{
 			if (0 == div)
 			{
-				static_assert(always_false<T>, "div is zero");
+				//static_assert(always_false<T>, "div is zero");
 
 				throw NAN;
 			}
