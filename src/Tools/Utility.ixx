@@ -86,7 +86,7 @@ export extern "C++" namespace util
 
 	template<typename T>
 	[[nodiscard]]
-	__forceinline constexpr auto sqr(T&& value) noexcept(noexcept(value * value))
+	__forceinline constexpr auto sqr(T&& value) noexcept(noexcept(value* value))
 	{
 		return value * value;
 	}
@@ -130,4 +130,173 @@ export extern "C++" namespace util
 			return std::sqrt(value);
 		}
 	}
+
+	[[nodiscard]]
+	constexpr int abs(const int& value) noexcept
+	{
+		return 0 < value ? value : -value;
+	}
+
+	[[nodiscard]]
+	constexpr const unsigned int& abs(const unsigned int& value) noexcept
+	{
+		return value;
+	}
+
+	[[nodiscard]]
+	constexpr unsigned int&& abs(unsigned int&& value) noexcept
+	{
+		return static_cast<unsigned int&&>(value);
+	}
+
+	[[nodiscard]]
+	constexpr long long abs(const long long& value) noexcept
+	{
+		return 0 < value ? value : -value;
+	}
+
+	[[nodiscard]]
+	constexpr const unsigned long long& abs(const unsigned long long& value) noexcept
+	{
+		return value;
+	}
+
+	[[nodiscard]]
+	constexpr unsigned long long&& abs(unsigned long long&& value) noexcept
+	{
+		return static_cast<unsigned long long&&>(value);
+	}
+
+	[[nodiscard]]
+	constexpr double abs(const double& value) noexcept
+	{
+		return 0 < value ? value : -value;
+	}
+
+	[[nodiscard]]
+	constexpr double abs(const long double& value) noexcept
+	{
+		return 0 < value ? value : -value;
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const int& value) noexcept
+	{
+		return 0 < value ? 1 : (value < 0 ? -1 : 0);
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const unsigned int& value) noexcept
+	{
+		return 1;
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const float& value) noexcept
+	{
+		return 0 < value ? 1 : (value < 0 ? -1 : 0);
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const long long& value) noexcept
+	{
+		return 0 < value ? 1 : (value < 0 ? -1 : 0);
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const unsigned long long& value) noexcept
+	{
+		return 1;
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const double& value) noexcept
+	{
+		return 0 < value ? 1 : (value < 0 ? -1 : 0);
+	}
+
+	[[nodiscard]]
+	constexpr int sign(const long double& value) noexcept
+	{
+		return 0 < value ? 1 : (value < 0 ? -1 : 0);
+	}
+
+	[[nodiscard]]
+	constexpr auto MulDiv(const auto& value, const auto& mul, const auto& div)
+	{
+		const auto& mulval = value * mul;
+
+		auto result = mulval / div;
+		if (div / 2 <= mulval % div) // Round up for 0.5
+		{
+			result++;
+		}
+
+		return result;
+	}
+
+	template<typename T>
+	[[nodiscard]]
+	constexpr auto SafeDenom(const T& value, const T& mul, const T& div)
+	{
+		const int& signs = util::sign(value) * util::sign(mul) * util::sign(div);
+		if (0 == signs)
+		{
+			if (0 == div)
+			{
+				static_assert(always_false<decltype(div)>, "div is zero");
+
+				throw NAN;
+			}
+			else
+			{
+				return T{};
+			}
+		}
+
+		T tval;
+		T tmul;
+		T tdiv;
+		if (signs == 1)
+		{
+			tval = util::abs(value);
+			tmul = util::abs(mul);
+			tdiv = util::abs(div);
+		}
+		else
+		{
+			tval = util::abs(value);
+			tmul = util::abs(mul);
+			// push all signs to div
+			tdiv = util::abs(div) * signs;
+		}
+
+		if (tval < tmul)
+		{
+			const double mdiv = static_cast<double>(tmul) / tdiv;
+
+			return static_cast<T>(mdiv * tval);
+		}
+		else
+		{
+			const double vdiv = static_cast<double>(tval) / tdiv;
+
+			return static_cast<T>(vdiv * tmul);
+		}
+	}
 }
+
+#pragma warning(push, 1)
+namespace util::test
+{
+	void test_safe_denom()
+	{
+		constexpr auto aaa = util::SafeDenom(754638, -6352, 1);
+		constexpr auto bbb = util::SafeDenom(754638, -6352, 10);
+		constexpr auto ccc = util::SafeDenom(754638, -6352, 100);
+		constexpr auto ddd = util::SafeDenom(754638, -6352, 1000);
+		constexpr auto eee = util::SafeDenom(754638, -6352, 10000);
+		constexpr auto fff = util::SafeDenom(754638, -6352, 100000);
+	}
+}
+#pragma warning(pop)
