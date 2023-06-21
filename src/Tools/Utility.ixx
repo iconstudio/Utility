@@ -71,6 +71,9 @@ export extern "C++" namespace util
 		return __builtin_addressof(_Val);
 	}
 
+	template<typename T>
+	inline constexpr bool always_false = false;
+
 	template <class T>
 	const T* addressof(const T&&) = delete;
 
@@ -244,7 +247,7 @@ export extern "C++" namespace util
 		{
 			if (0 == div)
 			{
-				static_assert(always_false<decltype(div)>, "div is zero");
+				static_assert(always_false<T>, "div is zero");
 
 				throw NAN;
 			}

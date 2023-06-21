@@ -127,10 +127,6 @@ export namespace util
 	template <size_t... Indices>
 	inline constexpr in_place_indices_t<Indices...> in_place_indices{};
 
-	// Always
-	template<typename T>
-	inline constexpr bool always_false = false;
-
 	// cleaner
 	template<typename T>
 	using clean_t = std::remove_cvref_t<std::remove_all_extents_t<T>>;

@@ -2,6 +2,7 @@ module;
 #include <utility>
 
 export module Utility.Meta;
+import Utility;
 import Utility.Traits;
 
 #define EXPORT export
