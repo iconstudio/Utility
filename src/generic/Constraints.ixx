@@ -17,10 +17,16 @@ export namespace util
 	concept crtp = classes<D> && std::same_as<D, remove_cv_t<D>>;
 
 	template<typename T>
-	using not_void = std::negation<std::is_same<clean_t<T>, void>>;
+	using is_void = std::is_same<clean_t<T>, void>;
+
+	template<typename T>
+	using is_not_void = std::negation<std::is_same<clean_t<T>, void>>;
 
 	template<typename... Ts>
-	concept notvoids = make_conjunction<not_void, clean_t<Ts>...>;
+	concept voids = make_conjunction<is_void, clean_t<Ts>...>;
+
+	template<typename... Ts>
+	concept notvoids = make_conjunction<is_not_void, clean_t<Ts>...>;
 
 	template<typename... Ts>
 	concept integrals = make_conjunction<std::is_integral, clean_t<Ts>...>;
