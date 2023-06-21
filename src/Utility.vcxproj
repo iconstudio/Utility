@@ -179,6 +179,7 @@
     <ClCompile Include="concurrency\Thread.ixx" />
     <ClCompile Include="containers\Array.ixx" />
     <ClCompile Include="containers\Union.ixx" />
+    <ClCompile Include="Coroutine.ixx" />
     <ClCompile Include="functional\Expected.ixx" />
     <ClCompile Include="functional\Identity.ixx" />
     <ClCompile Include="functional\LooseMonad.ixx" />
