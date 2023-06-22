@@ -283,7 +283,7 @@ export namespace util::coroutine
 
 export namespace util
 {
-	template<movable T, typename Guard>
+	template<movable T, equality_comparable_with<T> Guard>
 	inline coroutine::Generator<T> cogenerate(T first, const Guard last)
 		noexcept(nothrow_copy_constructibles<T>)
 	{
