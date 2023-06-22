@@ -105,7 +105,7 @@ export namespace util
 	{};
 
 	template<movable T>
-	class [[nodiscard]] Generator : public std::ranges::view_interface<Generator<T>>
+	class [[nodiscard]] Generator
 	{
 	public:
 		using value_type = clean_t<T>;
@@ -116,6 +116,7 @@ export namespace util
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
+		using interface = std::ranges::view_interface<Generator<T>>;
 		using promise_type = default_promise<Generator<T>>;
 		using handle_type = promise_type::handle_type;
 
@@ -125,6 +126,7 @@ export namespace util
 			using coro_type = Generator<T>;
 			using handle_type = coro_type::handle_type;
 
+			using iterator_concept = std::forward_iterator_tag;
 			using iterator_category = std::forward_iterator_tag;
 			using value_type = coro_type::value_type;
 			using reference = coro_type::reference;
@@ -214,7 +216,13 @@ export namespace util
 				myHandle.resume();
 			}
 
-			return const_iterator{ myHandle };
+			return iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr default_sentinel_t end() noexcept
+		{
+			return {};
 		}
 
 		[[nodiscard]]
@@ -249,6 +257,18 @@ export namespace util
 		constexpr default_sentinel_t cend() const noexcept
 		{
 			return {};
+		}
+
+		[[nodiscard]]
+		constexpr bool empty() const noexcept
+		{
+			return !myHandle || myHandle.done();
+		}
+
+		[[nodiscard]]
+		constexpr explicit operator bool() const noexcept
+		{
+			return !empty();
 		}
 
 		Generator(const Generator& other) = delete;
