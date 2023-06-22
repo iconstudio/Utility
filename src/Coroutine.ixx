@@ -1,11 +1,9 @@
 export module Utility.Coroutine;
-export import <algorithm>;
-export import <stack>;
 export import <ranges>;
 export import <coroutine>;
-export import Utility.Memory;
 export import Utility.Traits;
 import Utility.Constraints;
+import Utility.Monad;
 
 export namespace util
 {
@@ -30,14 +28,8 @@ export namespace util
 		t.await_resume();
 	};
 
-	/// <summary>
-	/// A Co-working Forward list
-	/// (Pre-implement the C++23 standard class)
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <typeparam name="R"></typeparam>
-	template<movable T, typename R = T&>
-	class [[nodiscard]] generator : public std::ranges::view_interface<generator<T, R>>
+	template<movable T>
+	class [[nodiscard]] Generator
 	{
 	public:
 		using value_type = clean_t<T>;
@@ -45,15 +37,12 @@ export namespace util
 		using const_reference = const T&;
 		using rvalue_reference = T&&;
 		using const_rvalue_reference = const T&&;
-		using yielded = R;
 
-		class iterator;
 		class promise_type;
+		using handle_type = std::coroutine_handle<promise_type>;
 
-		generator(generator&& other) noexcept;
-		generator& operator=(generator&& other) noexcept;
-
-		~generator() noexcept
+		inline Generator() noexcept = default;
+		inline ~Generator() noexcept
 		{
 			if (myHandle.done())
 			{
@@ -61,100 +50,196 @@ export namespace util
 			}
 		}
 
-		[[nodiscard]]
-		iterator begin() noexcept
-		{
+		explicit constexpr Generator(const handle_type& coroutine)
+			noexcept(nothrow_copy_constructibles<handle_type>)
+			: myHandle(coroutine)
+		{}
 
+		explicit constexpr Generator(handle_type&& coroutine)
+			noexcept(nothrow_move_constructibles<handle_type>)
+			: myHandle(move(coroutine))
+		{}
+
+		class CoIterator
+		{
+		public:
+			using coro_type = Generator<T>;
+			using handle_type = coro_type::handle_type;
+			friend class coro_type::promise_type;
+
+			using iterator_category = std::forward_iterator_tag;
+			using difference_type = ptrdiff_t;
+			using value_type = coro_type::value_type;
+			using reference = coro_type::reference;
+			using const_reference = coro_type::const_reference;
+			using rvalue_reference = coro_type::rvalue_reference;
+			using const_rvalue_reference = coro_type::const_rvalue_reference;
+
+			explicit CoIterator(const handle_type& coroutine) noexcept
+				: coHandle(coroutine)
+			{}
+
+			explicit CoIterator(handle_type&& coroutine) noexcept
+				: coHandle(move(coroutine))
+			{}
+
+			inline CoIterator& operator++()
+			{
+				if (!coHandle.done())
+				{
+					coHandle.resume();
+				}
+
+				return *this;
+			}
+
+			inline void operator++(int)
+			{
+				if (!coHandle.done())
+				{
+					coHandle.resume();
+				}
+			}
+
+			[[nodiscard]]
+			inline const_reference operator*() const&
+			{
+				return coHandle.promise().return_value();
+			}
+
+			[[nodiscard]]
+			inline const_rvalue_reference operator*() const&&
+			{
+				return move(coHandle.promise()).return_value();
+			}
+
+			[[nodiscard]]
+			inline bool operator==(default_sentinel_t) const
+			{
+				return !coHandle || coHandle.done();
+			}
+
+		private:
+			handle_type coHandle;
+		};
+
+		[[nodiscard]]
+		CoIterator begin() noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return CoIterator{ myHandle };
 		}
 
 		[[nodiscard]]
-		default_sentinel_t end() const noexcept
+		default_sentinel_t end() noexcept
 		{
 			return {};
 		}
 
-		generator(const generator& other) = delete;
-		generator& operator=(const generator& other) = delete;
+		Generator(const Generator& other) = delete;
+		Generator(Generator&& other) noexcept = default;
+		Generator& operator=(const Generator& other) = delete;
+		Generator& operator=(Generator&& other) noexcept = default;
 
 	private:
-		coroutine_handle<promise_type> myHandle = nullptr;
-		unique_ptr<std::stack<coroutine_handle<>>> active_;
+		handle_type myHandle;
 	};
 
-	template<movable T, typename U>
-	class [[nodiscard]] generator<T, U>::promise_type
+	template<movable T>
+	class [[nodiscard]] Generator<T>::promise_type
 	{
 	public:
-		using coro_t = generator<T, U>;
-		using value_type = coro_t::yielded;
+		constexpr promise_type()
+			noexcept(nothrow_default_constructibles<T>)
+			requires default_initializables<T> = default;
+		constexpr ~promise_type() noexcept(nothrow_destructibles<T>) = default;
 
-		generator get_return_object() noexcept;
+		[[nodiscard]]
+		Generator<T> get_return_object()
+		{
+			return Generator{ handle_type::from_promise(*this) };
+		}
 
-		suspend_never initial_suspend() const noexcept
+		static suspend_always initial_suspend() noexcept
 		{
 			return {};
 		}
 
-		suspend_never final_suspend() noexcept
+		static suspend_always final_suspend() noexcept
 		{
 			return {};
 		}
 
-		suspend_always yield_value(yielded val) noexcept;
+		suspend_always yield_value(rvalue_reference value)
+			noexcept(nothrow_move_constructibles<T>)
+		{
+			currentValue = move(value);
+			return {};
+		}
 
-		suspend_always yield_value(const remove_reference_t<yielded>& lval)
-			requires std::is_rvalue_reference_v<yielded>&& constructible_from<remove_cvref_t<yielded>, const remove_reference_t<yielded>&>;
+		suspend_always yield_value(const_rvalue_reference value)
+			noexcept(nothrow_move_constructibles<const T>)
+		{
+			currentValue = move(value);
+			return {};
+		}
 
-		void return_void() const noexcept {}
+		suspend_always yield_value(const_reference value)
+			noexcept(nothrow_copy_constructibles<T>)
+			requires move_constructibles<T>
+		{
+			currentValue = value;
+			return {};
+		}
 
-		void unhandled_exception();
+		reference return_value() &
+			noexcept
+		{
+			return *currentValue;
+		}
 
+		const_reference return_value() const&
+			noexcept
+		{
+			return *currentValue;
+		}
+
+		rvalue_reference return_value() &&
+			noexcept(nothrow_move_constructibles<T>)
+		{
+			return *move(currentValue);
+		}
+
+		const_rvalue_reference return_value() const&&
+			noexcept(nothrow_move_constructibles<T>)
+		{
+			return *move(currentValue);
+		}
+
+		// Disallow co_await
 		void await_transform() = delete;
 
+		[[noreturn]]
+		static void unhandled_exception()
+		{
+			throw;
+		}
+
 	private:
-		add_pointer_t<yielded> myValue = nullptr;
-		std::exception_ptr lastError;
+		Monad<T> currentValue;
 	};
 
-	template<movable T, typename U>
-	class [[nodiscard]] generator<T, U>::iterator
+	template<movable T, typename Sentinel>
+	Generator<T> range(T first, const Sentinel last)
+		noexcept(nothrow_copy_constructibles<T>)
 	{
-	public:
-		using coro_t = generator<T, U>;
-		using value_type = coro_t::value_type;
-		using reference = coro_t::reference;
-		using const_reference = coro_t::const_reference;
-		using rvalue_reference = coro_t::rvalue_reference;
-		using rvalue_const_reference = coro_t::const_rvalue_reference;
-		using difference_type = ptrdiff_t;
-
-		[[nodiscard]]
-		coro_t::reference operator*() const noexcept(nothrow_copy_constructibles<reference>)
+		while (first < last)
 		{
-			return myCoroutine->promise().myValue;
+			co_yield first++;
 		}
-
-		iterator& operator++()
-		{
-			return *this;
-		}
-
-		void operator++(int)
-		{
-
-		}
-
-		[[nodiscard]]
-		friend bool operator==(iterator it, default_sentinel_t)
-		{
-			return true;
-		}
-
-		iterator(iterator&& other) noexcept = default;
-		iterator& operator=(iterator&& other) noexcept = default;
-
-	private:
-		coro_t* myCoroutine = nullptr;
-		coroutine_handle<promise_type> refHandle;
-	};
+	}
 }

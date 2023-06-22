@@ -1,5 +1,6 @@
 import Utility;
 import Utility.Print;
+import Utility.Coroutine;
 
 int main()
 {
@@ -16,6 +17,12 @@ int main()
 	constexpr auto sqrt3 = util::sqrt(1676.0);
 	constexpr auto sqrt4 = util::sqrt(16.0f);
 	util::Println("Testing square roots: {}, {}, {}, {}", sqrt1, sqrt2, sqrt3, sqrt4);
+
+	for (auto&& i : util::range('A', 'Z' + 1))
+	{
+		util::Print("{} ", i);
+	}
+	util::Println("");
 
 	return 0;
 }
