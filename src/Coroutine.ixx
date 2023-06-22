@@ -187,7 +187,7 @@ export namespace util::coroutine
 		handle_type coHandle;
 	};
 
-	template<typename Rng>
+	template<std::ranges::forward_range Rng>
 	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
 	{
 	public:
@@ -203,7 +203,24 @@ export namespace util::coroutine
 		using interface = std::ranges::view_interface<Enumerable<Rng>>;
 		using promise_type = default_promise<type>;
 		using handle_type = promise_type::handle_type;
+
+		template<std::ranges::forward_range Sng>
+		constexpr Enumerable(Enumerable<Sng>&& other) noexcept
+		{
+
+		}
+
+		Enumerable(const Enumerable& other) = delete;
+		constexpr Enumerable(Enumerable&& other) noexcept = default;
+		Enumerable& operator=(const Enumerable& other) = delete;
+		constexpr Enumerable& operator=(Enumerable&& other) noexcept = default;
+
+	private:
+		handle_type myHandle;
 	};
+
+	template<std::ranges::forward_range Rng>
+	Enumerable(Rng&&) -> Enumerable<Rng>;
 
 	template<movable T>
 	class [[nodiscard]] Generator
