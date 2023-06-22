@@ -27,21 +27,38 @@ int main()
 	util::Println("");
 
 	const std::vector<int> tttvec{ 0, 1, 2, 4, 5 };
-	auto it = tttvec.begin();
 
-	auto task = util::corepeat([&]() -> bool {
-		util::Println("{} ", *it);
+	// test 1
+	auto it1 = tttvec.begin();
+	auto task1 = util::corepeat(
+		[&]() noexcept -> bool {
+		util::Print("{} ", *it1);
 
-		++it;
+		++it1;
 
-		return it != tttvec.end();
+		return it1 != tttvec.end();
 	});
 
-	while (!task.Done())
+	while (!task1.Done())
 	{
-		task();
+		task1();
 	}
+	util::Println("");
 
+	// test 2
+	auto it2 = tttvec.rbegin();
+	auto task2 = util::corepeat_if<util::coexcution::Later>(
+		[&]() noexcept {
+		util::Print("{} ", *it2);
+		++it2;
+	}, [&]() noexcept -> bool {
+		return it2 != tttvec.rend();
+	});
+
+	while (!task2.Done())
+	{
+		task2();
+	}
 	util::Println("");
 
 	return 0;

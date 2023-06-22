@@ -513,7 +513,16 @@ export namespace util
 
 		while (predicate())
 		{
-			co_yield functor();
+			functor();
+
+			if constexpr (Policy == coexcution::Now)
+			{
+				co_await coroutine::suspend_never{};
+			}
+			else
+			{
+				co_await coroutine::suspend_always{};
+			}
 		}
 	}
 
