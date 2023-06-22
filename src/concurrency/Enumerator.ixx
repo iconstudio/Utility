@@ -1,11 +1,22 @@
+module;
+#include <ranges>
 export module Utility.Coroutine.Enumerator;
-import <ranges>;
 import Utility.Coroutine;
 
-export namespace util::coroutine
+namespace util::coroutine
 {
-	template<std::ranges::forward_range Rng>
-	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
+	template<typename Rng>
+	concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
+
+	namespace detail
+	{
+		template<typename Rng>
+		concept available_data = std::ranges::range<Rng> && std::contiguous_iterator<std::ranges::iterator_t<Rng>>;
+	}
+
+	export template<std::ranges::forward_range Rng>
+		requires movable<Rng>
+		class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
 	{
 	public:
 		using value_type = std::ranges::range_value_t<Rng>;
@@ -21,11 +32,60 @@ export namespace util::coroutine
 		using promise_type = DeferredValuePromise<type, value_type>;
 		using handle_type = promise_type::handle_type;
 
+		class iterator;
+		class const_iterator;
+
+		constexpr Enumerable()
+			noexcept(nothrow_default_constructibles<Rng>)
+			requires(default_initializable<Rng>) = default;
+		constexpr ~Enumerable()
+			noexcept(nothrow_destructibles<Rng>) = default;
+
 		template<std::ranges::forward_range Sng>
 		constexpr Enumerable(Enumerable<Sng>&& other) noexcept
 		{
 
 		}
+
+		[[nodiscard]]
+		inline iterator begin() noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr default_sentinel_t end() noexcept
+		{
+			return {};
+		}
+
+		[[nodiscard]]
+		inline const_iterator begin() const noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return const_iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr default_sentinel_t end() const noexcept
+		{
+			return {};
+		}
+
+		constexpr auto data()
+			requires detail::available_data<Rng>;
+
+		constexpr auto data() const
+			requires detail::available_data<const Rng>;
 
 		Enumerable(const Enumerable& other) = delete;
 		constexpr Enumerable(Enumerable&& other) noexcept = default;
@@ -34,6 +94,7 @@ export namespace util::coroutine
 
 	private:
 		handle_type myHandle;
+		Rng underlyingRange;
 	};
 
 	template<std::ranges::forward_range Rng>
@@ -46,10 +107,8 @@ inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumer
 export namespace util
 {
 	template<std::ranges::forward_range Rng>
-	inline coroutine::Enumerable<Rng> coenumerate(Rng&& range) noexcept
+	inline coroutine::Enumerable<Rng> coenumerate(add_const_t<Rng&&> range) noexcept
 	{
-		std::ranges::borrowed_range<Rng>;
-
 		for (auto&& it = range.begin(); it != range.end(); ++it)
 		{
 			co_yield *it;
