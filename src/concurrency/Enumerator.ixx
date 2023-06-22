@@ -18,7 +18,7 @@ export namespace util::coroutine
 
 		using type = Enumerable<Rng>;
 		using interface = std::ranges::view_interface<Enumerable<Rng>>;
-		using promise_type = ValuePromise<type>;
+		using promise_type = DeferredValuePromise<type, value_type>;
 		using handle_type = promise_type::handle_type;
 
 		template<std::ranges::forward_range Sng>

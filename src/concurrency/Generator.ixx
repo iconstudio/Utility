@@ -16,7 +16,7 @@ export namespace util::coroutine
 		using difference_type = ptrdiff_t;
 
 		using type = Generator<T>;
-		using promise_type = ValuePromise<type>;
+		using promise_type = DeferredValuePromise<type, value_type>;
 		using handle_type = promise_type::handle_type;
 
 		using iterator = ConstCoIterator<type>;
