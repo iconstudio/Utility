@@ -8,14 +8,6 @@ export namespace util::coroutine
 {
 	using ::std::default_sentinel_t;
 
-	template<typename T>
-	concept awaitable = requires(T t)
-	{
-		t.await_ready();
-		t.await_suspend();
-		t.await_resume();
-	};
-
 	class [[nodiscard]] DeferredTask
 	{
 	public:
