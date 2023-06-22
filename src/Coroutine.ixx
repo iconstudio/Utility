@@ -568,7 +568,7 @@ export namespace util
 		corepeat(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
-		return corepeat_if<coexcution::Later>(forward<Fn>(fn));
+		return corepeat_as<coexcution::Later>(forward<Fn>(fn));
 	}
 
 	template<movable T, equality_comparable_with<T> Guard>
