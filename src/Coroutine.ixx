@@ -143,6 +143,22 @@ export namespace util::coroutine
 			: myHandle(move(handle))
 		{}
 
+		[[nodiscard]]
+		bool Done() const noexcept
+		{
+			return myHandle.done();
+		}
+
+		void Resume() const noexcept
+		{
+			myHandle.resume();
+		}
+
+		void operator()() const noexcept
+		{
+			myHandle.resume();
+		}
+
 		~Task() noexcept
 		{
 			if (myHandle.done())

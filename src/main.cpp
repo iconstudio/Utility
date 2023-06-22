@@ -29,13 +29,18 @@ int main()
 	const std::vector<int> tttvec{ 0, 1, 2, 4, 5 };
 	auto it = tttvec.begin();
 
-	util::corepeat([&]() -> bool {
+	auto task = util::corepeat([&]() -> bool {
 		util::Println("{} ", *it);
 
 		++it;
 
 		return it == tttvec.end();
 	});
+
+	while (!task.Done())
+	{
+		task();
+	}
 	util::Println("");
 
 	return 0;
