@@ -1,8 +1,9 @@
 export module Utility.Coroutine;
 import <memory>;
-export import <coroutine>;
+import <coroutine>;
 export import Utility.Constraints;
 import Utility.Monad;
+export import :Promise;
 
 export namespace util::coroutine
 {
@@ -26,68 +27,6 @@ export namespace util::coroutine
 		t.await_suspend();
 		t.await_resume();
 	};
-
-	template<typename Coroutine>
-	struct [[nodiscard]] DeferredPromise
-	{
-		Coroutine get_return_object()
-		{
-			return Coroutine{ coroutine_handle<DeferredPromise>::from_promise(*this) };
-		}
-
-		static suspend_always initial_suspend() noexcept
-		{
-			return {};
-		}
-
-		static suspend_always final_suspend() noexcept
-		{
-			return {};
-		}
-
-		[[noreturn]]
-		void return_void() const noexcept {}
-
-		[[noreturn]]
-		static void unhandled_exception()
-		{
-			throw;
-		}
-	};
-
-	template<typename Coroutine>
-	struct [[nodiscard]] RelaxedPromise
-	{
-		Coroutine get_return_object()
-		{
-			return Coroutine{ coroutine_handle<RelaxedPromise>::from_promise(*this) };
-		}
-
-		static suspend_never initial_suspend() noexcept
-		{
-			return {};
-		}
-
-		static suspend_always final_suspend() noexcept
-		{
-			return {};
-		}
-
-		[[noreturn]]
-		void return_void() const noexcept {}
-
-		[[noreturn]]
-		static void unhandled_exception()
-		{
-			throw;
-		}
-	};
-
-	template<typename Coroutine>
-	using defer = DeferredPromise<Coroutine>;
-
-	template<typename Coroutine>
-	using relax = RelaxedPromise<Coroutine>;
 
 	class [[nodiscard]] DeferredTask
 	{
