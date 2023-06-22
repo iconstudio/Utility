@@ -340,15 +340,12 @@ export namespace util::coroutine
 
 export namespace util
 {
-	enum class coexcution
-	{
-		Now, Later
-	};
+	using coroutine::coexecution;
 
-	template<coexcution Policy>
-	using Cowork = conditional_t<Policy == coexcution::Now, coroutine::RelaxedTask, coroutine::DeferredTask>;
+	template<coexecution Policy>
+	using Cowork = conditional_t<Policy == coexecution::Now, coroutine::RelaxedTask, coroutine::DeferredTask>;
 
-	template<coexcution Policy, typename Fn, typename Pred>
+	template<coexecution Policy, typename Fn, typename Pred>
 		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
 	inline
 		Cowork<Policy>
@@ -362,7 +359,7 @@ export namespace util
 		{
 			functor();
 
-			if constexpr (Policy == coexcution::Now)
+			if constexpr (Policy == coexecution::Now)
 			{
 				co_await coroutine::suspend_never{};
 			}
@@ -380,10 +377,10 @@ export namespace util
 		corepeat_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
-		return corepeat_as_if<coexcution::Later>(forward<Fn>(fn), forward<Pred>(pred));
+		return corepeat_as_if<coexecution::Later>(forward<Fn>(fn), forward<Pred>(pred));
 	}
 
-	template<coexcution Policy, r_invocables<bool> Fn>
+	template<coexecution Policy, r_invocables<bool> Fn>
 	inline
 		coroutine::RelaxedTask
 		corepeat_as(Fn&& fn)
@@ -398,7 +395,7 @@ export namespace util
 				co_return;
 			}
 
-			if constexpr (Policy == coexcution::Now)
+			if constexpr (Policy == coexecution::Now)
 			{
 				co_await coroutine::suspend_never{};
 			}
@@ -415,7 +412,7 @@ export namespace util
 		corepeat(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
-		return corepeat_as<coexcution::Later>(forward<Fn>(fn));
+		return corepeat_as<coexecution::Later>(forward<Fn>(fn));
 	}
 }
 
