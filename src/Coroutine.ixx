@@ -2,10 +2,10 @@ export module Utility.Coroutine;
 export import <ranges>;
 export import <coroutine>;
 export import Utility.Traits;
-import Utility.Constraints;
+export import Utility.Constraints;
 import Utility.Monad;
 
-export namespace util
+export namespace util::coroutine
 {
 	using ::std::coroutine_traits;
 	using ::std::coroutine_handle;
@@ -100,8 +100,8 @@ export namespace util
 		Monad<value_type> currentValue;
 	};
 
-	template<movable T>
-	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<T>>
+	template<typename Rng>
+	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
 	{};
 
 	template<movable T>
@@ -279,14 +279,26 @@ export namespace util
 	private:
 		handle_type myHandle;
 	};
+}
 
-	template<movable T, typename Sentinel>
-	inline Generator<T> cogenerate(T first, const Sentinel last)
+export namespace util
+{
+	template<movable T, typename Guard>
+	inline coroutine::Generator<T> cogenerate(T first, const Guard last)
 		noexcept(nothrow_copy_constructibles<T>)
 	{
 		while (first != last)
 		{
 			co_yield first++;
+		}
+	}
+
+	template<std::ranges::forward_range Rng>
+	inline coroutine::Enumerable<Rng> coenumerate(Rng&& range) noexcept
+	{
+		for (auto&& it = range.begin(); it != range.end(); ++it)
+		{
+			co_yield *it;
 		}
 	}
 }
@@ -296,7 +308,7 @@ namespace util::test
 {
 	void test_coroutines()
 	{
-		const Generator aa = cogenerate(1, 10);
+		const coroutine::Generator aa = cogenerate(1, 10);
 
 		for (auto&& val : aa)
 		{
