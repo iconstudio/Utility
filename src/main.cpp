@@ -41,7 +41,7 @@ int main()
 		return it1 != tttvec.end();
 	});
 
-	while (!task1.Done())
+	while (!task1.IsDone())
 	{
 		task1();
 	}
@@ -57,7 +57,7 @@ int main()
 		return it2 != tttvec.rend();
 	});
 
-	while (!task2.Done())
+	while (!task2.IsDone())
 	{
 		task2();
 	}
