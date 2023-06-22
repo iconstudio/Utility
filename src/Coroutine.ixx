@@ -100,9 +100,110 @@ export namespace util::coroutine
 		Monad<value_type> currentValue;
 	};
 
+	template<typename Coroutine>
+	class ConstCoIterator
+	{
+	public:
+		using coro_type = Coroutine;
+		using handle_type = coro_type::handle_type;
+
+		using iterator_concept = std::forward_iterator_tag;
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = coro_type::value_type;
+		using reference = coro_type::reference;
+		using const_reference = coro_type::const_reference;
+		using rvalue_reference = coro_type::rvalue_reference;
+		using const_rvalue_reference = coro_type::const_rvalue_reference;
+		using size_type = coro_type::size_type;
+		using difference_type = coro_type::difference_type;
+
+		constexpr ConstCoIterator()
+			noexcept(nothrow_default_constructibles<handle_type>)
+			requires default_initializables<handle_type> = default;
+		constexpr ~ConstCoIterator() noexcept(nothrow_destructibles<handle_type>) = default;
+
+		explicit constexpr ConstCoIterator(const handle_type& coroutine) noexcept
+			: coHandle(coroutine)
+		{}
+
+		explicit constexpr ConstCoIterator(handle_type&& coroutine) noexcept
+			: coHandle(move(coroutine))
+		{}
+
+		inline ConstCoIterator& operator++()
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int)
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+		}
+
+		inline const ConstCoIterator& operator++() const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int) const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+		}
+
+		inline const_reference operator*() const&
+		{
+			return *(coHandle.promise().currentValue);
+		}
+
+		inline rvalue_reference operator*() &&
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			return *move(coHandle.promise().currentValue);
+		}
+
+		[[nodiscard]]
+		inline bool operator==(default_sentinel_t) const
+		{
+			return !coHandle || coHandle.done();
+		}
+
+	private:
+		handle_type coHandle;
+	};
+
 	template<typename Rng>
 	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
-	{};
+	{
+	public:
+		using value_type = std::ranges::range_value_t<Rng>;
+		using reference = std::ranges::range_reference_t<Rng>;
+		using const_reference = std::ranges::range_reference_t<const Rng>;
+		using rvalue_reference = std::ranges::range_rvalue_reference_t<Rng>;
+		using const_rvalue_reference = std::ranges::range_rvalue_reference_t<const Rng>;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+
+		using type = Enumerable<Rng>;
+		using interface = std::ranges::view_interface<Enumerable<Rng>>;
+		using promise_type = default_promise<type>;
+		using handle_type = promise_type::handle_type;
+	};
 
 	template<movable T>
 	class [[nodiscard]] Generator
@@ -116,77 +217,11 @@ export namespace util::coroutine
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
-		using interface = std::ranges::view_interface<Generator<T>>;
-		using promise_type = default_promise<Generator<T>>;
+		using type = Generator<T>;
+		using promise_type = default_promise<type>;
 		using handle_type = promise_type::handle_type;
 
-		class iterator
-		{
-		public:
-			using coro_type = Generator<T>;
-			using handle_type = coro_type::handle_type;
-
-			using iterator_concept = std::forward_iterator_tag;
-			using iterator_category = std::forward_iterator_tag;
-			using value_type = coro_type::value_type;
-			using reference = coro_type::reference;
-			using const_reference = coro_type::const_reference;
-			using rvalue_reference = coro_type::rvalue_reference;
-			using const_rvalue_reference = coro_type::const_rvalue_reference;
-			using size_type = coro_type::size_type;
-			using difference_type = coro_type::difference_type;
-
-			constexpr iterator()
-				noexcept(nothrow_default_constructibles<handle_type>)
-				requires default_initializables<handle_type> = default;
-			constexpr ~iterator() noexcept(nothrow_destructibles<handle_type>) = default;
-
-			explicit constexpr iterator(const handle_type& coroutine) noexcept
-				: coHandle(coroutine)
-			{}
-
-			explicit constexpr iterator(handle_type&& coroutine) noexcept
-				: coHandle(move(coroutine))
-			{}
-
-			inline iterator& operator++()
-			{
-				if (!coHandle.done())
-				{
-					coHandle.resume();
-				}
-
-				return *this;
-			}
-
-			inline void operator++(int)
-			{
-				if (!coHandle.done())
-				{
-					coHandle.resume();
-				}
-			}
-
-			inline const_reference operator*() const&
-			{
-				return *(coHandle.promise().currentValue);
-			}
-
-			inline rvalue_reference operator*() &&
-				noexcept(nothrow_move_constructibles<value_type>)
-			{
-				return *move(coHandle.promise().currentValue);
-			}
-
-			[[nodiscard]]
-			inline bool operator==(default_sentinel_t) const
-			{
-				return !coHandle || coHandle.done();
-			}
-
-		private:
-			handle_type coHandle;
-		};
+		using iterator = ConstCoIterator<type>;
 		using const_iterator = iterator;
 
 		inline Generator() noexcept = default;
