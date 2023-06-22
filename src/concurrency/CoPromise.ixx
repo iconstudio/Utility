@@ -112,18 +112,21 @@ export namespace util::coroutine
 		using rvalue_reference = value_type&&;
 		using const_rvalue_reference = const value_type&&;
 
-		constexpr PromiseTemplate() noexcept = default;
-		constexpr ~PromiseTemplate() noexcept = default;
+		constexpr PromiseTemplate()
+			noexcept(nothrow_default_constructibles<value_type>)
+			requires default_initializable<value_type> = default;
+		constexpr ~PromiseTemplate()
+			noexcept(nothrow_destructibles<value_type>) = default;
 
 		Final yield_value(rvalue_reference value)
-			noexcept(nothrow_move_constructibles<value_type>)
+			noexcept(nothrow_move_assignables<value_type>)
 		{
 			currentValue = static_cast<rvalue_reference>(value);
 			return {};
 		}
 
 		Final yield_value(const_rvalue_reference value)
-			noexcept(nothrow_move_constructibles<const value_type>)
+			noexcept(nothrow_move_assignables<const value_type>)
 			requires move_constructibles<const value_type>
 		{
 			currentValue = static_cast<const_rvalue_reference>(value);
@@ -131,7 +134,7 @@ export namespace util::coroutine
 		}
 
 		Final yield_value(const_reference value)
-			noexcept(nothrow_copy_constructibles<value_type>)
+			noexcept(nothrow_copy_assignables<value_type>)
 			requires move_constructibles<value_type>
 		{
 			currentValue = value;
