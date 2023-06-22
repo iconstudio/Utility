@@ -47,7 +47,7 @@ int main()
 
 	// test 2
 	auto it2 = tttvec.rbegin();
-	auto task2 = util::corepeat_if<util::coexcution::Later>(
+	auto task2 = util::corepeat_as_if<util::coexcution::Later>(
 		[&]() noexcept {
 		util::Print("{} ", *it2);
 		++it2;

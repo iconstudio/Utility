@@ -505,7 +505,7 @@ export namespace util
 		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
 	inline
 		Cowork<Policy>
-		corepeat_if(Fn&& fn, Pred&& pred)
+		corepeat_as_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
 		Fn functor = forward<Fn>(fn);
@@ -530,16 +530,16 @@ export namespace util
 		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
 	inline
 		auto
-		corepeat(Fn&& fn, Pred&& pred)
+		corepeat_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
-		return corepeat_if<coexcution::Later>(forward<Fn>(fn), forward<Pred>(pred));
+		return corepeat_as_if<coexcution::Later>(forward<Fn>(fn), forward<Pred>(pred));
 	}
 
 	template<coexcution Policy, r_invocables<bool> Fn>
 	inline
 		coroutine::RelaxedTask
-		corepeat_if(Fn&& fn)
+		corepeat_as(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
 		Fn functor = forward<Fn>(fn);
