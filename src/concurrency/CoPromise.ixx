@@ -1,5 +1,7 @@
 export module Utility.Coroutine:Promise;
+import <iterator>;
 import <coroutine>;
+import Utility;
 import Utility.Constraints;
 import Utility.Monad;
 
@@ -73,6 +75,92 @@ export namespace util::coroutine
 			return {};
 		}
 	};
+
+	template<movable Storage>
+	class Borrower;
+
+	template<std::indirectly_readable Storage>
+	class Borrower<Storage>
+	{
+	public:
+		constexpr Borrower()
+			noexcept(nothrow_default_constructibles<Storage>)
+			requires default_initializable<Storage> = default;
+		constexpr ~Borrower()
+			noexcept(nothrow_destructibles<Storage>) = default;
+
+		template<std::indirectly_readable S>
+			requires (constructible_from<Storage, S&&> || constructible_from<Storage, std::indirect_result_t<S&&>>)
+		explicit(!is_trivially_constructible_v<Storage, S&&>)
+			constexpr Borrower(S&& storage)
+			noexcept(nothrow_constructibles<Storage, S&&>)
+			: currentValue(static_cast<S&&>(storage))
+		{}
+
+		template<movable V>
+			requires (constructible_from<Storage, V&&> && !std::indirectly_readable<V>)
+		explicit(!is_trivially_constructible_v<Storage, V&&>)
+			constexpr Borrower(V&& value)
+			noexcept(nothrow_constructibles<Storage, V&&>)
+			: currentValue(static_cast<V&&>(value))
+		{}
+
+		Storage& Get() &
+			noexcept(nothrow_copy_constructibles<Storage>)
+			requires(copy_constructible<Storage>)
+		{ return currentValue; }
+
+		const Storage& Get() const&
+			noexcept(nothrow_copy_constructibles<Storage>)
+			requires(copy_constructible<Storage>)
+		{ return currentValue; }
+
+		Storage&& Get() &&
+			noexcept(nothrow_move_constructibles<Storage>)
+			requires(move_constructible<Storage>)
+		{ return move(currentValue); }
+
+		const Storage&& Get() const&&
+			noexcept(nothrow_move_constructibles<Storage>)
+			requires(move_constructible<Storage>)
+		{ return move(currentValue); }
+
+	protected:
+		Storage currentValue;
+	};
+
+	template<typename T>
+	class Yielder;
+
+	template<typename T>
+	class Yielder
+	{
+	public:
+		using pure_value_type = T;
+		using value_type = T&&;
+		using reference = add_lvalue_reference_t<T&&>;
+		using const_reference = const add_lvalue_reference_t<T&&>;
+		using rvalue_reference = add_rvalue_reference_t<T&&>;
+		using const_rvalue_reference = add_rvalue_reference_t<const T&&>;
+
+		constexpr Yielder()
+			noexcept(nothrow_default_constructibles<value_type>)
+			requires default_initializable<value_type> = default;
+		constexpr ~Yielder()
+			noexcept(nothrow_destructibles<value_type>) = default;
+
+		template<typename U>
+			requires constructible_from<value_type, U&&>
+		constexpr Yielder(U&& value)
+			noexcept(nothrow_constructibles<value_type, U&&>)
+			: current(static_cast<U&&>(value))
+		{}
+
+		T&& current;
+	};
+
+	template<movable T>
+	Yielder(T&&) -> Yielder<T&&>;
 
 	template<typename Coroutine
 		, awaitable Init = std::suspend_always, awaitable Final = std::suspend_always
@@ -155,6 +243,9 @@ export namespace util::coroutine
 
 	template<classes Coroutine>
 	using RelaxedPromise = PromiseTemplate<Coroutine, std::suspend_never, std::suspend_always>;
+
+	template<classes Coroutine, awaitable Init, awaitable Final, movable Value>
+	using LvaluePromise = PromiseTemplate<Coroutine, Init, Final, Value&>;
 
 	template<classes Coroutine, awaitable Init, awaitable Final, movable Value>
 	using ValuePromise = PromiseTemplate<Coroutine, Init, Final, Value>;

@@ -66,5 +66,8 @@ int main()
 	// test 3
 	auto task3 = util::coenumerate(std::vector{ 3, 4, 5, 6, 7, 8, 9 });
 
+	// test 4
+	const util::coroutine::Yielder yielder1{4};
+
 	return 0;
 }
