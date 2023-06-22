@@ -29,32 +29,6 @@ export namespace util::coroutine
 		t.await_resume();
 	};
 
-	class Task
-	{
-	public:
-		using type = Task;
-		using promise_type = noop_coroutine_promise;
-		using handle_type = noop_coroutine_handle;
-
-		explicit constexpr Task(const handle_type& handle) noexcept
-			: myHandle(handle)
-		{}
-
-		explicit constexpr Task(handle_type&& handle) noexcept
-			: myHandle(move(handle))
-		{}
-
-		~Task() noexcept
-		{
-			if (myHandle.done())
-			{
-				myHandle.destroy();
-			}
-		}
-
-		handle_type myHandle;
-	};
-
 	template<typename Coroutine>
 	class [[nodiscard]] default_promise
 	{
@@ -113,6 +87,7 @@ export namespace util::coroutine
 			return {};
 		}
 
+		[[noreturn]]
 		void return_void() const noexcept {}
 
 		[[noreturn]]
@@ -125,6 +100,58 @@ export namespace util::coroutine
 		void await_transform() = delete;
 
 		Monad<value_type> currentValue;
+	};
+
+	template<typename T>
+	class Task
+	{
+	public:
+		using type = Task<T>;
+		struct promise_type
+		{
+			Task get_return_object()
+			{
+				return Task{ coroutine_handle<promise_type>::from_promise(*this) };
+			}
+
+			static suspend_always initial_suspend() noexcept
+			{
+				return {};
+			}
+
+			static suspend_never final_suspend() noexcept
+			{
+				return {};
+			}
+
+			[[noreturn]]
+			void return_void() const noexcept {}
+
+			[[noreturn]]
+			static void unhandled_exception()
+			{
+				throw;
+			}
+		};
+		using handle_type = coroutine_handle<promise_type>;
+
+		explicit constexpr Task(const handle_type& handle) noexcept
+			: myHandle(handle)
+		{}
+
+		explicit constexpr Task(handle_type&& handle) noexcept
+			: myHandle(move(handle))
+		{}
+
+		~Task() noexcept
+		{
+			if (myHandle.done())
+			{
+				myHandle.destroy();
+			}
+		}
+
+		handle_type myHandle;
 	};
 
 	template<typename Coroutine>
@@ -364,7 +391,9 @@ export namespace util
 {
 	template<typename Fn, typename Pred>
 		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
-	inline coroutine::Task corepeat(Fn&& fn, Pred&& pred)
+	inline
+		coroutine::Task<invoke_result_t<Fn>>
+		corepeat(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
 		Fn functor = forward<Fn>(fn);
@@ -377,14 +406,20 @@ export namespace util
 	}
 
 	template<typename Fn>
-		requires invocables<Fn>&& convertible_to<invoke_result_t<Fn>, bool>
-	inline coroutine::Task corepeat(Fn&& fn)
+		requires invocables<Fn>
+	inline
+		coroutine::Task<void>
+		corepeat(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
 		Fn functor = forward<Fn>(fn);
 
-		for (bool condition = functor(); condition; condition = functor())
-		{}
+		while (true)
+		{
+			functor();
+
+			co_await coroutine::suspend_always{};
+		}
 	}
 
 	template<movable T, equality_comparable_with<T> Guard>

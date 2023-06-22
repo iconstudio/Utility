@@ -27,6 +27,16 @@ int main()
 	util::Println("");
 
 	const std::vector<int> tttvec{ 0, 1, 2, 4, 5 };
+	auto it = tttvec.begin();
+
+	util::corepeat([&]() -> bool {
+		util::Println("{} ", *it);
+
+		++it;
+
+		return it == tttvec.end();
+	});
+	util::Println("");
 
 	return 0;
 }
