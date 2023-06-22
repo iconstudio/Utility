@@ -101,7 +101,11 @@ export namespace util
 	};
 
 	template<movable T>
-	class [[nodiscard]] Generator : std::ranges::view_interface<Generator<T>>
+	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<T>>
+	{};
+
+	template<movable T>
+	class [[nodiscard]] Generator : public std::ranges::view_interface<Generator<T>>
 	{
 	public:
 		using value_type = clean_t<T>;
