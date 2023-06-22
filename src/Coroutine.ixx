@@ -281,7 +281,7 @@ export namespace util
 	};
 
 	template<movable T, typename Sentinel>
-	inline Generator<T> range(T first, const Sentinel last)
+	inline Generator<T> cogenerate(T first, const Sentinel last)
 		noexcept(nothrow_copy_constructibles<T>)
 	{
 		while (first != last)
@@ -296,7 +296,7 @@ namespace util::test
 {
 	void test_coroutines()
 	{
-		const Generator aa = range(1, 10);
+		const Generator aa = cogenerate(1, 10);
 
 		for (auto&& val : aa)
 		{
