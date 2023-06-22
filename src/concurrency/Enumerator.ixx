@@ -1,6 +1,7 @@
 module;
 #include <ranges>
 export module Utility.Coroutine.Enumerator;
+import Utility;
 import Utility.Coroutine;
 
 namespace util::coroutine
@@ -11,12 +12,29 @@ namespace util::coroutine
 	namespace detail
 	{
 		template<typename Rng>
-		concept available_data = std::ranges::range<Rng> && std::contiguous_iterator<std::ranges::iterator_t<Rng>>;
+		concept available_data = enumerable<Rng>
+			&& std::contiguous_iterator<std::ranges::iterator_t<Rng>>
+			&& requires(Rng & range)
+		{
+			range.data();
+		};
+
+		template<typename Rng>
+		struct noexcept_data
+		{
+			static constexpr bool value = false;
+		};
+
+		template<available_data Rng>
+		struct noexcept_data<Rng>
+		{
+			static constexpr bool value = noexcept(declval<Rng>().data());
+		};
 	}
 
-	export template<std::ranges::forward_range Rng>
+	export template<enumerable Rng>
 		requires movable<Rng>
-		class [[nodiscard]] Enumerator : public std::ranges::view_interface<Enumerator<Rng>>
+	class [[nodiscard]] Enumerator : public std::ranges::view_interface<Enumerator<Rng>>
 	{
 	public:
 		using value_type = std::ranges::range_value_t<Rng>;
@@ -41,7 +59,7 @@ namespace util::coroutine
 		constexpr ~Enumerator()
 			noexcept(nothrow_destructibles<Rng>) = default;
 
-		template<std::ranges::forward_range Sng>
+		template<enumerable Sng>
 		constexpr Enumerator(Enumerator<Sng>&& other) noexcept
 		{
 
@@ -81,16 +99,28 @@ namespace util::coroutine
 			return {};
 		}
 
+		[[nodiscard]]
 		constexpr auto data()
-			requires detail::available_data<Rng>;
+			noexcept(detail::noexcept_data<Rng>::value)
+			requires detail::available_data<Rng>
+		{
+			return underlyingRange.data();
+		}
 
+		[[nodiscard]]
 		constexpr auto data() const
-			requires detail::available_data<const Rng>;
+			noexcept(detail::noexcept_data<Rng>::value)
+			requires detail::available_data<const Rng>
+		{
+			return underlyingRange.data();
+		}
 
 		Enumerator(const Enumerator& other) = delete;
-		constexpr Enumerator(Enumerator&& other) noexcept = default;
+		constexpr Enumerator(Enumerator&& other)
+			noexcept(nothrow_move_constructibles<Rng, handle_type>) = default;
 		Enumerator& operator=(const Enumerator& other) = delete;
-		constexpr Enumerator& operator=(Enumerator&& other) noexcept = default;
+		constexpr Enumerator& operator=(Enumerator&& other)
+			noexcept(nothrow_move_assignables<Rng, handle_type>) = default;
 
 	private:
 		handle_type myHandle;
