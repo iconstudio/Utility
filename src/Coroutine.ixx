@@ -2,7 +2,6 @@ export module Utility.Coroutine;
 import <memory>;
 import <ranges>;
 export import <coroutine>;
-export import Utility.Traits;
 export import Utility.Constraints;
 import Utility.Monad;
 
