@@ -1,5 +1,6 @@
 export module Utility.Coroutine;
-export import <ranges>;
+import <memory>;
+import <ranges>;
 export import <coroutine>;
 export import Utility.Traits;
 export import Utility.Constraints;
@@ -26,6 +27,32 @@ export namespace util::coroutine
 		t.await_ready();
 		t.await_suspend();
 		t.await_resume();
+	};
+
+	class Task
+	{
+	public:
+		using type = Task;
+		using promise_type = noop_coroutine_promise;
+		using handle_type = noop_coroutine_handle;
+
+		explicit constexpr Task(const handle_type& handle) noexcept
+			: myHandle(handle)
+		{}
+
+		explicit constexpr Task(handle_type&& handle) noexcept
+			: myHandle(move(handle))
+		{}
+
+		~Task() noexcept
+		{
+			if (myHandle.done())
+			{
+				myHandle.destroy();
+			}
+		}
+
+		handle_type myHandle;
 	};
 
 	template<typename Coroutine>
@@ -335,6 +362,31 @@ export namespace util::coroutine
 
 export namespace util
 {
+	template<typename Fn, typename Pred>
+		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
+	inline coroutine::Task corepeat(Fn&& fn, Pred&& pred)
+		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
+	{
+		Fn functor = forward<Fn>(fn);
+		Pred predicate = forward<Pred>(pred);
+
+		while (predicate())
+		{
+			co_yield functor();
+		}
+	}
+
+	template<typename Fn>
+		requires invocables<Fn>&& convertible_to<invoke_result_t<Fn>, bool>
+	inline coroutine::Task corepeat(Fn&& fn)
+		noexcept(nothrow_invocables<Fn>)
+	{
+		Fn functor = forward<Fn>(fn);
+
+		for (bool condition = functor(); condition; condition = functor())
+		{}
+	}
+
 	template<movable T, equality_comparable_with<T> Guard>
 	inline coroutine::Generator<T> cogenerate(T first, const Guard last)
 		noexcept(nothrow_copy_constructibles<T>)
