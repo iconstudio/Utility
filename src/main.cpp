@@ -29,7 +29,7 @@ int main()
 	const std::vector<int> tttvec{ 0, 1, 2, 4, 5 };
 	auto it = tttvec.begin();
 
-	auto task = util::corepeat_for([&]() -> bool {
+	auto task = util::corepeat([&]() -> bool {
 		util::Println("{} ", *it);
 
 		++it;

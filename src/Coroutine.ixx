@@ -30,29 +30,11 @@ export namespace util::coroutine
 	};
 
 	template<typename Coroutine>
-	class [[nodiscard]] default_promise
+	struct [[nodiscard]] DeferredPromise
 	{
-	public:
-		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<default_promise<Coroutine>>;
-
-		using value_type = coro_type::value_type;
-		using reference = coro_type::reference;
-		using const_reference = coro_type::const_reference;
-		using rvalue_reference = coro_type::rvalue_reference;
-		using const_rvalue_reference = coro_type::const_rvalue_reference;
-		using size_type = coro_type::size_type;
-		using difference_type = coro_type::difference_type;
-
-		constexpr default_promise()
-			noexcept(nothrow_default_constructibles<value_type>)
-			requires default_initializables<value_type> = default;
-		constexpr ~default_promise() noexcept(nothrow_destructibles<value_type>) = default;
-
-		[[nodiscard]]
-		coro_type get_return_object() noexcept
+		Coroutine get_return_object()
 		{
-			return coro_type{ handle_type::from_promise(*this) };
+			return Coroutine{ coroutine_handle<DeferredPromise>::from_promise(*this) };
 		}
 
 		static suspend_always initial_suspend() noexcept
@@ -65,25 +47,31 @@ export namespace util::coroutine
 			return {};
 		}
 
-		suspend_always yield_value(rvalue_reference value)
-			noexcept(nothrow_move_constructibles<value_type>)
+		[[noreturn]]
+		void return_void() const noexcept {}
+
+		[[noreturn]]
+		static void unhandled_exception()
 		{
-			currentValue = move(value);
+			throw;
+		}
+	};
+
+	template<typename Coroutine>
+	struct [[nodiscard]] RelaxedPromise
+	{
+		Coroutine get_return_object()
+		{
+			return Coroutine{ coroutine_handle<RelaxedPromise>::from_promise(*this) };
+		}
+
+		static suspend_never initial_suspend() noexcept
+		{
 			return {};
 		}
 
-		suspend_always yield_value(const_rvalue_reference value)
-			noexcept(nothrow_move_constructibles<const value_type>)
+		static suspend_always final_suspend() noexcept
 		{
-			currentValue = move(value);
-			return {};
-		}
-
-		suspend_always yield_value(const_reference value)
-			noexcept(nothrow_copy_constructibles<value_type>)
-			requires move_constructibles<value_type>
-		{
-			currentValue = value;
 			return {};
 		}
 
@@ -95,51 +83,25 @@ export namespace util::coroutine
 		{
 			throw;
 		}
-
-		// Disallow co_await
-		void await_transform() = delete;
-
-		Monad<value_type> currentValue;
 	};
 
-	template<typename T>
-	class Task
+	template<typename Coroutine>
+	using defer = DeferredPromise<Coroutine>;
+
+	template<typename Coroutine>
+	using relax = RelaxedPromise<Coroutine>;
+
+	class [[nodiscard]] DeferredTask
 	{
 	public:
-		using type = Task<T>;
-		struct promise_type
-		{
-			Task get_return_object()
-			{
-				return Task{ coroutine_handle<promise_type>::from_promise(*this) };
-			}
-
-			static suspend_always initial_suspend() noexcept
-			{
-				return {};
-			}
-
-			static suspend_always final_suspend() noexcept
-			{
-				return {};
-			}
-
-			[[noreturn]]
-			void return_void() const noexcept {}
-
-			[[noreturn]]
-			static void unhandled_exception()
-			{
-				throw;
-			}
-		};
+		using promise_type = defer<DeferredTask>;
 		using handle_type = coroutine_handle<promise_type>;
 
-		explicit constexpr Task(const handle_type& handle) noexcept
+		explicit constexpr DeferredTask(const handle_type& handle) noexcept
 			: myHandle(handle)
 		{}
 
-		explicit constexpr Task(handle_type&& handle) noexcept
+		explicit constexpr DeferredTask(handle_type&& handle) noexcept
 			: myHandle(move(handle))
 		{}
 
@@ -162,7 +124,51 @@ export namespace util::coroutine
 			Resume();
 		}
 
-		~Task() noexcept
+		~DeferredTask() noexcept
+		{
+			if (myHandle.done())
+			{
+				myHandle.destroy();
+			}
+		}
+
+		handle_type myHandle;
+	};
+
+	class [[nodiscard]] RelaxedTask
+	{
+	public:
+		using promise_type = relax<RelaxedTask>;
+		using handle_type = coroutine_handle<promise_type>;
+
+		explicit constexpr RelaxedTask(const handle_type& handle) noexcept
+			: myHandle(handle)
+		{}
+
+		explicit constexpr RelaxedTask(handle_type&& handle) noexcept
+			: myHandle(move(handle))
+		{}
+
+		[[nodiscard]]
+		bool Done() const noexcept
+		{
+			return myHandle.done();
+		}
+
+		void Resume() const noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+		}
+
+		void operator()() const noexcept
+		{
+			Resume();
+		}
+
+		~RelaxedTask() noexcept
 		{
 			if (myHandle.done())
 			{
@@ -260,6 +266,79 @@ export namespace util::coroutine
 		handle_type coHandle;
 	};
 
+	template<typename Coroutine>
+	class [[nodiscard]] ValuePromise
+	{
+	public:
+		using coro_type = Coroutine;
+		using handle_type = std::coroutine_handle<ValuePromise<Coroutine>>;
+
+		using value_type = coro_type::value_type;
+		using reference = coro_type::reference;
+		using const_reference = coro_type::const_reference;
+		using rvalue_reference = coro_type::rvalue_reference;
+		using const_rvalue_reference = coro_type::const_rvalue_reference;
+		using size_type = coro_type::size_type;
+		using difference_type = coro_type::difference_type;
+
+		constexpr ValuePromise()
+			noexcept(nothrow_default_constructibles<value_type>)
+			requires default_initializables<value_type> = default;
+		constexpr ~ValuePromise() noexcept(nothrow_destructibles<value_type>) = default;
+
+		[[nodiscard]]
+		coro_type get_return_object() noexcept
+		{
+			return coro_type{ handle_type::from_promise(*this) };
+		}
+
+		static suspend_always initial_suspend() noexcept
+		{
+			return {};
+		}
+
+		static suspend_always final_suspend() noexcept
+		{
+			return {};
+		}
+
+		suspend_always yield_value(rvalue_reference value)
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			currentValue = move(value);
+			return {};
+		}
+
+		suspend_always yield_value(const_rvalue_reference value)
+			noexcept(nothrow_move_constructibles<const value_type>)
+		{
+			currentValue = move(value);
+			return {};
+		}
+
+		suspend_always yield_value(const_reference value)
+			noexcept(nothrow_copy_constructibles<value_type>)
+			requires move_constructibles<value_type>
+		{
+			currentValue = value;
+			return {};
+		}
+
+		[[noreturn]]
+		void return_void() const noexcept {}
+
+		[[noreturn]]
+		static void unhandled_exception()
+		{
+			throw;
+		}
+
+		// Disallow co_await
+		void await_transform() = delete;
+
+		Monad<value_type> currentValue;
+	};
+
 	template<std::ranges::forward_range Rng>
 	class [[nodiscard]] Enumerable : public std::ranges::view_interface<Enumerable<Rng>>
 	{
@@ -274,7 +353,7 @@ export namespace util::coroutine
 
 		using type = Enumerable<Rng>;
 		using interface = std::ranges::view_interface<Enumerable<Rng>>;
-		using promise_type = default_promise<type>;
+		using promise_type = ValuePromise<type>;
 		using handle_type = promise_type::handle_type;
 
 		template<std::ranges::forward_range Sng>
@@ -308,7 +387,7 @@ export namespace util::coroutine
 		using difference_type = ptrdiff_t;
 
 		using type = Generator<T>;
-		using promise_type = default_promise<type>;
+		using promise_type = ValuePromise<type>;
 		using handle_type = promise_type::handle_type;
 
 		using iterator = ConstCoIterator<type>;
@@ -414,11 +493,19 @@ export namespace util::coroutine
 
 export namespace util
 {
-	template<typename Fn, typename Pred>
+	enum class coexcution
+	{
+		Now, Later
+	};
+
+	template<coexcution Policy>
+	using Cowork = conditional_t<Policy == coexcution::Now, coroutine::RelaxedTask, coroutine::DeferredTask>;
+
+	template<coexcution Policy, typename Fn, typename Pred>
 		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
 	inline
-		coroutine::Task<invoke_result_t<Fn>>
-		corepeat(Fn&& fn, Pred&& pred)
+		Cowork<Policy>
+		corepeat_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
 		Fn functor = forward<Fn>(fn);
@@ -430,10 +517,20 @@ export namespace util
 		}
 	}
 
-	template<r_invocables<void> Fn>
+	template<typename Fn, typename Pred>
+		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
 	inline
-		coroutine::Task<void>
-		corepeat_for(Fn&& fn)
+		auto
+		corepeat(Fn&& fn, Pred&& pred)
+		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
+	{
+		return corepeat_if<coexcution::Later>(forward<Fn>(fn), forward<Pred>(pred));
+	}
+
+	template<coexcution Policy, r_invocables<bool> Fn>
+	inline
+		coroutine::RelaxedTask
+		corepeat_if(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
 		Fn functor = forward<Fn>(fn);
@@ -445,24 +542,24 @@ export namespace util
 				co_return;
 			}
 
-			co_await coroutine::suspend_always{};
+			if constexpr (Policy == coexcution::Now)
+			{
+				co_await coroutine::suspend_never{};
+			}
+			else
+			{
+				co_await coroutine::suspend_always{};
+			}
 		}
 	}
 
-	template<invocables Fn>
+	template<r_invocables<bool> Fn>
 	inline
-		coroutine::Task<void>
-		cotask(Fn&& fn)
+		coroutine::RelaxedTask
+		corepeat(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
-		Fn functor = forward<Fn>(fn);
-
-		while (true)
-		{
-			functor();
-
-			co_await coroutine::suspend_never{};
-		}
+		return corepeat_if<coexcution::Later>(forward<Fn>(fn));
 	}
 
 	template<movable T, equality_comparable_with<T> Guard>
