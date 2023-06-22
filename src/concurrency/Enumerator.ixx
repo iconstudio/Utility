@@ -1,7 +1,9 @@
 module;
+#include <array>
 #include <ranges>
 export module Utility.Coroutine.Enumerator;
 import Utility;
+import Utility.Monad;
 import Utility.Coroutine;
 
 namespace util::coroutine
@@ -60,10 +62,33 @@ namespace util::coroutine
 			noexcept(nothrow_destructibles<Rng>) = default;
 
 		template<enumerable Sng>
-		constexpr Enumerator(Enumerator<Sng>&& other) noexcept
-		{
+			requires constructible_from<Rng, Sng>
+		constexpr Enumerator(Enumerator<Sng>&& other)
+			noexcept(nothrow_constructibles<Rng, Sng>)
+			: myHandle(std::move(other.myHandle))
+			, underlyingRange(std::move(other.underlyingRange))
+		{}
 
-		}
+		template<enumerable Sng>
+			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng, handle_type>
+		constexpr Enumerator(const Enumerator<Sng>& other)
+			noexcept(nothrow_constructibles<Rng, Sng>)
+			: myHandle(other.myHandle)
+			, underlyingRange(other.underlyingRange)
+		{}
+
+		explicit constexpr Enumerator(handle_type&& handle)
+			noexcept(nothrow_move_constructibles<handle_type>)
+			: myHandle(move(handle))
+			, underlyingRange(handle.promise().currentValue)
+		{}
+
+		explicit constexpr Enumerator(const handle_type& handle)
+			noexcept(nothrow_copy_constructibles<handle_type>)
+			requires copy_constructibles<Rng, handle_type>
+		: myHandle(handle)
+			, underlyingRange(handle.promise().currentValue)
+		{}
 
 		[[nodiscard]]
 		inline iterator begin() noexcept
@@ -104,7 +129,7 @@ namespace util::coroutine
 			noexcept(detail::noexcept_data<Rng>::value)
 			requires detail::available_data<Rng>
 		{
-			return underlyingRange.data();
+			return (*underlyingRange).data();
 		}
 
 		[[nodiscard]]
@@ -112,7 +137,7 @@ namespace util::coroutine
 			noexcept(detail::noexcept_data<Rng>::value)
 			requires detail::available_data<const Rng>
 		{
-			return underlyingRange.data();
+			return (*underlyingRange).data();
 		}
 
 		Enumerator(const Enumerator& other) = delete;
@@ -124,7 +149,7 @@ namespace util::coroutine
 
 	private:
 		handle_type myHandle;
-		Rng underlyingRange;
+		Monad<Rng> underlyingRange;
 	};
 
 	template<std::ranges::forward_range Rng>
@@ -137,7 +162,7 @@ inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumer
 export namespace util
 {
 	template<std::ranges::forward_range Rng>
-	inline coroutine::Enumerator<Rng> coenumerate(add_const_t<Rng&&> range) noexcept
+	inline coroutine::Enumerator<Rng> coenumerate(Rng&& range) noexcept
 	{
 		for (auto&& it = range.begin(); it != range.end(); ++it)
 		{

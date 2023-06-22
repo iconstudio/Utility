@@ -63,5 +63,8 @@ int main()
 	}
 	util::Println("");
 
+	// test 3
+	auto task3 = util::coenumerate(std::vector{ 3, 4, 5, 6, 7, 8, 9 });
+
 	return 0;
 }
