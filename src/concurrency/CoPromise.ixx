@@ -150,9 +150,18 @@ export namespace util::coroutine
 		Monad<value_type> currentValue;
 	};
 
-	template<typename Coroutine>
+	template<classes Coroutine>
 	using DeferredPromise = PromiseTemplate<Coroutine, std::suspend_always, std::suspend_always>;
 
-	template<typename Coroutine>
+	template<classes Coroutine>
 	using RelaxedPromise = PromiseTemplate<Coroutine, std::suspend_never, std::suspend_always>;
+
+	template<classes Coroutine, awaitable Init, awaitable Final, movable Value>
+	using ValuePromise = PromiseTemplate<Coroutine, Init, Final, Value>;
+
+	template<classes Coroutine, movable Value>
+	using DeferredValuePromise = ValuePromise<Coroutine, std::suspend_always, std::suspend_always, Value>;
+
+	template<classes Coroutine, movable Value>
+	using RelaxedValuePromise = ValuePromise<Coroutine, std::suspend_never, std::suspend_always, Value>;
 }
