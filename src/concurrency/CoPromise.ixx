@@ -15,10 +15,10 @@ export namespace util::coroutine
 	};
 
 	template<typename T>
-	concept awaitable = default_initializable<T> && requires(T t)
+	concept awaitable = requires(T t)
 	{
 		t.await_ready();
-		t.await_suspend();
+		t.await_suspend(coroutine_handle<>{});
 		t.await_resume();
 	};
 
@@ -89,8 +89,11 @@ export namespace util::coroutine
 		using coro_type = Coroutine;
 		using handle_type = std::coroutine_handle<type>;
 
-		// Disallow co_await
-		void await_transform() = delete;
+		[[nodiscard]]
+		Coroutine acquire_coroutine() noexcept
+		{
+			return Coroutine{ handle_type::from_promise(*this) };
+		}
 	};
 
 	template<typename Coroutine, awaitable Init, awaitable Final, notvoids Value>
@@ -135,69 +138,18 @@ export namespace util::coroutine
 			return {};
 		}
 
+		[[nodiscard]]
+		Coroutine acquire_coroutine() noexcept
+		{
+			return Coroutine{ handle_type::from_promise(*this) };
+		}
+
 		Monad<value_type> currentValue;
 	};
 
 	template<typename Coroutine>
-	class [[nodiscard]] DeferredPromise : public BasicPromise<DeferredPromise<Coroutine>>
-	{
-	public:
-		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<DeferredPromise<Coroutine>>;
-
-		constexpr DeferredPromise() noexcept = default;
-		constexpr ~DeferredPromise() noexcept = default;
-
-		static std::suspend_always initial_suspend() noexcept
-		{
-			return {};
-		}
-
-		static std::suspend_always final_suspend() noexcept
-		{
-			return {};
-		}
-
-		[[nodiscard]]
-		Coroutine acquire_coroutine() noexcept
-		{
-			return Coroutine{ handle_type::from_promise(*this) };
-		}
-	};
+	using DeferredPromise = PromiseTemplate<Coroutine, std::suspend_always, std::suspend_always>;
 
 	template<typename Coroutine>
-	class [[nodiscard]] RelaxedPromise : public BasicPromise<RelaxedPromise<Coroutine>>
-	{
-	public:
-		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<RelaxedPromise<Coroutine>>;
-
-		constexpr RelaxedPromise() noexcept = default;
-		constexpr ~RelaxedPromise() noexcept = default;
-
-		static std::suspend_never initial_suspend() noexcept
-		{
-			return {};
-		}
-
-		static std::suspend_always final_suspend() noexcept
-		{
-			return {};
-		}
-
-		[[noreturn]]
-		void return_void() const noexcept {}
-
-		[[nodiscard]]
-		Coroutine acquire_coroutine() noexcept
-		{
-			return Coroutine{ handle_type::from_promise(*this) };
-		}
-	};
-
-	template<typename Coroutine>
-	using defer = DeferredPromise<Coroutine>;
-
-	template<typename Coroutine>
-	using relax = RelaxedPromise<Coroutine>;
+	using RelaxedPromise = PromiseTemplate<Coroutine, std::suspend_never, std::suspend_always>;
 }

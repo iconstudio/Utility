@@ -19,7 +19,7 @@ export namespace util::coroutine
 		{}
 
 		explicit constexpr DeferredTask(handle_type&& handle) noexcept
-			: myHandle(move(handle))
+			: myHandle(static_cast<handle_type&&>(handle))
 		{}
 
 		[[nodiscard]]
@@ -55,7 +55,7 @@ export namespace util::coroutine
 	class [[nodiscard]] RelaxedTask
 	{
 	public:
-		using promise_type = relax<RelaxedTask>;
+		using promise_type = RelaxedPromise<RelaxedTask>;
 		using handle_type = coroutine_handle<promise_type>;
 
 		explicit constexpr RelaxedTask(const handle_type& handle) noexcept
