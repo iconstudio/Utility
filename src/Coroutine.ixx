@@ -366,13 +366,19 @@ export namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		constexpr bool empty() const noexcept
+		bool done() const noexcept
+		{
+			return myHandle.done();
+		}
+
+		[[nodiscard]]
+		bool empty() const noexcept
 		{
 			return !myHandle || myHandle.done();
 		}
 
 		[[nodiscard]]
-		constexpr explicit operator bool() const noexcept
+		explicit operator bool() const noexcept
 		{
 			return !empty();
 		}
