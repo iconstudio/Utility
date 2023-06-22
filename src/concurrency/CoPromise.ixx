@@ -133,15 +133,66 @@ export namespace util::coroutine
 	class Yielder;
 
 	template<typename T>
+	class Yielder<T&>
+	{
+	public:
+		using value_type = T&;
+		using reference = T&;
+		using const_reference = const T&;
+		using rvalue_reference = T&&;
+		using const_rvalue_reference = const T&&;
+
+		constexpr ~Yielder() noexcept = default;
+
+		constexpr Yielder(reference ref) noexcept
+			: current(ref)
+		{}
+
+		value_type current;
+	};
+
+	template<typename T>
+	class Yielder<const T&>
+	{
+	public:
+		using value_type = const T&;
+		using reference = T&;
+		using const_reference = const T&;
+		using rvalue_reference = T&&;
+		using const_rvalue_reference = const T&&;
+
+		constexpr ~Yielder() noexcept = default;
+
+		constexpr Yielder(reference ref) noexcept
+			: current(ref)
+		{}
+
+		constexpr Yielder(const_reference ref) noexcept
+			: current(ref)
+		{}
+
+		constexpr Yielder(rvalue_reference value)
+			noexcept(nothrow_constructibles<value_type, rvalue_reference>)
+			: current(static_cast<rvalue_reference>(value))
+		{}
+
+		constexpr Yielder(const_rvalue_reference value)
+			noexcept(nothrow_constructibles<value_type, const_rvalue_reference>)
+			: current(static_cast<const_rvalue_reference>(value))
+		{}
+
+		value_type current;
+	};
+
+	template<typename T>
 	class Yielder
 	{
 	public:
-		using pure_value_type = T;
-		using value_type = T&&;
-		using reference = add_lvalue_reference_t<T&&>;
-		using const_reference = const add_lvalue_reference_t<T&&>;
-		using rvalue_reference = add_rvalue_reference_t<T&&>;
-		using const_rvalue_reference = add_rvalue_reference_t<const T&&>;
+		using value_type = T;
+		using reference = add_lvalue_reference_t<value_type>;
+		using const_reference = const reference;
+		using rvalue_reference = add_rvalue_reference_t<value_type>;
+		using const_rvalue_reference = const rvalue_reference;
 
 		constexpr Yielder()
 			noexcept(nothrow_default_constructibles<value_type>)
@@ -156,10 +207,10 @@ export namespace util::coroutine
 			: current(static_cast<U&&>(value))
 		{}
 
-		T&& current;
+		T current;
 	};
-
-	template<movable T>
+	
+	template<typename T>
 	Yielder(T&&) -> Yielder<T&&>;
 
 	template<typename Coroutine
