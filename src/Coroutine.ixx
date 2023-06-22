@@ -37,9 +37,90 @@ export namespace util
 		using const_reference = const T&;
 		using rvalue_reference = T&&;
 		using const_rvalue_reference = const T&&;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
 
 		class promise_type;
 		using handle_type = std::coroutine_handle<promise_type>;
+
+		class iterator
+		{
+		public:
+			using coro_type = Generator<T>;
+			using handle_type = coro_type::handle_type;
+
+			using iterator_category = std::forward_iterator_tag;
+			using value_type = coro_type::value_type;
+			using reference = coro_type::reference;
+			using const_reference = coro_type::const_reference;
+			using rvalue_reference = coro_type::rvalue_reference;
+			using const_rvalue_reference = coro_type::const_rvalue_reference;
+			using size_type = coro_type::size_type;
+			using difference_type = coro_type::difference_type;
+
+			constexpr iterator()
+				noexcept(nothrow_default_constructibles<handle_type>)
+				requires default_initializables<handle_type> = default;
+			constexpr ~iterator() noexcept(nothrow_destructibles<handle_type>) = default;
+
+			explicit constexpr iterator(const handle_type& coroutine) noexcept
+				: coHandle(coroutine)
+			{}
+
+			explicit constexpr iterator(handle_type&& coroutine) noexcept
+				: coHandle(move(coroutine))
+			{}
+
+			inline iterator& operator++()
+			{
+				if (!coHandle.done())
+				{
+					coHandle.resume();
+				}
+
+				return *this;
+			}
+
+			inline void operator++(int)
+			{
+				if (!coHandle.done())
+				{
+					coHandle.resume();
+				}
+			}
+
+			inline reference operator*()&
+			{
+				return *(coHandle.promise().currentValue);
+			}
+
+			inline const_reference operator*() const&
+			{
+				return *(coHandle.promise().currentValue);
+			}
+
+			inline rvalue_reference operator*() &&
+				noexcept(nothrow_move_constructibles<value_type>)
+			{
+				return *move(coHandle.promise().currentValue);
+			}
+
+			inline const_rvalue_reference operator*() const&&
+				noexcept(nothrow_move_constructibles<value_type>)
+			{
+				return *move(coHandle.promise().currentValue);
+			}
+
+			[[nodiscard]]
+			inline bool operator==(default_sentinel_t) const
+			{
+				return !coHandle || coHandle.done();
+			}
+
+		private:
+			handle_type coHandle;
+		};
+		using const_iterator = iterator;
 
 		inline Generator() noexcept = default;
 		inline ~Generator() noexcept
@@ -60,82 +141,53 @@ export namespace util
 			: myHandle(move(coroutine))
 		{}
 
-		class CoIterator
-		{
-		public:
-			using coro_type = Generator<T>;
-			using handle_type = coro_type::handle_type;
-			friend class coro_type::promise_type;
-
-			using iterator_category = std::forward_iterator_tag;
-			using difference_type = ptrdiff_t;
-			using value_type = coro_type::value_type;
-			using reference = coro_type::reference;
-			using const_reference = coro_type::const_reference;
-			using rvalue_reference = coro_type::rvalue_reference;
-			using const_rvalue_reference = coro_type::const_rvalue_reference;
-
-			explicit CoIterator(const handle_type& coroutine) noexcept
-				: coHandle(coroutine)
-			{}
-
-			explicit CoIterator(handle_type&& coroutine) noexcept
-				: coHandle(move(coroutine))
-			{}
-
-			inline CoIterator& operator++()
-			{
-				if (!coHandle.done())
-				{
-					coHandle.resume();
-				}
-
-				return *this;
-			}
-
-			inline void operator++(int)
-			{
-				if (!coHandle.done())
-				{
-					coHandle.resume();
-				}
-			}
-
-			[[nodiscard]]
-			inline const_reference operator*() const&
-			{
-				return coHandle.promise().return_value();
-			}
-
-			[[nodiscard]]
-			inline const_rvalue_reference operator*() const&&
-			{
-				return move(coHandle.promise()).return_value();
-			}
-
-			[[nodiscard]]
-			inline bool operator==(default_sentinel_t) const
-			{
-				return !coHandle || coHandle.done();
-			}
-
-		private:
-			handle_type coHandle;
-		};
-
 		[[nodiscard]]
-		CoIterator begin() noexcept
+		iterator begin() noexcept
 		{
 			if (!myHandle.done())
 			{
 				myHandle.resume();
 			}
 
-			return CoIterator{ myHandle };
+			return iterator{ myHandle };
 		}
 
 		[[nodiscard]]
-		default_sentinel_t end() noexcept
+		constexpr default_sentinel_t end() noexcept
+		{
+			return {};
+		}
+
+		[[nodiscard]]
+		const_iterator begin() const noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return const_iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr default_sentinel_t end() const noexcept
+		{
+			return {};
+		}
+
+		[[nodiscard]]
+		const_iterator cbegin() const noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return const_iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr default_sentinel_t cend() const noexcept
 		{
 			return {};
 		}
@@ -159,7 +211,7 @@ export namespace util
 		constexpr ~promise_type() noexcept(nothrow_destructibles<T>) = default;
 
 		[[nodiscard]]
-		Generator<T> get_return_object()
+		Generator<T> get_return_object() noexcept
 		{
 			return Generator{ handle_type::from_promise(*this) };
 		}
@@ -182,43 +234,21 @@ export namespace util
 		}
 
 		suspend_always yield_value(const_rvalue_reference value)
-			noexcept(nothrow_move_constructibles<const T>)
+			noexcept(nothrow_move_constructibles<const value_type>)
 		{
 			currentValue = move(value);
 			return {};
 		}
 
 		suspend_always yield_value(const_reference value)
-			noexcept(nothrow_copy_constructibles<T>)
-			requires move_constructibles<T>
+			noexcept(nothrow_copy_constructibles<value_type>)
+			requires move_constructibles<value_type>
 		{
 			currentValue = value;
 			return {};
 		}
 
-		reference return_value() &
-			noexcept
-		{
-			return *currentValue;
-		}
-
-		const_reference return_value() const&
-			noexcept
-		{
-			return *currentValue;
-		}
-
-		rvalue_reference return_value() &&
-			noexcept(nothrow_move_constructibles<T>)
-		{
-			return *move(currentValue);
-		}
-
-		const_rvalue_reference return_value() const&&
-			noexcept(nothrow_move_constructibles<T>)
-		{
-			return *move(currentValue);
-		}
+		void return_void() const noexcept {}
 
 		// Disallow co_await
 		void await_transform() = delete;
@@ -229,7 +259,6 @@ export namespace util
 			throw;
 		}
 
-	private:
 		Monad<T> currentValue;
 	};
 
@@ -237,9 +266,22 @@ export namespace util
 	Generator<T> range(T first, const Sentinel last)
 		noexcept(nothrow_copy_constructibles<T>)
 	{
-		while (first < last)
+		while (first != last)
 		{
 			co_yield first++;
 		}
 	}
 }
+
+#pragma warning(push, 1)
+namespace util::test
+{
+	void test_coroutines()
+	{
+		for (auto&& val : range('A', 'Z' + 1))
+		{
+
+		}
+	}
+}
+#pragma warning(pop)
