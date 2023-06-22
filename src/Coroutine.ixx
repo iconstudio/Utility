@@ -1,23 +1,11 @@
 export module Utility.Coroutine;
-import <memory>;
-import <coroutine>;
+import <algorithm>;
 export import Utility.Constraints;
 import Utility.Monad;
 export import :Promise;
 
 export namespace util::coroutine
 {
-	using ::std::coroutine_traits;
-	using ::std::coroutine_handle;
-	using ::std::noop_coroutine_promise;
-	using ::std::noop_coroutine_handle;
-	using ::std::noop_coroutine;
-	using ::std::is_corresponding_member;
-	using ::std::operator==;
-	using ::std::operator<=>;
-	using ::std::hash;
-	using ::std::suspend_never;
-	using ::std::suspend_always;
 	using ::std::default_sentinel_t;
 
 	template<typename T>
@@ -31,8 +19,8 @@ export namespace util::coroutine
 	class [[nodiscard]] DeferredTask
 	{
 	public:
-		using promise_type = defer<DeferredTask>;
-		using handle_type = coroutine_handle<promise_type>;
+		using promise_type = DeferredPromise<DeferredTask>;
+		using handle_type = std::coroutine_handle<promise_type>;
 
 		explicit constexpr DeferredTask(const handle_type& handle) noexcept
 			: myHandle(handle)
