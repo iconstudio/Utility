@@ -128,6 +128,9 @@
     <ClCompile Include="concurrency\Enumerator.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
+    <ClCompile Include="concurrency\CoTask.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />
