@@ -29,11 +29,11 @@ export namespace util
 	};
 
 	template<typename Coroutine>
-	class [[nodiscard]] default_enumerator
+	class [[nodiscard]] default_promise
 	{
 	public:
 		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<default_enumerator<Coroutine>>;
+		using handle_type = std::coroutine_handle<default_promise<Coroutine>>;
 
 		using value_type = coro_type::value_type;
 		using reference = coro_type::reference;
@@ -43,10 +43,10 @@ export namespace util
 		using size_type = coro_type::size_type;
 		using difference_type = coro_type::difference_type;
 
-		constexpr default_enumerator()
+		constexpr default_promise()
 			noexcept(nothrow_default_constructibles<value_type>)
 			requires default_initializables<value_type> = default;
-		constexpr ~default_enumerator() noexcept(nothrow_destructibles<value_type>) = default;
+		constexpr ~default_promise() noexcept(nothrow_destructibles<value_type>) = default;
 
 		[[nodiscard]]
 		coro_type get_return_object() noexcept
@@ -112,7 +112,7 @@ export namespace util
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
-		using promise_type = default_enumerator<Generator<T>>;
+		using promise_type = default_promise<Generator<T>>;
 		using handle_type = promise_type::handle_type;
 
 		class iterator
