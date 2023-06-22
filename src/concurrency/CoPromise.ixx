@@ -1,4 +1,4 @@
-export module Utility.Coroutine.Promise;
+export module Utility.Coroutine:Promise;
 import Utility.Coroutine;
 
 export namespace util::coroutine
