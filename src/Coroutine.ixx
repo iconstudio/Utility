@@ -119,7 +119,7 @@ export namespace util::coroutine
 				return {};
 			}
 
-			static suspend_never final_suspend() noexcept
+			static suspend_always final_suspend() noexcept
 			{
 				return {};
 			}
@@ -151,12 +151,15 @@ export namespace util::coroutine
 
 		void Resume() const noexcept
 		{
-			myHandle.resume();
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
 		}
 
 		void operator()() const noexcept
 		{
-			myHandle.resume();
+			Resume();
 		}
 
 		~Task() noexcept
@@ -427,11 +430,29 @@ export namespace util
 		}
 	}
 
-	template<typename Fn>
-		requires invocables<Fn>
+	template<r_invocables<void> Fn>
 	inline
 		coroutine::Task<void>
-		corepeat(Fn&& fn)
+		corepeat_for(Fn&& fn)
+		noexcept(nothrow_invocables<Fn>)
+	{
+		Fn functor = forward<Fn>(fn);
+
+		while (true)
+		{
+			if (!functor())
+			{
+				co_return;
+			}
+
+			co_await coroutine::suspend_always{};
+		}
+	}
+
+	template<invocables Fn>
+	inline
+		coroutine::Task<void>
+		cotask(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
 		Fn functor = forward<Fn>(fn);
@@ -440,7 +461,7 @@ export namespace util
 		{
 			functor();
 
-			co_await coroutine::suspend_always{};
+			co_await coroutine::suspend_never{};
 		}
 	}
 
