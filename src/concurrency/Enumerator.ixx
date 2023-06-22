@@ -40,11 +40,16 @@ export namespace util::coroutine
 	Enumerable(Rng&&) -> Enumerable<Rng>;
 }
 
+export template<typename Rng>
+inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumerable<Rng>> = std::ranges::enable_borrowed_range<Rng>;
+
 export namespace util
 {
 	template<std::ranges::forward_range Rng>
 	inline coroutine::Enumerable<Rng> coenumerate(Rng&& range) noexcept
 	{
+		std::ranges::borrowed_range<Rng>;
+
 		for (auto&& it = range.begin(); it != range.end(); ++it)
 		{
 			co_yield *it;
