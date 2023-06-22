@@ -28,8 +28,80 @@ export namespace util
 		t.await_resume();
 	};
 
+	template<typename Coroutine>
+	class [[nodiscard]] default_enumerator
+	{
+	public:
+		using coro_type = Coroutine;
+		using handle_type = std::coroutine_handle<default_enumerator<Coroutine>>;
+
+		using value_type = coro_type::value_type;
+		using reference = coro_type::reference;
+		using const_reference = coro_type::const_reference;
+		using rvalue_reference = coro_type::rvalue_reference;
+		using const_rvalue_reference = coro_type::const_rvalue_reference;
+		using size_type = coro_type::size_type;
+		using difference_type = coro_type::difference_type;
+
+		constexpr default_enumerator()
+			noexcept(nothrow_default_constructibles<value_type>)
+			requires default_initializables<value_type> = default;
+		constexpr ~default_enumerator() noexcept(nothrow_destructibles<value_type>) = default;
+
+		[[nodiscard]]
+		coro_type get_return_object() noexcept
+		{
+			return coro_type{ handle_type::from_promise(*this) };
+		}
+
+		static suspend_always initial_suspend() noexcept
+		{
+			return {};
+		}
+
+		static suspend_always final_suspend() noexcept
+		{
+			return {};
+		}
+
+		suspend_always yield_value(rvalue_reference value)
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			currentValue = move(value);
+			return {};
+		}
+
+		suspend_always yield_value(const_rvalue_reference value)
+			noexcept(nothrow_move_constructibles<const value_type>)
+		{
+			currentValue = move(value);
+			return {};
+		}
+
+		suspend_always yield_value(const_reference value)
+			noexcept(nothrow_copy_constructibles<value_type>)
+			requires move_constructibles<value_type>
+		{
+			currentValue = value;
+			return {};
+		}
+
+		void return_void() const noexcept {}
+
+		[[noreturn]]
+		static void unhandled_exception()
+		{
+			throw;
+		}
+
+		// Disallow co_await
+		void await_transform() = delete;
+
+		Monad<value_type> currentValue;
+	};
+
 	template<movable T>
-	class [[nodiscard]] Generator
+	class [[nodiscard]] Generator : std::ranges::view_interface<Generator<T>>
 	{
 	public:
 		using value_type = clean_t<T>;
@@ -40,8 +112,8 @@ export namespace util
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
-		class promise_type;
-		using handle_type = std::coroutine_handle<promise_type>;
+		using promise_type = default_enumerator<Generator<T>>;
+		using handle_type = promise_type::handle_type;
 
 		class iterator
 		{
@@ -89,23 +161,12 @@ export namespace util
 				}
 			}
 
-			inline reference operator*()&
-			{
-				return *(coHandle.promise().currentValue);
-			}
-
 			inline const_reference operator*() const&
 			{
 				return *(coHandle.promise().currentValue);
 			}
 
 			inline rvalue_reference operator*() &&
-				noexcept(nothrow_move_constructibles<value_type>)
-			{
-				return *move(coHandle.promise().currentValue);
-			}
-
-			inline const_rvalue_reference operator*() const&&
 				noexcept(nothrow_move_constructibles<value_type>)
 			{
 				return *move(coHandle.promise().currentValue);
@@ -142,24 +203,18 @@ export namespace util
 		{}
 
 		[[nodiscard]]
-		iterator begin() noexcept
+		inline iterator begin() noexcept
 		{
 			if (!myHandle.done())
 			{
 				myHandle.resume();
 			}
 
-			return iterator{ myHandle };
+			return const_iterator{ myHandle };
 		}
 
 		[[nodiscard]]
-		constexpr default_sentinel_t end() noexcept
-		{
-			return {};
-		}
-
-		[[nodiscard]]
-		const_iterator begin() const noexcept
+		inline const_iterator begin() const noexcept
 		{
 			if (!myHandle.done())
 			{
@@ -176,7 +231,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		const_iterator cbegin() const noexcept
+		inline const_iterator cbegin() const noexcept
 		{
 			if (!myHandle.done())
 			{
@@ -201,69 +256,8 @@ export namespace util
 		handle_type myHandle;
 	};
 
-	template<movable T>
-	class [[nodiscard]] Generator<T>::promise_type
-	{
-	public:
-		constexpr promise_type()
-			noexcept(nothrow_default_constructibles<T>)
-			requires default_initializables<T> = default;
-		constexpr ~promise_type() noexcept(nothrow_destructibles<T>) = default;
-
-		[[nodiscard]]
-		Generator<T> get_return_object() noexcept
-		{
-			return Generator{ handle_type::from_promise(*this) };
-		}
-
-		static suspend_always initial_suspend() noexcept
-		{
-			return {};
-		}
-
-		static suspend_always final_suspend() noexcept
-		{
-			return {};
-		}
-
-		suspend_always yield_value(rvalue_reference value)
-			noexcept(nothrow_move_constructibles<T>)
-		{
-			currentValue = move(value);
-			return {};
-		}
-
-		suspend_always yield_value(const_rvalue_reference value)
-			noexcept(nothrow_move_constructibles<const value_type>)
-		{
-			currentValue = move(value);
-			return {};
-		}
-
-		suspend_always yield_value(const_reference value)
-			noexcept(nothrow_copy_constructibles<value_type>)
-			requires move_constructibles<value_type>
-		{
-			currentValue = value;
-			return {};
-		}
-
-		void return_void() const noexcept {}
-
-		// Disallow co_await
-		void await_transform() = delete;
-
-		[[noreturn]]
-		static void unhandled_exception()
-		{
-			throw;
-		}
-
-		Monad<T> currentValue;
-	};
-
 	template<movable T, typename Sentinel>
-	Generator<T> range(T first, const Sentinel last)
+	inline Generator<T> range(T first, const Sentinel last)
 		noexcept(nothrow_copy_constructibles<T>)
 	{
 		while (first != last)
@@ -278,9 +272,10 @@ namespace util::test
 {
 	void test_coroutines()
 	{
-		for (auto&& val : range('A', 'Z' + 1))
-		{
+		const Generator aa = range(1, 10);
 
+		for (auto&& val : aa)
+		{
 		}
 	}
 }
