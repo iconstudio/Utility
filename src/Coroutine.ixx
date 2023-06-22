@@ -307,9 +307,9 @@ export namespace util::coroutine
 		}
 
 		Generator(const Generator& other) = delete;
-		Generator(Generator&& other) noexcept = default;
+		constexpr Generator(Generator&& other) noexcept = default;
 		Generator& operator=(const Generator& other) = delete;
-		Generator& operator=(Generator&& other) noexcept = default;
+		constexpr Generator& operator=(Generator&& other) noexcept = default;
 
 	private:
 		handle_type myHandle;
