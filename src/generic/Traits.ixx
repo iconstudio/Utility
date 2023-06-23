@@ -229,6 +229,87 @@ export namespace util
 
 	template<typename Fn, typename T, template<typename> typename Wrapper>
 	using fn_result_t = util::monad_result_t<Fn, Wrapper<T>>;
+
+	template<typename R, typename... Params>
+	using function_t = R(*)(Params...);
+
+	template<typename R, typename... Params>
+	using nothrow_function_t = R(*)(Params...) noexcept;
+
+	template<typename Class, typename R, typename... Params>
+	using method_t = R(decay_t<Class>::*)(Params...);
+
+	template<typename Class, typename R, typename... Params>
+	using const_method_t = R(decay_t<Class>::*)(Params...) const;
+
+	template<typename Class, typename R, typename... Params>
+	using nothrow_method_t = R(decay_t<Class>::*)(Params...) noexcept;
+
+	template<typename Class, typename R, typename... Params>
+	using const_nothrow_method_t = R(decay_t<Class>::*)(Params...) const noexcept;
+
+	template<typename M, typename C>
+	struct method_trait;
+
+	template<typename C, typename R, typename... Params>
+	struct method_trait<method_t<C, R, Params...>, C>
+	{
+		using type = method_t<decay_t<C>, R, Params...>;
+		using result = R;
+		using owner = C;
+
+		template<typename... Args>
+		using apply = decltype((std::declval<C>().*std::declval<type>())(std::declval<Args>()...));
+
+		static inline constexpr bool is_nothrow = false;
+	};
+
+	template<typename C, typename R, typename... Params>
+	struct method_trait<const_method_t<C, R, Params...>, C>
+	{
+		using type = const_method_t<decay_t<C>, R, Params...>;
+		using result = R;
+		using owner = C;
+
+		template<typename... Args>
+		using apply = decltype((std::declval<C>().*std::declval<type>())(std::declval<Args>()...));
+
+		static inline constexpr bool is_nothrow = false;
+	};
+
+	template<typename C, typename R, typename... Params>
+	struct method_trait<nothrow_method_t<C, R, Params...>, C>
+	{
+		using type = nothrow_method_t<decay_t<C>, R, Params...>;
+		using result = R;
+		using owner = C;
+
+		template<typename... Args>
+		using apply = decltype((std::declval<C>().*std::declval<type>())(std::declval<Args>()...));
+
+		static inline constexpr bool is_nothrow = true;
+	};
+
+	template<typename C, typename R, typename... Params>
+	struct method_trait<const_nothrow_method_t<C, R, Params...>, C>
+	{
+		using type = const_nothrow_method_t<decay_t<C>, R, Params...>;
+		using result = R;
+		using owner = C;
+
+		template<typename... Args>
+		using apply = decltype((std::declval<C>().*std::declval<type>())(std::declval<Args>()...));
+
+		static inline constexpr bool is_nothrow = true;
+	};
+
+	/// <summary>
+	/// A decayed method type trait
+	/// </summary>
+	/// <typeparam name="M"></typeparam>
+	/// <typeparam name="C"></typeparam>
+	template<typename M, typename C>
+	using method_trait_t = typename method_trait<clean_t<M>, C>::type;
 }
 
 #pragma warning(push, 1)
@@ -248,5 +329,76 @@ namespace util::test
 	constexpr bool av1 = logical_product_v<is_copy_assignable, std::conjunction, int, test_noncopy_ctor>;
 	constexpr bool av2 = logical_product_v<is_copy_assignable, std::conjunction, int, test_noncopy_asin>;
 	constexpr bool av3 = logical_product_v<is_copy_assignable, std::conjunction, void, bool>;
+
+	struct test_methods
+	{
+		constexpr bool test_memfn1() { return false; }
+		constexpr int test_memfn2() const noexcept { return 30; }
+		constexpr float test_memfn3(int) const { return 10.0f; }
+		constexpr long test_memfn4(int) noexcept { return 60000L; }
+	};
+
+	void test_traits()
+	{
+		test_methods tester1{};
+		constexpr test_methods tester2{};
+
+		constexpr auto fptr1 = &test_methods::test_memfn1;
+		constexpr auto fptr2 = &test_methods::test_memfn2;
+		constexpr auto fptr3 = &test_methods::test_memfn3;
+		constexpr auto fptr4 = &test_methods::test_memfn4;
+
+		using fty1 = decltype(&test_methods::test_memfn1);
+		using fty2 = decltype(&test_methods::test_memfn2);
+		using fty3 = decltype(&test_methods::test_memfn3);
+		using fty4 = decltype(&test_methods::test_memfn4);
+
+		constexpr method_t<test_methods, bool> mptr1 = &test_methods::test_memfn1;
+
+		//constexpr method_t<test_methods, int> mut_mptr2 = &test_methods::test_memfn2;
+		constexpr const_method_t<test_methods, int> mptr2 = &test_methods::test_memfn2;
+
+		//constexpr method_t<test_methods, float, int> mut_mptr3 = &test_methods::test_memfn3;
+		constexpr const_method_t<test_methods, float, int> mptr3 = &test_methods::test_memfn3;
+
+		constexpr method_t<test_methods, long, int> mptr4 = &test_methods::test_memfn4;
+
+		constexpr method_trait<fty1, test_methods>::type pr_val1 = &test_methods::test_memfn1;
+		method_trait<fty2, test_methods>::type pr_val2;
+		method_trait<fty3, test_methods>::type pr_val3;
+		method_trait<fty4, test_methods>::type pr_val4;
+
+		method_trait<fty1, const test_methods>::type cp_val1;
+		method_trait<fty2, const test_methods>::type cp_val2;
+		method_trait<fty3, const test_methods>::type cp_val3;
+		method_trait<fty4, const test_methods>::type cp_val4;
+
+		method_trait<fty1, test_methods&>::type lv_val1;
+		method_trait<fty1, test_methods&>::apply<> lv_val1_res;
+
+		method_trait<fty2, test_methods&>::type lv_val2;
+		method_trait<fty2, test_methods&>::apply<> lv_val2_res;
+
+		method_trait<fty3, test_methods&>::type lv_val3;
+		method_trait<fty3, test_methods&>::apply<int> lv_val3_res;
+
+		method_trait<fty4, test_methods&>::type lv_val4;
+		method_trait<fty4, test_methods&>::apply<int> lv_val4_res;
+
+		method_trait<fty1, const test_methods&>::type cl_val1;
+		method_trait<fty2, const test_methods&>::type cl_val2;
+		method_trait<fty3, const test_methods&>::type cl_val3;
+		method_trait<fty4, const test_methods&>::type cl_val4;
+
+		method_trait<fty1, test_methods&&>::type rv_val1;
+		method_trait<fty2, test_methods&&>::type rv_val2;
+		method_trait<fty3, test_methods&&>::type rv_val3;
+		method_trait<fty4, test_methods&&>::type rv_val4;
+
+		method_trait<fty1, const test_methods&&>::type cr_val1;
+		method_trait<fty2, const test_methods&&>::type cr_val2;
+		method_trait<fty3, const test_methods&&>::type cr_val3;
+		method_trait<fty4, const test_methods&&>::type cr_val4;
+	}
 }
 #pragma warning(pop)
