@@ -204,10 +204,10 @@ export namespace util
 	template<coexecution Policy>
 	using Cowork = conditional_t<Policy == coexecution::Now, coroutine::RelaxedTask, coroutine::DeferredTask>;
 
-	template<coexecution Policy, typename Fn, typename Pred>
-		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
+	template<coexecution Policy, invocables Fn, invocables Pred>
+		requires convertible_to<invoke_result_t<Pred>, bool>
 	inline
-		Cowork<Policy>
+		coroutine::RelaxedTask
 		corepeat_as_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
@@ -229,14 +229,57 @@ export namespace util
 		}
 	}
 
-	template<typename Fn, typename Pred>
-		requires invocables<Fn>&& invocables<Pred>&& convertible_to<invoke_result_t<Pred>, bool>
+	template<coexecution Policy, functions Fn, typename Pred, typename... Args>
+	inline
+		coroutine::RelaxedTask
+		corepeat_as_if(Fn&& fn, Pred&& pred, Args&&... args)
+		noexcept(noexcept(forward<Pred>(pred)()) && noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
+	{
+		Fn&& functor = forward<Fn>(fn);
+		Pred&& predicate = forward<Pred>(pred);
+		const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+
+		while (predicate())
+		{
+			if constexpr (Policy == coexecution::Now)
+			{
+				co_await coroutine::suspend_never{};
+			}
+			else
+			{
+				co_await coroutine::suspend_always{};
+			}
+
+			std::apply(functor, arguments);
+		}
+	}
+
+	template<invocables Fn, invocables Pred>
+		requires convertible_to<invoke_result_t<Pred>, bool>
 	inline
 		auto
 		corepeat_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
 		return corepeat_as_if<coexecution::Later>(forward<Fn>(fn), forward<Pred>(pred));
+	}
+
+	template<functions Fn, functions Pred, typename... Args>
+	inline
+		auto
+		corepeat_if(Fn&& fn, Pred&& pred, Args&&... args)
+		noexcept(noexcept(forward<Pred>(pred)()) && noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
+	{
+		return corepeat_as_if<coexecution::Later>(forward<Fn>(fn), forward<Pred>(pred), forward<Args>(args)...);
+	}
+
+	template<functions Fn, r_invocables<bool> Pred, typename... Args>
+	inline
+		auto
+		corepeat_if(Fn&& fn, Pred&& pred, Args&&... args)
+		noexcept(nothrow_invocables<Pred> && noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
+	{
+		return corepeat_as_if<coexecution::Later>(forward<Fn>(fn), forward<Pred>(pred), forward<Args>(args)...);
 	}
 
 	template<coexecution Policy, r_invocables<bool> Fn>
