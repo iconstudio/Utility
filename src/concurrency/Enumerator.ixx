@@ -77,17 +77,17 @@ namespace util::coroutine
 			, underlyingRange(other.underlyingRange)
 		{}
 
-		explicit constexpr Enumerator(handle_type&& handle)
-			noexcept(nothrow_move_constructibles<handle_type>)
-			: myHandle(move(handle))
-			, underlyingRange(handle.promise().currentValue)
-		{}
-
 		explicit constexpr Enumerator(const handle_type& handle)
 			noexcept(nothrow_copy_constructibles<handle_type>)
 			requires copy_constructibles<Rng, handle_type>
 		: myHandle(handle)
-			, underlyingRange(handle.promise().currentValue)
+			, underlyingRange(handle.promise().value())
+		{}
+
+		explicit constexpr Enumerator(handle_type&& handle)
+			noexcept(nothrow_move_constructibles<handle_type>)
+			: myHandle(move(handle))
+			, underlyingRange(move(handle.promise()).value())
 		{}
 
 		[[nodiscard]]

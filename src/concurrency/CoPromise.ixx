@@ -130,73 +130,23 @@ export namespace util::coroutine
 	};
 
 	template<typename T>
-	class Yielder;
-
-	template<typename T>
-	class Yielder<T&>
-	{
-	public:
-		using value_type = T&;
-		using reference = T&;
-		using const_reference = const T&;
-		using rvalue_reference = T&&;
-		using const_rvalue_reference = const T&&;
-
-		constexpr ~Yielder() noexcept = default;
-
-		constexpr Yielder(reference ref) noexcept
-			: current(ref)
-		{}
-
-		value_type current;
-	};
-
-	template<typename T>
-	class Yielder<const T&>
-	{
-	public:
-		using value_type = const T&;
-		using reference = T&;
-		using const_reference = const T&;
-		using rvalue_reference = T&&;
-		using const_rvalue_reference = const T&&;
-
-		constexpr ~Yielder() noexcept = default;
-
-		constexpr Yielder(reference ref) noexcept
-			: current(ref)
-		{}
-
-		constexpr Yielder(const_reference ref) noexcept
-			: current(ref)
-		{}
-
-		constexpr Yielder(rvalue_reference value)
-			noexcept(nothrow_constructibles<value_type, rvalue_reference>)
-			: current(static_cast<rvalue_reference>(value))
-		{}
-
-		constexpr Yielder(const_rvalue_reference value)
-			noexcept(nothrow_constructibles<value_type, const_rvalue_reference>)
-			: current(static_cast<const_rvalue_reference>(value))
-		{}
-
-		value_type current;
-	};
-
-	template<typename T>
 	class Yielder
 	{
 	public:
 		using value_type = T;
 		using reference = add_lvalue_reference_t<value_type>;
-		using const_reference = const reference;
-		using rvalue_reference = add_rvalue_reference_t<value_type>;
-		using const_rvalue_reference = const rvalue_reference;
+		using const_reference = const value_type&;
+		using rvalue_reference = value_type&&;
+		using const_rvalue_reference = const value_type&&;
 
 		constexpr Yielder()
 			noexcept(nothrow_default_constructibles<value_type>)
 			requires default_initializable<value_type> = default;
+
+		constexpr Yielder()
+			requires (!default_initializable<value_type>)
+		{}
+
 		constexpr ~Yielder()
 			noexcept(nothrow_destructibles<value_type>) = default;
 
@@ -207,9 +157,49 @@ export namespace util::coroutine
 			: current(static_cast<U&&>(value))
 		{}
 
-		T current;
+		constexpr Yielder& operator=(const_reference ref)
+			noexcept(nothrow_copy_assignables<T>)
+		{
+			current = ref;
+			return *this;
+		}
+
+		constexpr Yielder& operator=(rvalue_reference value)
+			noexcept(nothrow_move_assignables<T>)
+		{
+			current = move(value);
+			return *this;
+		}
+
+		[[nodiscard]]
+		constexpr reference value() & noexcept
+			requires (!std::is_const_v<T>)
+		{
+			return current;
+		}
+
+		[[nodiscard]]
+		constexpr const_reference value() const& noexcept
+		{
+			return current;
+		}
+
+		[[nodiscard]]
+		constexpr rvalue_reference value() && noexcept
+			requires (!std::is_const_v<T>)
+		{
+			return move(current);
+		}
+
+		[[nodiscard]]
+		constexpr const_rvalue_reference value() const&& noexcept
+		{
+			return move(current);
+		}
+
+		value_type current;
 	};
-	
+
 	template<typename T>
 	Yielder(T&&) -> Yielder<T&&>;
 
@@ -235,48 +225,44 @@ export namespace util::coroutine
 		}
 	};
 
-	template<typename Coroutine, awaitable Init, awaitable Final, notvoids Value>
+	template<typename Coroutine
+		, awaitable Init, awaitable Final
+		, notvoids Value>
 	class [[nodiscard]] PromiseTemplate<Coroutine, Init, Final, Value>
 		: public BasicPromise<PromiseTemplate<Coroutine, Init, Final, Value>>
 		, public Suspender<Init, Final>
+		, public Yielder<Value>
 	{
 	public:
 		using type = PromiseTemplate<Coroutine, Init, Final, Value>;
 		using coro_type = Coroutine;
 		using handle_type = std::coroutine_handle<type>;
 
-		using value_type = clean_t<Value>;
-		using reference = value_type&;
-		using const_reference = const value_type&;
-		using rvalue_reference = value_type&&;
-		using const_rvalue_reference = const value_type&&;
+		using value_type = Yielder<Value>;
+		using reference = remove_reference_t<Value>&;
+		using const_reference = const remove_reference_t<Value>&;
+		using rvalue_reference = remove_reference_t<Value>&&;
+		using const_rvalue_reference = const remove_reference_t<Value>&&;
 
 		constexpr PromiseTemplate()
 			noexcept(nothrow_default_constructibles<value_type>)
-			requires default_initializable<value_type> = default;
+			requires default_initializable<Value&&>
+		: value_type()
+		{}
+
+		constexpr PromiseTemplate()
+			noexcept(nothrow_default_constructibles<value_type>)
+			requires (!default_initializable<Value&&>)
+		{}
+
 		constexpr ~PromiseTemplate()
 			noexcept(nothrow_destructibles<value_type>) = default;
 
-		Final yield_value(rvalue_reference value)
-			noexcept(nothrow_move_assignables<value_type>)
+		template<typename U>
+		constexpr Final yield_value(U&& value)
+			noexcept(nothrow_assignables<Value, U&&>)
 		{
-			currentValue = static_cast<rvalue_reference>(value);
-			return {};
-		}
-
-		Final yield_value(const_rvalue_reference value)
-			noexcept(nothrow_move_assignables<const value_type>)
-			requires move_constructibles<const value_type>
-		{
-			currentValue = static_cast<const_rvalue_reference>(value);
-			return {};
-		}
-
-		Final yield_value(const_reference value)
-			noexcept(nothrow_copy_assignables<value_type>)
-			requires move_constructibles<value_type>
-		{
-			currentValue = value;
+			Yielder<Value>::operator=(static_cast<U&&>(value));
 			return {};
 		}
 
@@ -285,8 +271,6 @@ export namespace util::coroutine
 		{
 			return Coroutine{ handle_type::from_promise(*this) };
 		}
-
-		Monad<value_type> currentValue;
 	};
 
 	template<classes Coroutine>

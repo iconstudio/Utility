@@ -77,13 +77,13 @@ export namespace util::coroutine
 
 		inline const_reference operator*() const&
 		{
-			return *(coHandle.promise().currentValue);
+			return coHandle.promise().value();
 		}
 
 		inline rvalue_reference operator*() &&
 			noexcept(nothrow_move_constructibles<value_type>)
 		{
-			return *move(coHandle.promise().currentValue);
+			return move(coHandle.promise()).value();
 		}
 
 		[[nodiscard]]
