@@ -1,5 +1,6 @@
 export module Utility.Coroutine;
 import <algorithm>;
+export import <coroutine>;
 export import Utility.Constraints;
 import Utility.Monad;
 export import :Promise;
@@ -82,6 +83,86 @@ export namespace util::coroutine
 
 		inline rvalue_reference operator*() &&
 			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			return move(coHandle.promise()).value();
+		}
+
+		[[nodiscard]]
+		inline bool operator==(default_sentinel_t) const
+		{
+			return !coHandle || coHandle.done();
+		}
+
+	private:
+		handle_type coHandle;
+	};
+
+	template<typename Coroutine>
+	class CoIterator
+	{
+	public:
+		using coro_type = Coroutine;
+		using handle_type = coro_type::handle_type;
+
+		using iterator_concept = std::forward_iterator_tag;
+		using iterator_category = std::forward_iterator_tag;
+		using value_type = coro_type::value_type;
+		using reference = coro_type::reference;
+		using const_reference = coro_type::const_reference;
+		using rvalue_reference = coro_type::rvalue_reference;
+		using const_rvalue_reference = coro_type::const_rvalue_reference;
+		using size_type = coro_type::size_type;
+		using difference_type = coro_type::difference_type;
+
+		constexpr CoIterator()
+			noexcept(nothrow_default_constructibles<handle_type>)
+			requires default_initializables<handle_type> = default;
+		constexpr ~CoIterator() noexcept(nothrow_destructibles<handle_type>) = default;
+
+		explicit constexpr CoIterator(const handle_type& coroutine) noexcept
+			: coHandle(coroutine)
+		{}
+
+		explicit constexpr CoIterator(handle_type&& coroutine) noexcept
+			: coHandle(move(coroutine))
+		{}
+
+		inline CoIterator& operator++()
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int)
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+		}
+
+		inline reference operator*() & noexcept
+		{
+			return coHandle.promise().value();
+		}
+
+		inline const_reference operator*() const& noexcept
+		{
+			return coHandle.promise().value();
+		}
+
+		inline rvalue_reference operator*() &&
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			return move(coHandle.promise()).value();
+		}
+
+		inline const_rvalue_reference operator*() const&&
+			noexcept(nothrow_move_constructibles<const value_type>)
 		{
 			return move(coHandle.promise()).value();
 		}
@@ -179,7 +260,6 @@ export namespace util
 namespace util::test
 {
 	void test_coroutines()
-	{
-	}
+	{}
 }
 #pragma warning(pop)
