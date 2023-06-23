@@ -187,4 +187,18 @@ export namespace util
 
 	template<typename Rx, typename Fn, typename... Args>
 	concept invocable_results = invocables<Fn, Args...>&& convertible_to<std::invoke_result_t<Fn, Args...>, Rx>;
+
+	template<classes Host, typename Method>
+	[[nodiscard]]
+	consteval bool CheckMethodException() noexcept
+	{
+		if constexpr (method_by<Method, Host&&>)
+		{
+			return noexcept((std::declval<Host&&>().*std::declval<Method>())());
+		}
+		else
+		{
+			return true;
+		}
+	}
 }

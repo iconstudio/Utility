@@ -121,19 +121,6 @@ export namespace util
 		}
 	}
 
-	template<classes Host, typename Method>
-	consteval bool CheckMethodException() noexcept
-	{
-		if constexpr (method_by<Method, Host&&>)
-		{
-			return noexcept((declval<Host&&>().*declval<Method>())());
-		}
-		else
-		{
-			return true;
-		}
-	}
-
 	template<coexecution Policy, classes Host, typename Method>
 	inline
 		coroutine::RelaxedTask
