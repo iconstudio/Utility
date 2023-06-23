@@ -1048,7 +1048,7 @@ export namespace util
 	};
 }
 
-namespace util
+namespace util::test
 {
 #if false
 	constexpr void do_something() noexcept
