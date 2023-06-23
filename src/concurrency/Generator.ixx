@@ -1,4 +1,5 @@
 export module Utility.Coroutine.Generator;
+import Utility.Constraints;
 import Utility.Coroutine;
 
 export namespace util::coroutine
