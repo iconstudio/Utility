@@ -133,8 +133,8 @@ export namespace util::coroutine
 	class Yielder
 	{
 	public:
-		using value_type = T;
-		using reference = add_lvalue_reference_t<value_type>;
+		using value_type = conditional_t<std::is_lvalue_reference_v<T>, clean_t<T>&, clean_t<T>>;
+		using reference = value_type&;
 		using const_reference = const value_type&;
 		using rvalue_reference = value_type&&;
 		using const_rvalue_reference = const value_type&&;
@@ -150,11 +150,11 @@ export namespace util::coroutine
 		constexpr ~Yielder()
 			noexcept(nothrow_destructibles<value_type>) = default;
 
-		template<typename U>
-			requires constructible_from<value_type, U&&>
-		constexpr Yielder(U&& value)
-			noexcept(nothrow_constructibles<value_type, U&&>)
-			: current(static_cast<U&&>(value))
+		template<typename W>
+			requires constructible_from<value_type, W&&>
+		constexpr Yielder(W&& value)
+			noexcept(nothrow_constructibles<value_type, W&&>)
+			: current(forward<W>(value))
 		{}
 
 		constexpr Yielder& operator=(const_reference ref)
