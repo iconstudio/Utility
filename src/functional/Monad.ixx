@@ -45,13 +45,13 @@ export namespace util
 			: myStorage()
 		{}
 
-		constexpr Monad(const T& fwd)
+		constexpr Monad(const clean_t<T>& fwd)
 			noexcept(nothrow_copy_constructibles<T>)
 			: myStorage(fwd)
 			, hasValue(true)
 		{}
 
-		constexpr Monad(T&& fwd)
+		constexpr Monad(clean_t<T>&& fwd)
 			noexcept(nothrow_move_constructibles<T>)
 			: myStorage(static_cast<T&&>(fwd))
 			, hasValue(true)
