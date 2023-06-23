@@ -173,7 +173,7 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		constexpr default_sentinel_t end() noexcept
+		constexpr std::default_sentinel_t end() noexcept
 		{
 			return {};
 		}
@@ -185,7 +185,7 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		constexpr default_sentinel_t end() const noexcept
+		constexpr std::default_sentinel_t end() const noexcept
 		{
 			return {};
 		}
