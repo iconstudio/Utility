@@ -283,18 +283,13 @@ export namespace util
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct is_method_invocable<Ref, method_lv_t<Ref, R, Params...>>
-		: public std::bool_constant<!std::is_const_v<remove_reference_t<Ref>>>
-	{};
-
-	template<typename Ref, typename R, typename... Params>
-	struct is_method_invocable<Ref, method_rv_t<Ref, R, Params...>>
-		: public std::bool_constant<std::is_rvalue_reference_v<Ref> && !std::is_const_v<remove_reference_t<Ref>>>
-	{};
-
-	template<typename Ref, typename R, typename... Params>
 	struct is_method_invocable<Ref, const_method_t<Ref, R, Params...>>
 		: public true_type
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct is_method_invocable<Ref, method_lv_t<Ref, R, Params...>>
+		: public std::bool_constant<!std::is_const_v<remove_reference_t<Ref>>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
@@ -303,8 +298,13 @@ export namespace util
 	{};
 
 	template<typename Ref, typename R, typename... Params>
+	struct is_method_invocable<Ref, method_rv_t<Ref, R, Params...>>
+		: public std::bool_constant<std::is_rvalue_reference_v<remove_const_t<Ref>> && !std::is_const_v<remove_reference_t<Ref>>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
 	struct is_method_invocable<Ref, method_cr_t<Ref, R, Params...>>
-		: public std::bool_constant<std::is_rvalue_reference_v<Ref>>
+		: public std::bool_constant<std::is_rvalue_reference_v<remove_const_t<Ref>>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
@@ -408,7 +408,7 @@ export namespace util
 
 	template<typename M, typename Ref>
 	struct [[nodiscard]] method_noexcept
-		: public conditional_t<is_method_invocable_v<remove_pointer_t<clean_t<M>>, Ref>
+		: public conditional_t<is_method_invocable_v<remove_pointer_t<remove_reference_t<M>>, Ref>
 		, true_type
 		, false_type>
 	{};
