@@ -261,40 +261,40 @@ export namespace util
 	using method_cr_t = R(clean_t<Class>::*)(Params...) const&&;
 
 	template<typename Ref, typename M>
-	struct method_invocable;
+	struct is_method_invocable;
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, method_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, method_t<Ref, R, Params...>>
 		: public std::bool_constant<!std::is_const_v<Ref>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, const_method_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, const_method_t<Ref, R, Params...>>
 		: public true_type
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, method_lv_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, method_lv_t<Ref, R, Params...>>
 		: public std::bool_constant<std::is_lvalue_reference_v<Ref> && !std::is_const_v<Ref>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, method_cl_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, method_cl_t<Ref, R, Params...>>
 		: public std::bool_constant<std::is_lvalue_reference_v<Ref>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, method_rv_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, method_rv_t<Ref, R, Params...>>
 		: public std::bool_constant<std::is_rvalue_reference_v<Ref> && !std::is_const_v<Ref>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
-	struct method_invocable<Ref, method_cr_t<Ref, R, Params...>>
+	struct is_method_invocable<Ref, method_cr_t<Ref, R, Params...>>
 		: public std::bool_constant<std::is_rvalue_reference_v<Ref>>
 	{};
 
 	template<typename Ref, typename M>
-	inline constexpr bool method_invocable_v = method_invocable<Ref, M>::value;
+	inline constexpr bool is_method_invocable_v = is_method_invocable<Ref, M>::value;
 
 	template<typename M, typename C>
 	struct method_trait;
