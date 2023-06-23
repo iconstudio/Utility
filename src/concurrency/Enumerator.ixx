@@ -1,14 +1,15 @@
 module;
-#include <array>
-#include <ranges>
 export module Utility.Coroutine.Enumerator;
+import <memory>;
+import <stack>;
+import <ranges>;
 import Utility;
 import Utility.Monad;
 import Utility.Coroutine;
 
 namespace util::coroutine
 {
-	template<typename Rng>
+	export template<typename Rng>
 	concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
 
 	namespace detail
@@ -145,7 +146,66 @@ namespace util::coroutine
 			noexcept(nothrow_move_constructibles<Rng, handle_type>) = default;
 		Enumerator& operator=(const Enumerator& other) = delete;
 		constexpr Enumerator& operator=(Enumerator&& other)
-			noexcept(nothrow_move_assignables<Rng, handle_type>) = default;
+			noexcept(nothrow_move_assignables<Rng>) = default;
+
+	private:
+		Monad<Rng> underlyingRange;
+	};
+
+	template<enumerable Rng>
+		requires movable<Rng>
+	class Enumerator<Rng>::iterator
+	{
+	public:
+		using super_type = Enumerator<Rng>;
+
+		iterator() noexcept = default;
+		~iterator() noexcept = default;
+
+		iterator(Rng* const& range) noexcept
+			: myHandle()
+			, underlyingRange(range)
+		{}
+
+		explicit constexpr iterator(const handle_type& handle)
+			noexcept(nothrow_copy_constructibles<handle_type>)
+			requires copy_constructibles<Rng, handle_type>
+		: myHandle(handle)
+			, underlyingRange(handle.promise().value())
+		{}
+
+		explicit constexpr iterator(handle_type&& handle)
+			noexcept(nothrow_move_constructibles<handle_type>)
+			: myHandle(move(handle))
+			, underlyingRange(move(handle.promise()).value())
+		{}
+
+		inline iterator& operator++()
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int)
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+		}
+
+		[[nodiscard]]
+		inline bool operator==(default_sentinel_t) const
+		{
+			return !myHandle || myHandle.done();
+		}
+
+		iterator(const iterator& other) = delete;
+		iterator& operator=(const iterator& other) = delete;
 
 	private:
 		handle_type myHandle;
@@ -153,7 +213,7 @@ namespace util::coroutine
 	};
 
 	template<std::ranges::forward_range Rng>
-	Enumerator(Rng&&) -> Enumerator<Rng>;
+	Enumerator(Rng) -> Enumerator<Rng>;
 }
 
 export template<typename Rng>
