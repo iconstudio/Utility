@@ -90,6 +90,12 @@ export namespace util
 	using ::std::is_trivially_destructible;
 	using ::std::is_trivially_destructible_v;
 
+	// functions
+	using ::std::is_function;
+	using ::std::is_function_v;
+	using ::std::is_member_function_pointer;
+	using ::std::is_member_function_pointer_v;
+
 	// models
 	//using ::std::same_as;
 
