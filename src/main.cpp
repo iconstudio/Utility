@@ -64,13 +64,14 @@ int main()
 	util::Println("");
 
 	// test 3
-	const std::vector<int> test3_vec({ 3, 4, 5, 6, 7, 8, 9 });
-	//const auto task3 = util::coenumerate(test3_vec);
+	const std::vector<int> test3_vec({ 131233, 4, 5, 6, 7, 8, 353463 });
+	const auto task3 = util::coenumerate(test3_vec);
 
-	//for (const auto& vv : task3)
+	for (auto&& vv : util::coenumerate(test3_vec))
 	{
-
+		util::Print("{} ", vv);
 	}
+	util::Println("");
 
 	// test 4
 
