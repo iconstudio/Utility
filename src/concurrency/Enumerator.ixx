@@ -151,9 +151,14 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		inline iterator begin() const noexcept
+		inline const_iterator begin() const noexcept
 		{
-			return iterator{ myHandle };
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return const_iterator{ myHandle };
 		}
 
 		[[nodiscard]]
