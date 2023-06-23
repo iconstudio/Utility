@@ -101,6 +101,12 @@ namespace util::coroutine
 			coro_t::value_type current;
 		};
 		using handle_type = std::coroutine_handle<promise_type>;
+
+		using iterator = CoIterator<Enumerator<Rng>>;
+		using const_iterator = ConstCoIterator<Enumerator<Rng>>;
+		//class iterator;
+		//using const_iterator = const iterator;
+
 		constexpr Enumerator()
 			noexcept(nothrow_default_constructibles<Rng>)
 			requires(default_initializable<Rng>) = default;
@@ -192,87 +198,6 @@ namespace util::coroutine
 
 	template<std::ranges::forward_range Rng>
 	Enumerator(Rng&&) -> Enumerator<Rng>;
-	{
-	public:
-		using super_type = Enumerator<Rng>;
-
-		iterator() noexcept = default;
-		~iterator() noexcept = default;
-
-		constexpr iterator(handle_type coroutine) noexcept
-			: coHandle(coroutine)
-		{}
-
-		inline iterator& operator++()
-		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
-
-			return *this;
-		}
-
-		inline void operator++(int)
-		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
-		}
-
-		inline const iterator& operator++() const
-		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
-
-			return *this;
-		}
-
-		inline void operator++(int) const
-		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
-		}
-
-		inline reference operator*() & noexcept
-		{
-			return *(coHandle.promise().value());
-		}
-
-		inline const_reference operator*() const& noexcept
-		{
-			return *(coHandle.promise().value());
-		}
-
-		inline rvalue_reference operator*() &&
-			noexcept(nothrow_move_constructibles<value_type>)
-		{
-			return *(move(coHandle.promise()).value());
-		}
-
-		inline const_rvalue_reference operator*() const&&
-			noexcept(nothrow_move_constructibles<value_type>)
-		{
-			return *(move(coHandle.promise()).value());
-		}
-
-		[[nodiscard]]
-		inline bool operator==(default_sentinel_t) const
-		{
-			return !coHandle || coHandle.done();
-		}
-
-	private:
-		handle_type coHandle;
-	};
-
-	template<std::ranges::forward_range Rng>
-	Enumerator(Rng) -> Enumerator<Rng>;
 }
 
 export template<typename Rng>
@@ -281,11 +206,36 @@ inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumer
 export namespace util
 {
 	template<std::ranges::forward_range Rng>
-	inline coroutine::Enumerator<Rng> coenumerate(Rng&& range) noexcept
+	inline coroutine::Enumerator<Rng> coenumerate(Rng&& rng) noexcept
 	{
-		for (auto&& it = range.begin(); it != range.end(); ++it)
+		auto&& range = forward<Rng>(rng);
+		auto it = std::ranges::cbegin(range);
+
+		while (it != range.cend())
 		{
-			co_yield *it;
+			co_yield *(it++);
 		}
 	}
 }
+
+#pragma warning(push, 1)
+
+namespace util::test
+{
+	void test_enum_coroutine()
+	{
+		auto aa = coenumerate(std::vector{ 0, 2, 34, 54, 56, 654, 75 });
+
+		for (auto&& val : aa)
+		{
+		}
+
+		std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
+		auto bb = coenumerate(vb);
+
+		for (auto&& val : vb)
+		{
+		}
+	}
+}
+#pragma warning(pop)
