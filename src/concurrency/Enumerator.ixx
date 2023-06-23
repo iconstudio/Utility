@@ -10,7 +10,7 @@ import Utility.Coroutine;
 namespace util::coroutine
 {
 	export template<typename Rng>
-	concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
+		concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
 
 	namespace detail
 	{
@@ -48,13 +48,14 @@ namespace util::coroutine
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
+		using internal_iterator = std::ranges::iterator_t<Rng>;
 		using type = Enumerator<Rng>;
 		using interface = std::ranges::view_interface<Enumerator<Rng>>;
-		using promise_type = DeferredValuePromise<type, value_type>;
+		using promise_type = DeferredValuePromise<type, internal_iterator>;
 		using handle_type = promise_type::handle_type;
 
 		class iterator;
-		class const_iterator;
+		using const_iterator = iterator;
 
 		constexpr Enumerator()
 			noexcept(nothrow_default_constructibles<Rng>)
@@ -66,39 +67,36 @@ namespace util::coroutine
 			requires constructible_from<Rng, Sng>
 		constexpr Enumerator(Enumerator<Sng>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
-			: myHandle(std::move(other.myHandle))
-			, underlyingRange(std::move(other.underlyingRange))
+			: myHandle(move(other.myHandle))
+			, underlyingRange(move(other.underlyingRange))
+			, underlyingIt(move(other.underlyingIt))
 		{}
 
 		template<enumerable Sng>
-			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng, handle_type>
+			requires constructible_from<Rng, Sng, internal_iterator>&& copy_constructibles<Rng, Sng, internal_iterator>
 		constexpr Enumerator(const Enumerator<Sng>& other)
-			noexcept(nothrow_constructibles<Rng, Sng>)
+			noexcept(nothrow_constructibles<Rng, Sng, internal_iterator>)
 			: myHandle(other.myHandle)
 			, underlyingRange(other.underlyingRange)
+			, underlyingIt(other.underlyingIt)
 		{}
 
 		explicit constexpr Enumerator(const handle_type& handle)
 			noexcept(nothrow_copy_constructibles<handle_type>)
 			requires copy_constructibles<Rng, handle_type>
 		: myHandle(handle)
-			, underlyingRange(handle.promise().value())
+			, underlyingIt(handle.promise().value())
 		{}
 
 		explicit constexpr Enumerator(handle_type&& handle)
 			noexcept(nothrow_move_constructibles<handle_type>)
 			: myHandle(move(handle))
-			, underlyingRange(move(handle.promise()).value())
+			, underlyingIt(move(handle.promise()).value())
 		{}
 
 		[[nodiscard]]
 		inline iterator begin() noexcept
 		{
-			if (!myHandle.done())
-			{
-				myHandle.resume();
-			}
-
 			return iterator{ myHandle };
 		}
 
@@ -109,14 +107,9 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		inline const_iterator begin() const noexcept
+		inline iterator begin() const noexcept
 		{
-			if (!myHandle.done())
-			{
-				myHandle.resume();
-			}
-
-			return const_iterator{ myHandle };
+			return iterator{ myHandle };
 		}
 
 		[[nodiscard]]
@@ -143,13 +136,15 @@ namespace util::coroutine
 
 		Enumerator(const Enumerator& other) = delete;
 		constexpr Enumerator(Enumerator&& other)
-			noexcept(nothrow_move_constructibles<Rng, handle_type>) = default;
+			noexcept(nothrow_move_constructibles<Rng>) = default;
 		Enumerator& operator=(const Enumerator& other) = delete;
 		constexpr Enumerator& operator=(Enumerator&& other)
 			noexcept(nothrow_move_assignables<Rng>) = default;
 
 	private:
+		handle_type myHandle;
 		Monad<Rng> underlyingRange;
+		Monad<internal_iterator> underlyingIt;
 	};
 
 	template<enumerable Rng>
@@ -162,29 +157,15 @@ namespace util::coroutine
 		iterator() noexcept = default;
 		~iterator() noexcept = default;
 
-		iterator(Rng* const& range) noexcept
-			: myHandle()
-			, underlyingRange(range)
-		{}
-
-		explicit constexpr iterator(const handle_type& handle)
-			noexcept(nothrow_copy_constructibles<handle_type>)
-			requires copy_constructibles<Rng, handle_type>
-		: myHandle(handle)
-			, underlyingRange(handle.promise().value())
-		{}
-
-		explicit constexpr iterator(handle_type&& handle)
-			noexcept(nothrow_move_constructibles<handle_type>)
-			: myHandle(move(handle))
-			, underlyingRange(move(handle.promise()).value())
+		constexpr iterator(handle_type coroutine) noexcept
+			: coHandle(coroutine)
 		{}
 
 		inline iterator& operator++()
 		{
-			if (!myHandle.done())
+			if (!coHandle.done())
 			{
-				myHandle.resume();
+				coHandle.resume();
 			}
 
 			return *this;
@@ -192,24 +173,60 @@ namespace util::coroutine
 
 		inline void operator++(int)
 		{
-			if (!myHandle.done())
+			if (!coHandle.done())
 			{
-				myHandle.resume();
+				coHandle.resume();
 			}
+		}
+
+		inline const iterator& operator++() const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int) const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+		}
+
+		inline reference operator*() & noexcept
+		{
+			return *(coHandle.promise().value());
+		}
+
+		inline const_reference operator*() const& noexcept
+		{
+			return *(coHandle.promise().value());
+		}
+
+		inline rvalue_reference operator*() &&
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			return *(move(coHandle.promise()).value());
+		}
+
+		inline const_rvalue_reference operator*() const&&
+			noexcept(nothrow_move_constructibles<value_type>)
+		{
+			return *(move(coHandle.promise()).value());
 		}
 
 		[[nodiscard]]
 		inline bool operator==(default_sentinel_t) const
 		{
-			return !myHandle || myHandle.done();
+			return !coHandle || coHandle.done();
 		}
 
-		iterator(const iterator& other) = delete;
-		iterator& operator=(const iterator& other) = delete;
-
 	private:
-		handle_type myHandle;
-		Monad<Rng> underlyingRange;
+		handle_type coHandle;
 	};
 
 	template<std::ranges::forward_range Rng>
