@@ -1,8 +1,12 @@
 module;
 #include <ranges>
+#include <vector>
+#include <stack>
+#include <coroutine>
 
 export module Utility.Coroutine.Enumerator;
 import Utility;
+import Utility.Constraints;
 import Utility.Monad;
 import Utility.Coroutine;
 
