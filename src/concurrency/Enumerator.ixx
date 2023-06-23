@@ -219,8 +219,8 @@ namespace util::coroutine
 		Monad<internal_iterator> underlyingIt;
 	};
 
-	template<enumerable Rng>
-	class Enumerator<Rng>::iterator
+	template<std::ranges::forward_range Rng>
+	Enumerator(Rng&&) -> Enumerator<Rng>;
 	{
 	public:
 		using super_type = Enumerator<Rng>;
