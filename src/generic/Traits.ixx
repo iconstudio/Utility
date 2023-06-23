@@ -237,16 +237,64 @@ export namespace util
 	using nothrow_function_t = R(*)(Params...) noexcept;
 
 	template<typename Class, typename R, typename... Params>
-	using method_t = R(decay_t<Class>::*)(Params...);
+	using method_t = R(clean_t<Class>::*)(Params...);
 
 	template<typename Class, typename R, typename... Params>
-	using const_method_t = R(decay_t<Class>::*)(Params...) const;
+	using const_method_t = R(clean_t<Class>::*)(Params...) const;
 
 	template<typename Class, typename R, typename... Params>
-	using nothrow_method_t = R(decay_t<Class>::*)(Params...) noexcept;
+	using nothrow_method_t = R(clean_t<Class>::*)(Params...) noexcept;
 
 	template<typename Class, typename R, typename... Params>
-	using const_nothrow_method_t = R(decay_t<Class>::*)(Params...) const noexcept;
+	using const_nothrow_method_t = R(clean_t<Class>::*)(Params...) const noexcept;
+
+	template<typename Class, typename R, typename... Params>
+	using method_lv_t = R(clean_t<Class>::*)(Params...)&;
+
+	template<typename Class, typename R, typename... Params>
+	using method_cl_t = R(clean_t<Class>::*)(Params...) const&;
+
+	template<typename Class, typename R, typename... Params>
+	using method_rv_t = R(clean_t<Class>::*)(Params...)&&;
+
+	template<typename Class, typename R, typename... Params>
+	using method_cr_t = R(clean_t<Class>::*)(Params...) const&&;
+
+	template<typename Ref, typename M>
+	struct method_invocable;
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, method_t<Ref, R, Params...>>
+		: public std::bool_constant<!std::is_const_v<Ref>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, const_method_t<Ref, R, Params...>>
+		: public true_type
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, method_lv_t<Ref, R, Params...>>
+		: public std::bool_constant<std::is_lvalue_reference_v<Ref> && !std::is_const_v<Ref>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, method_cl_t<Ref, R, Params...>>
+		: public std::bool_constant<std::is_lvalue_reference_v<Ref>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, method_rv_t<Ref, R, Params...>>
+		: public std::bool_constant<std::is_rvalue_reference_v<Ref> && !std::is_const_v<Ref>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct method_invocable<Ref, method_cr_t<Ref, R, Params...>>
+		: public std::bool_constant<std::is_rvalue_reference_v<Ref>>
+	{};
+
+	template<typename Ref, typename M>
+	inline constexpr bool method_invocable_v = method_invocable<Ref, M>::value;
 
 	template<typename M, typename C>
 	struct method_trait;
