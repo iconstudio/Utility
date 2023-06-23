@@ -118,14 +118,18 @@ namespace util::coroutine
 		constexpr Enumerator(Enumerator<Sng>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(move(other.myHandle))
-		{}
+		{
+			myHandle.promise().current = move(other.myHandle.promise().current);
+		}
 
 		template<enumerable Sng>
 			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng>
 		constexpr Enumerator(const Enumerator<Sng>& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
-		{}
+		{
+			myHandle.promise().current = other.myHandle.promise().current;
+		}
 
 		explicit constexpr Enumerator(const handle_type& handle)
 			noexcept(nothrow_copy_constructibles<handle_type>)
