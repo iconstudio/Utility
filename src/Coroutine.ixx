@@ -121,13 +121,24 @@ export namespace util
 		}
 	}
 
+	template<classes Host, typename Method>
+	consteval bool CheckMethodException() noexcept
+	{
+		if constexpr (method_by<Method, Host&&>)
+		{
+			return noexcept((declval<Host&&>().*declval<Method>())());
+		}
+		else
+		{
+			return true;
+		}
+	}
 
 	template<coexecution Policy, classes Host, typename Method>
-		requires method_by<Method, Host&&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(Host&& host, const Method& fn)
-		noexcept(method_noexcept<Method, Host&&>::value)
+		corepeat_as_by(Host&& host, Method&& fn)
+		noexcept(CheckMethodException<Host&&, Method&&>())
 	{
 		static_assert(method_by<Method, Host&&>, "The method does not take proper specifier");
 
@@ -142,7 +153,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!(forward<Host>(host).*fn)())
+			if (!(forward<Host>(host).*forward<Method>(fn))())
 			{
 				co_return;
 			}
@@ -200,38 +211,56 @@ namespace util::test
 {
 	struct test_coclass
 	{
-		constexpr bool test_memfn1() noexcept { return false; }
-		constexpr bool test_memfn2() const noexcept { return false; }
+		constexpr bool test_memfn1() { return false; }
+		constexpr bool test_memfn2() const { return false; }
+		constexpr bool test_memfn3() noexcept { return false; }
+		constexpr bool test_memfn4() const noexcept { return false; }
 	};
 
 	void test_coroutines()
 	{
 		constexpr auto ptr1 = &test_coclass::test_memfn1;
 		constexpr auto ptr2 = &test_coclass::test_memfn2;
+		constexpr auto ptr3 = &test_coclass::test_memfn3;
+		constexpr auto ptr4 = &test_coclass::test_memfn4;
 
 		using ftype1 = decltype(ptr1);
 		using ftype2 = decltype(ptr2);
+		using ftype3 = decltype(ptr3);
+		using ftype4 = decltype(ptr4);
 
 		test_coclass cocl1{};
 		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn3);
+		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn4);
 
 		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn3);
+		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn4);
 
 		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn3);
+		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn4);
 
 		const test_coclass cocl2{};
-		//corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn1); //
+		//corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn1); //!
 		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn2);
+		//corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn3); //!
+		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn4);
 
 		constexpr test_coclass cocl3{};
-		//corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
+		//corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //!
 		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn2);
+		//corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn3); //!
+		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn4);
 
-		//corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
+		//corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //!
 		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
+		//corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn3); //!
+		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn4);
 	}
 }
 #pragma warning(pop)
