@@ -174,6 +174,7 @@
     <ClCompile Include="..\Testbed.cpp" />
     <ClCompile Include="..\ThreadUnit.ixx" />
     <ClCompile Include="..\Time.ixx" />
+    <ClCompile Include="concurrency\CoIterator.ixx" />
     <ClCompile Include="concurrency\CoPromise.ixx" />
     <ClCompile Include="concurrency\CoTask.ixx" />
     <ClCompile Include="concurrency\Enumerator.ixx" />
