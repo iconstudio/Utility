@@ -28,7 +28,7 @@ export namespace util::coroutine
 	class [[nodiscard]] BasicPromise
 	{
 	public:
-		using handle_type = std::coroutine_handle<BasicPromise<Promise>>;
+		using handle_type = coroutine_handle<BasicPromise<Promise>>;
 
 		constexpr BasicPromise() noexcept = default;
 		constexpr ~BasicPromise() noexcept = default;
@@ -89,7 +89,7 @@ export namespace util::coroutine
 	public:
 		using type = PromiseTemplate<Coroutine, Init, Final, void>;
 		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<type>;
+		using handle_type = coroutine_handle<type>;
 
 		[[nodiscard]]
 		Coroutine acquire_coroutine() noexcept
@@ -108,7 +108,7 @@ export namespace util::coroutine
 	public:
 		using type = PromiseTemplate<Coroutine, Init, Final, Value>;
 		using coro_type = Coroutine;
-		using handle_type = std::coroutine_handle<type>;
+		using handle_type = coroutine_handle<type>;
 
 		using value_type = Value;
 		using reference = remove_reference_t<Value>&;

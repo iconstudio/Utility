@@ -95,6 +95,8 @@ export namespace util
 	using ::std::is_function_v;
 	using ::std::is_member_function_pointer;
 	using ::std::is_member_function_pointer_v;
+	using ::std::invoke_result;
+	using ::std::invoke_result_t;
 
 	// models
 	//using ::std::same_as;
@@ -166,7 +168,7 @@ export namespace util
 	struct avoid_void
 	{
 		template<typename Fn, typename... Args>
-		static consteval auto Eval() noexcept(std::is_nothrow_invocables<Fn, Args...>)->std::invoke_result_t<Fn, Args...>;
+		static consteval auto Eval() noexcept(std::is_nothrow_invocables<Fn, Args...>)->invoke_result_t<Fn, Args...>;
 	};
 
 	template<typename Void>
@@ -174,10 +176,10 @@ export namespace util
 	struct avoid_void<Void>
 	{
 		template<typename Fn, typename... Args>
-		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn, Args...>)->std::invoke_result_t<Fn, Args...>;
+		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn, Args...>)->invoke_result_t<Fn, Args...>;
 
 		template<typename Fn>
-		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn>)->std::invoke_result_t<Fn>;
+		static consteval auto Eval() noexcept(std::is_nothrow_invocable_v<Fn>)->invoke_result_t<Fn>;
 	};
 
 	template<template<typename> typename MetaFn, template<typename> typename Wrapper, typename... Ts>
@@ -211,7 +213,7 @@ export namespace util
 	inline constexpr bool is_explicit_constructible_v = is_explicit_constructible<T>::value;
 
 	template<typename Fn, typename... Args>
-	using monad_result_t = clean_t<std::invoke_result_t<Fn, Args...>>;
+	using monad_result_t = clean_t<invoke_result_t<Fn, Args...>>;
 
 	template<typename T>
 	using make_lvalue_t = conditional_t<std::same_as<clean_t<T>, void>, void, add_lvalue_reference_t<remove_const_t<T>>>;
