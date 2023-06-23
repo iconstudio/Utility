@@ -10,7 +10,7 @@ export namespace util
 	concept finalized = classes<T> && std::is_final_v<clean_t<T>>;
 
 	template<typename... Ts>
-	concept functions = make_conjunction<is_function, decay_t<Ts>...>;
+	concept functions = make_conjunction<is_function, clean_t<Ts>...>;
 
 	template<typename... Ts>
 	concept member_function_ptrs = make_conjunction<is_member_function_pointer, decay_t<Ts>...>;
