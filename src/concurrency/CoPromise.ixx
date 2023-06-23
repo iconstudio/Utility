@@ -76,59 +76,6 @@ export namespace util::coroutine
 		}
 	};
 
-	template<movable Storage>
-	class Borrower;
-
-	template<std::indirectly_readable Storage>
-	class Borrower<Storage>
-	{
-	public:
-		constexpr Borrower()
-			noexcept(nothrow_default_constructibles<Storage>)
-			requires default_initializable<Storage> = default;
-		constexpr ~Borrower()
-			noexcept(nothrow_destructibles<Storage>) = default;
-
-		template<std::indirectly_readable S>
-			requires (constructible_from<Storage, S&&> || constructible_from<Storage, std::indirect_result_t<S&&>>)
-		explicit(!is_trivially_constructible_v<Storage, S&&>)
-			constexpr Borrower(S&& storage)
-			noexcept(nothrow_constructibles<Storage, S&&>)
-			: currentValue(static_cast<S&&>(storage))
-		{}
-
-		template<movable V>
-			requires (constructible_from<Storage, V&&> && !std::indirectly_readable<V>)
-		explicit(!is_trivially_constructible_v<Storage, V&&>)
-			constexpr Borrower(V&& value)
-			noexcept(nothrow_constructibles<Storage, V&&>)
-			: currentValue(static_cast<V&&>(value))
-		{}
-
-		Storage& Get() &
-			noexcept(nothrow_copy_constructibles<Storage>)
-			requires(copy_constructible<Storage>)
-		{ return currentValue; }
-
-		const Storage& Get() const&
-			noexcept(nothrow_copy_constructibles<Storage>)
-			requires(copy_constructible<Storage>)
-		{ return currentValue; }
-
-		Storage&& Get() &&
-			noexcept(nothrow_move_constructibles<Storage>)
-			requires(move_constructible<Storage>)
-		{ return move(currentValue); }
-
-		const Storage&& Get() const&&
-			noexcept(nothrow_move_constructibles<Storage>)
-			requires(move_constructible<Storage>)
-		{ return move(currentValue); }
-
-	protected:
-		Storage currentValue;
-	};
-
 	template<typename Coroutine
 		, awaitable Init = std::suspend_always, awaitable Final = std::suspend_always
 		, typename V = void>

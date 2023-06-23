@@ -1,8 +1,7 @@
 module;
+#include <ranges>
+
 export module Utility.Coroutine.Enumerator;
-import <memory>;
-import <stack>;
-import <ranges>;
 import Utility;
 import Utility.Monad;
 import Utility.Coroutine;
@@ -35,8 +34,12 @@ namespace util::coroutine
 		};
 	}
 
+	struct promise_type : public util::coroutine::BasicPromise<promise_type>
+	{
+
+	};
+
 	export template<enumerable Rng>
-		requires movable<Rng>
 	class [[nodiscard]] Enumerator : public std::ranges::view_interface<Enumerator<Rng>>
 	{
 	public:
@@ -148,7 +151,6 @@ namespace util::coroutine
 	};
 
 	template<enumerable Rng>
-		requires movable<Rng>
 	class Enumerator<Rng>::iterator
 	{
 	public:
