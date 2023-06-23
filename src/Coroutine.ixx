@@ -145,6 +145,24 @@ export namespace util::coroutine
 			}
 		}
 
+		inline const CoIterator& operator++() const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+
+			return *this;
+		}
+
+		inline void operator++(int) const
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
+		}
+
 		inline reference operator*() & noexcept
 		{
 			return coHandle.promise().value();
@@ -197,8 +215,6 @@ export namespace util
 
 		while (predicate())
 		{
-			functor();
-
 			if constexpr (Policy == coexecution::Now)
 			{
 				co_await coroutine::suspend_never{};
@@ -207,6 +223,8 @@ export namespace util
 			{
 				co_await coroutine::suspend_always{};
 			}
+
+			functor();
 		}
 	}
 
@@ -230,11 +248,6 @@ export namespace util
 
 		while (true)
 		{
-			if (!functor())
-			{
-				co_return;
-			}
-
 			if constexpr (Policy == coexecution::Now)
 			{
 				co_await coroutine::suspend_never{};
@@ -243,7 +256,21 @@ export namespace util
 			{
 				co_await coroutine::suspend_always{};
 			}
+
+			if (!functor())
+			{
+				co_return;
+			}
 		}
+	}
+
+	template<coexecution Policy, functions Fn>
+	inline
+		coroutine::RelaxedTask
+		corepeat_as(Fn&& fn)
+		noexcept(noexcept(forward<Fn>(fn)()))
+	{
+
 	}
 
 	template<r_invocables<bool> Fn>
