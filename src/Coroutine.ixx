@@ -121,13 +121,14 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, classes Host, functions Method>
-		requires method_by<Method, Host&>
+	template<coexecution Policy, classes Host, typename Method>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(Host& host, Method Host::* const& fn)
-		noexcept(noexcept((declval<Host&>().*fn)()))
+		corepeat_as_by(Host& host, Method&& fn)
+		noexcept(method_noexcept<Method, Host&>::value)
 	{
+		static_assert(method_by<Method, Host&>, "The method does not take Host& as its first parameter.");
+
 		while (true)
 		{
 			if constexpr (Policy == coexecution::Now)
@@ -146,13 +147,14 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, classes Host, functions Method>
-		//requires method_by<Method, const Host&>
+	template<coexecution Policy, classes Host, typename Method>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(const Host& host, Method Host::* const& fn)
-		noexcept(noexcept((declval<const Host&>().*fn)()))
+		corepeat_as_by(const Host& host, Method&& fn)
+		noexcept(method_noexcept<Method, const Host&>::value)
 	{
+		static_assert(method_by<Method, const Host&>, "The method does not take const Host& as its first parameter.");
+
 		while (true)
 		{
 			if constexpr (Policy == coexecution::Now)
@@ -171,13 +173,14 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, classes Host, functions Method>
-		//requires method_by<Method, Host&&>
+	template<coexecution Policy, classes Host, typename Method>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(Host&& host, Method Host::* const& fn)
-		noexcept(noexcept((declval<Host&&>().*fn)()))
+		corepeat_as_by(Host&& host, Method&& fn)
+		noexcept(method_noexcept<Method, Host&&>::value)
 	{
+		static_assert(method_by<Method, Host&&>, "The method does not take Host&& as its first parameter.");
+
 		Host localhost = static_cast<Host&&>(host);
 
 		while (true)
@@ -198,13 +201,14 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, classes Host, functions Method>
-		requires method_by<Method, const Host&&>
+	template<coexecution Policy, classes Host, typename Method>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(const remove_reference_t<Host>&& host, Method Host::* const& fn)
-		noexcept(noexcept((declval<const Host&&>().*fn)()))
+		corepeat_as_by(const remove_reference_t<Host>&& host, Method&& fn)
+		noexcept(method_noexcept<Method, const Host&&>::value)
 	{
+		static_assert(method_by<Method, const Host&&>, "The method does not take const Host&& as its first parameter.");
+
 		const Host localhost = static_cast<const Host&&>(host);
 
 		while (true)

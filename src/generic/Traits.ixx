@@ -274,22 +274,32 @@ export namespace util
 
 	template<typename Ref, typename M>
 	struct is_method_invocable
-		: public true_type
+		: public false_type
 	{};
 
 	template<typename Ref, typename R, typename... Params>
 	struct is_method_invocable<Ref, method_t<Ref, R, Params...>>
-		: public std::bool_constant<!std::is_const_v<decay_t<Ref>>>
+		: public std::bool_constant<!std::is_const_v<remove_reference_t<Ref>>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
 	struct is_method_invocable<Ref, method_lv_t<Ref, R, Params...>>
-		: public std::bool_constant<!std::is_const_v<decay_t<Ref>>>
+		: public std::bool_constant<!std::is_const_v<remove_reference_t<Ref>>>
 	{};
 
 	template<typename Ref, typename R, typename... Params>
 	struct is_method_invocable<Ref, method_rv_t<Ref, R, Params...>>
-		: public std::bool_constant<std::is_rvalue_reference_v<Ref> && !std::is_const_v<decay_t<Ref>>>
+		: public std::bool_constant<std::is_rvalue_reference_v<Ref> && !std::is_const_v<remove_reference_t<Ref>>>
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct is_method_invocable<Ref, const_method_t<Ref, R, Params...>>
+		: public true_type
+	{};
+
+	template<typename Ref, typename R, typename... Params>
+	struct is_method_invocable<Ref, method_cl_t<Ref, R, Params...>>
+		: public true_type
 	{};
 
 	template<typename Ref, typename R, typename... Params>
@@ -331,10 +341,10 @@ export namespace util
 	inline constexpr bool is_method_invocable_v = is_method_invocable<Ref, M>::value;
 
 	template<typename M, typename C>
-	struct method_trait;
+	struct [[nodiscard]] method_trait;
 
 	template<typename C, typename R, typename... Params>
-	struct method_trait<method_t<C, R, Params...>, C>
+	struct [[nodiscard]] method_trait<method_t<C, R, Params...>, C>
 	{
 		using type = method_t<decay_t<C>, R, Params...>;
 		using result = R;
@@ -347,7 +357,7 @@ export namespace util
 	};
 
 	template<typename C, typename R, typename... Params>
-	struct method_trait<const_method_t<C, R, Params...>, C>
+	struct [[nodiscard]] method_trait<const_method_t<C, R, Params...>, C>
 	{
 		using type = const_method_t<decay_t<C>, R, Params...>;
 		using result = R;
@@ -360,7 +370,7 @@ export namespace util
 	};
 
 	template<typename C, typename R, typename... Params>
-	struct method_trait<nothrow_method_t<C, R, Params...>, C>
+	struct [[nodiscard]] method_trait<nothrow_method_t<C, R, Params...>, C>
 	{
 		using type = nothrow_method_t<decay_t<C>, R, Params...>;
 		using result = R;
@@ -373,7 +383,7 @@ export namespace util
 	};
 
 	template<typename C, typename R, typename... Params>
-	struct method_trait<const_nothrow_method_t<C, R, Params...>, C>
+	struct [[nodiscard]] method_trait<const_nothrow_method_t<C, R, Params...>, C>
 	{
 		using type = const_nothrow_method_t<decay_t<C>, R, Params...>;
 		using result = R;
@@ -392,6 +402,16 @@ export namespace util
 	/// <typeparam name="C"></typeparam>
 	template<typename M, typename C>
 	using method_trait_t = typename method_trait<clean_t<M>, C>::type;
+
+	template<typename M, typename Ref>
+	struct [[nodiscard]] method_noexcept;
+
+	template<typename M, typename Ref>
+	struct [[nodiscard]] method_noexcept
+		: public conditional_t<is_method_invocable_v<remove_pointer_t<clean_t<M>>, Ref>
+		, true_type
+		, false_type>
+	{};
 }
 
 #pragma warning(push, 1)
@@ -449,6 +469,26 @@ namespace util::test
 		method_trait<fty2, test_methods>::type pr_val2;
 		method_trait<fty3, test_methods>::type pr_val3;
 		method_trait<fty4, test_methods>::type pr_val4;
+
+		is_method_invocable_v<test_methods, fty1>;
+		is_method_invocable_v<test_methods, fty2>;
+		is_method_invocable_v<test_methods, fty3>;
+		is_method_invocable_v<test_methods, fty4>;
+
+		is_method_invocable_v<const test_methods, fty1>; // false
+		is_method_invocable_v<const test_methods, fty2>;
+		is_method_invocable_v<const test_methods, fty3>;
+		is_method_invocable_v<const test_methods, fty4>; // false
+
+		is_method_invocable_v<test_methods&, fty1>;
+		is_method_invocable_v<test_methods&, fty2>;
+		is_method_invocable_v<test_methods&, fty3>;
+		is_method_invocable_v<test_methods&, fty4>;
+
+		is_method_invocable_v<const test_methods&, fty1>; //!! not false
+		is_method_invocable_v<const test_methods&, fty2>;
+		is_method_invocable_v<const test_methods&, fty3>;
+		is_method_invocable_v<const test_methods&, fty4>; //!! not false
 
 		method_trait<fty1, const test_methods>::type cp_val1;
 		method_trait<fty2, const test_methods>::type cp_val2;

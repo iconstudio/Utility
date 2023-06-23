@@ -10,16 +10,16 @@ export namespace util
 	concept finalized = classes<T> && std::is_final_v<clean_t<T>>;
 
 	template<typename... Ts>
-	concept functions = make_conjunction<is_function, clean_t<Ts>...>;
+	concept functions = make_conjunction<is_function, decay_t<Ts>...>;
 
 	template<typename... Ts>
-	concept member_function_ptrs = make_conjunction<is_member_function_pointer, clean_t<Ts>...>;
+	concept member_function_ptrs = make_conjunction<is_member_function_pointer, decay_t<Ts>...>;
 
 	template<typename M, typename C>
 	concept method = classes<C> && member_function_ptrs<M>;
 
 	template<typename M, typename Ref>
-	concept method_by = classes<clean_t<Ref>> && is_method_invocable_v<Ref, clean_t<M>>;
+	concept method_by = classes<clean_t<Ref>> && is_method_invocable_v<Ref, decay_t<M>>;
 
 	template<typename Derived, typename Parent>
 	concept hierachy = classes<Derived, Parent>&& std::derived_from<Derived, remove_cv_t<Parent>>;
