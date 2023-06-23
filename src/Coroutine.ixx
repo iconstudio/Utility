@@ -1,4 +1,5 @@
 export module Utility.Coroutine;
+import <tuple>;
 import <algorithm>;
 export import <coroutine>;
 export import Utility.Constraints;
@@ -210,8 +211,8 @@ export namespace util
 		corepeat_as_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
-		Fn functor = forward<Fn>(fn);
-		Pred predicate = forward<Pred>(pred);
+		Fn&& functor = forward<Fn>(fn);
+		Pred&& predicate = forward<Pred>(pred);
 
 		while (predicate())
 		{
@@ -244,7 +245,7 @@ export namespace util
 		corepeat_as(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
-		Fn functor = forward<Fn>(fn);
+		Fn&& functor = forward<Fn>(fn);
 
 		while (true)
 		{
@@ -264,13 +265,31 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, functions Fn>
+	template<coexecution Policy, functions Fn, typename... Args>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(Fn&& fn)
-		noexcept(noexcept(forward<Fn>(fn)()))
+		corepeat_as(Fn&& fn, Args&&... args)
+		noexcept(noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
 	{
+		Fn&& functor = forward<Fn>(fn);
+		const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
 
+		while (true)
+		{
+			if constexpr (Policy == coexecution::Now)
+			{
+				co_await coroutine::suspend_never{};
+			}
+			else
+			{
+				co_await coroutine::suspend_always{};
+			}
+
+			if (!std::apply(functor, arguments))
+			{
+				co_return;
+			}
+		}
 	}
 
 	template<r_invocables<bool> Fn>
@@ -280,6 +299,15 @@ export namespace util
 		noexcept(nothrow_invocables<Fn>)
 	{
 		return corepeat_as<coexecution::Later>(forward<Fn>(fn));
+	}
+
+	template<functions Fn, typename... Args>
+	inline
+		coroutine::RelaxedTask
+		corepeat(Fn&& fn, Args&&... args)
+		noexcept(noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
+	{
+		return corepeat_as<coexecution::Later>(forward<Fn>(fn), forward<Args>(args)...);
 	}
 }
 
