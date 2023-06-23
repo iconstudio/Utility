@@ -4,6 +4,7 @@ export import <coroutine>;
 export import :CoIterator;
 export import :Promise;
 export import :Task;
+export import Utility;
 export import Utility.Constraints;
 
 export namespace util::coroutine
@@ -123,13 +124,11 @@ export namespace util
 	template<coexecution Policy, functions Method, classes Host>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(Host& host, Method Host::* (&& fn))
-		noexcept(noexcept(std::declval<Host&>().*forward<Method Host::*>(fn)()))
+		corepeat_as(Host& host, Method Host::* const& fn)
+		noexcept(noexcept((declval<Host&>().*fn)()))
 	{
 		static_assert(cl_invocable<Method Host::*, Host>);
 
-		auto functor = forward<Method Host::*>(fn);
-
 		while (true)
 		{
 			if constexpr (Policy == coexecution::Now)
@@ -141,7 +140,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!host.*functor())
+			if (!host.*fn())
 			{
 				co_return;
 			}
@@ -151,11 +150,9 @@ export namespace util
 	template<coexecution Policy, functions Method, classes Host>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(const Host& host, Method Host::* const (&& fn))
-		noexcept(noexcept(std::declval<const Host&>().*forward<Method Host::* const>(fn)()))
+		corepeat_as(const Host& host, Method Host::* const& (fn))
+		noexcept(noexcept((declval<const Host&>().*fn)()))
 	{
-		auto functor = forward<Method Host::* const>(fn);
-
 		while (true)
 		{
 			if constexpr (Policy == coexecution::Now)
@@ -167,7 +164,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!host.*functor())
+			if (!host.*fn())
 			{
 				co_return;
 			}
@@ -177,11 +174,10 @@ export namespace util
 	template<coexecution Policy, functions Method, classes Host>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(Host&& host, Method Host::* (&& fn))
-		noexcept(noexcept(std::declval<Host&&>().*forward<Method Host::*>(fn)()))
+		corepeat_as(Host&& host, Method Host::* const& (fn))
+		noexcept(noexcept((declval<Host&&>().*fn)()))
 	{
 		Host localhost = static_cast<Host&&>(host);
-		auto functor = forward<Method Host::*>(fn);
 
 		while (true)
 		{
@@ -194,7 +190,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!localhost.*functor())
+			if (!localhost.*fn())
 			{
 				co_return;
 			}
@@ -204,11 +200,10 @@ export namespace util
 	template<coexecution Policy, functions Method, classes Host>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(const Host&& host, Method Host::* const(&& fn))
-		noexcept(noexcept(std::declval<const Host&&>().*forward<Method Host::* const>(fn)(std::declval<const Host&&>())))
+		corepeat_as(const Host&& host, Method Host::* const& (fn))
+		noexcept(noexcept((declval<const Host&&>().*fn)()))
 	{
 		const Host localhost = static_cast<const Host&&>(host);
-		auto functor = forward<Method Host::* const>(fn);
 
 		while (true)
 		{
@@ -221,7 +216,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!localhost.*functor())
+			if (!localhost.*fn())
 			{
 				co_return;
 			}
@@ -292,10 +287,10 @@ namespace util::test
 		corepeat_as<coexecution::Now>(cocl2, &test_coclass::test_memfn1);
 
 		constexpr test_coclass cocl3{};
-		corepeat_as<coexecution::Now>(cocl3, &test_coclass::test_memfn1);
+		corepeat_as<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
 		corepeat_as<coexecution::Now>(cocl3, &test_coclass::test_memfn2);
 
-		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1);
+		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
 		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
 	}
 }
