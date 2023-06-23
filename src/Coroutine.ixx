@@ -121,67 +121,15 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, classes Host, typename Method>
-	inline
-		coroutine::RelaxedTask
-		corepeat_as_by(Host& host, Method&& fn)
-		noexcept(method_noexcept<Method, Host&>::value)
-	{
-		static_assert(method_by<Method, Host&>, "The method does not take Host& as its first parameter.");
-
-		while (true)
-		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
-			if (!(host.*fn)())
-			{
-				co_return;
-			}
-		}
-	}
 
 	template<coexecution Policy, classes Host, typename Method>
+		requires method_by<Method, Host&&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as_by(const Host& host, Method&& fn)
-		noexcept(method_noexcept<Method, const Host&>::value)
-	{
-		static_assert(method_by<Method, const Host&>, "The method does not take const Host& as its first parameter.");
-
-		while (true)
-		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
-			if (!(host.*fn)())
-			{
-				co_return;
-			}
-		}
-	}
-
-	template<coexecution Policy, classes Host, typename Method>
-	inline
-		coroutine::RelaxedTask
-		corepeat_as_by(Host&& host, Method&& fn)
+		corepeat_as_by(Host&& host, const Method& fn)
 		noexcept(method_noexcept<Method, Host&&>::value)
 	{
-		static_assert(method_by<Method, Host&&>, "The method does not take Host&& as its first parameter.");
-
-		Host localhost = static_cast<Host&&>(host);
+		static_assert(method_by<Method, Host&&>, "The method does not take proper specifier");
 
 		while (true)
 		{
@@ -194,35 +142,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!(localhost.*fn)())
-			{
-				co_return;
-			}
-		}
-	}
-
-	template<coexecution Policy, classes Host, typename Method>
-	inline
-		coroutine::RelaxedTask
-		corepeat_as_by(const remove_reference_t<Host>&& host, Method&& fn)
-		noexcept(method_noexcept<Method, const Host&&>::value)
-	{
-		static_assert(method_by<Method, const Host&&>, "The method does not take const Host&& as its first parameter.");
-
-		const Host localhost = static_cast<const Host&&>(host);
-
-		while (true)
-		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
-			if (!(localhost.*fn)())
+			if (!(forward<Host>(host).*fn)())
 			{
 				co_return;
 			}
@@ -295,20 +215,22 @@ namespace util::test
 		test_coclass cocl1{};
 		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn2);
+
 		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn2);
+
 		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn1);
 		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn2);
 
 		const test_coclass cocl2{};
-		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn1);
+		//corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn1); //
 		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn2);
 
 		constexpr test_coclass cocl3{};
-		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
+		//corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
 		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn2);
 
-		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
+		//corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
 		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
 	}
 }
