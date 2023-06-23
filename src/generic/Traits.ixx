@@ -402,16 +402,6 @@ export namespace util
 	/// <typeparam name="C"></typeparam>
 	template<typename M, typename C>
 	using method_trait_t = typename method_trait<clean_t<M>, C>::type;
-
-	template<typename M, typename Ref>
-	struct [[nodiscard]] method_noexcept;
-
-	template<typename M, typename Ref>
-	struct [[nodiscard]] method_noexcept
-		: public conditional_t<is_method_invocable_v<remove_pointer_t<remove_reference_t<M>>, Ref>
-		, true_type
-		, false_type>
-	{};
 }
 
 #pragma warning(push, 1)
