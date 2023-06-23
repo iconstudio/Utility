@@ -58,12 +58,77 @@ namespace util::coroutine
 		using internal_iterator = std::ranges::iterator_t<Rng>;
 		using type = Enumerator<Rng>;
 		using interface = std::ranges::view_interface<Enumerator<Rng>>;
-		using promise_type = DeferredValuePromise<type, internal_iterator>;
-		using handle_type = promise_type::handle_type;
 
-		class iterator;
-		using const_iterator = iterator;
+		class promise_type : public BasicPromise<Enumerator<Rng>::promise_type>
+		{
+		public:
+			using coro_t = Enumerator<Rng>;
+			using handle_type = typename coro_t::handle_type;
+			using iterator = typename coro_t::internal_iterator;
 
+			static constexpr std::suspend_always initial_suspend() noexcept
+			{
+				return {};
+			}
+
+			static constexpr std::suspend_always final_suspend() noexcept
+			{
+				return {};
+			}
+
+			//constexpr std::suspend_always yield_value(iterator it) noexcept
+			constexpr std::suspend_always yield_value(const coro_t::value_type& value)
+				noexcept(nothrow_copy_assignables<coro_t::value_type>)
+				requires(copy_assignables<coro_t::value_type>)
+			{
+				//underlyingIter = it;
+				current = value;
+
+				return {};
+			}
+
+			constexpr std::suspend_always yield_value(coro_t::value_type&& value)
+				noexcept(nothrow_move_assignables<coro_t::value_type>)
+				requires(move_assignables<coro_t::value_type>)
+			{
+				current = move(value);
+
+				return {};
+			}
+
+			coro_t::value_type& value() & noexcept
+			{
+				return current;
+			}
+
+			[[nodiscard]]
+			const coro_t::value_type& value() const& noexcept
+			{
+				return current;
+			}
+
+			[[nodiscard]]
+			coro_t::value_type&& value() && noexcept
+			{
+				return move(current);
+			}
+
+			[[nodiscard]]
+			const coro_t::value_type&& value() const&& noexcept
+			{
+				return move(current);
+			}
+
+			[[nodiscard]]
+			coro_t acquire_coroutine() noexcept
+			{
+				return coro_t{ handle_type::from_promise(*this) };
+			}
+
+			//iterator underlyingIter;
+			coro_t::value_type current;
+		};
+		using handle_type = std::coroutine_handle<promise_type>;
 		constexpr Enumerator()
 			noexcept(nothrow_default_constructibles<Rng>)
 			requires(default_initializable<Rng>) = default;
