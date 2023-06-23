@@ -15,34 +15,6 @@ namespace util::coroutine
 	export template<typename Rng>
 		concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
 
-	namespace detail
-	{
-		template<typename Rng>
-		concept available_data = enumerable<Rng>
-			&& std::contiguous_iterator<std::ranges::iterator_t<Rng>>
-			&& requires(Rng & range)
-		{
-			range.data();
-		};
-
-		template<typename Rng>
-		struct noexcept_data
-		{
-			static constexpr bool value = false;
-		};
-
-		template<available_data Rng>
-		struct noexcept_data<Rng>
-		{
-			static constexpr bool value = noexcept(declval<Rng>().data());
-		};
-	}
-
-	struct promise_type : public util::coroutine::BasicPromise<promise_type>
-	{
-
-	};
-
 	export template<enumerable Rng>
 	class [[nodiscard]] Enumerator : public std::ranges::view_interface<Enumerator<Rng>>
 	{
@@ -140,35 +112,35 @@ namespace util::coroutine
 		constexpr Enumerator(Enumerator<Sng>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(move(other.myHandle))
-			, underlyingRange(move(other.underlyingRange))
-			, underlyingIt(move(other.underlyingIt))
 		{}
 
 		template<enumerable Sng>
-			requires constructible_from<Rng, Sng, internal_iterator>&& copy_constructibles<Rng, Sng, internal_iterator>
+			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng>
 		constexpr Enumerator(const Enumerator<Sng>& other)
-			noexcept(nothrow_constructibles<Rng, Sng, internal_iterator>)
+			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
-			, underlyingRange(other.underlyingRange)
-			, underlyingIt(other.underlyingIt)
 		{}
 
 		explicit constexpr Enumerator(const handle_type& handle)
 			noexcept(nothrow_copy_constructibles<handle_type>)
 			requires copy_constructibles<Rng, handle_type>
 		: myHandle(handle)
-			, underlyingIt(handle.promise().value())
 		{}
 
 		explicit constexpr Enumerator(handle_type&& handle)
 			noexcept(nothrow_move_constructibles<handle_type>)
-			: myHandle(move(handle))
-			, underlyingIt(move(handle.promise()).value())
+			requires move_constructibles<Rng, handle_type>
+		: myHandle(move(handle))
 		{}
 
 		[[nodiscard]]
 		inline iterator begin() noexcept
 		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
 			return iterator{ myHandle };
 		}
 
@@ -191,19 +163,15 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		constexpr auto data()
-			noexcept(detail::noexcept_data<Rng>::value)
-			requires detail::available_data<Rng>
+		bool done() const noexcept
 		{
-			return (*underlyingRange).data();
+			return myHandle.done();
 		}
 
 		[[nodiscard]]
-		constexpr auto data() const
-			noexcept(detail::noexcept_data<Rng>::value)
-			requires detail::available_data<const Rng>
+		bool empty() const noexcept
 		{
-			return (*underlyingRange).data();
+			return !myHandle || myHandle.done();
 		}
 
 		Enumerator(const Enumerator& other) = delete;
@@ -215,8 +183,6 @@ namespace util::coroutine
 
 	private:
 		handle_type myHandle;
-		Monad<Rng> underlyingRange;
-		Monad<internal_iterator> underlyingIt;
 	};
 
 	template<std::ranges::forward_range Rng>
