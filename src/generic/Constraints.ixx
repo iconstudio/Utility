@@ -15,8 +15,14 @@ export namespace util
 	template<typename... Ts>
 	concept member_function_ptrs = make_conjunction<is_member_function_pointer, clean_t<Ts>...>;
 
+	template<typename M, typename C>
+	concept method = classes<C> && member_function_ptrs<M>;
+
+	template<typename M, typename Ref>
+	concept method_by = classes<clean_t<Ref>> && is_method_invocable_v<Ref, clean_t<M>>;
+
 	template<typename Derived, typename Parent>
-	concept hierachy = classes<Derived, Parent> && std::derived_from<Derived, remove_cv_t<Parent>>;
+	concept hierachy = classes<Derived, Parent>&& std::derived_from<Derived, remove_cv_t<Parent>>;
 
 	template<typename D>
 	concept crtp = classes<D> && std::same_as<D, remove_cv_t<D>>;
