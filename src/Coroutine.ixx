@@ -121,14 +121,13 @@ export namespace util
 		}
 	}
 
-	template<coexecution Policy, functions Method, classes Host>
+	template<coexecution Policy, classes Host, functions Method>
+		requires method_by<Method, Host&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(Host& host, Method Host::* const& fn)
+		corepeat_as_by(Host& host, Method Host::* const& fn)
 		noexcept(noexcept((declval<Host&>().*fn)()))
 	{
-		static_assert(cl_invocable<Method Host::*, Host>);
-
 		while (true)
 		{
 			if constexpr (Policy == coexecution::Now)
@@ -140,17 +139,18 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!host.*fn())
+			if (!(host.*fn)())
 			{
 				co_return;
 			}
 		}
 	}
 
-	template<coexecution Policy, functions Method, classes Host>
+	template<coexecution Policy, classes Host, functions Method>
+		//requires method_by<Method, const Host&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(const Host& host, Method Host::* const& (fn))
+		corepeat_as_by(const Host& host, Method Host::* const& fn)
 		noexcept(noexcept((declval<const Host&>().*fn)()))
 	{
 		while (true)
@@ -164,17 +164,18 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!host.*fn())
+			if (!(host.*fn)())
 			{
 				co_return;
 			}
 		}
 	}
 
-	template<coexecution Policy, functions Method, classes Host>
+	template<coexecution Policy, classes Host, functions Method>
+		//requires method_by<Method, Host&&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(Host&& host, Method Host::* const& (fn))
+		corepeat_as_by(Host&& host, Method Host::* const& fn)
 		noexcept(noexcept((declval<Host&&>().*fn)()))
 	{
 		Host localhost = static_cast<Host&&>(host);
@@ -190,17 +191,18 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!localhost.*fn())
+			if (!(localhost.*fn)())
 			{
 				co_return;
 			}
 		}
 	}
 
-	template<coexecution Policy, functions Method, classes Host>
+	template<coexecution Policy, classes Host, functions Method>
+		requires method_by<Method, const Host&&>
 	inline
 		coroutine::RelaxedTask
-		corepeat_as(const Host&& host, Method Host::* const& (fn))
+		corepeat_as_by(const remove_reference_t<Host>&& host, Method Host::* const& fn)
 		noexcept(noexcept((declval<const Host&&>().*fn)()))
 	{
 		const Host localhost = static_cast<const Host&&>(host);
@@ -216,7 +218,7 @@ export namespace util
 				co_await coroutine::suspend_always{};
 			}
 
-			if (!localhost.*fn())
+			if (!(localhost.*fn)())
 			{
 				co_return;
 			}
@@ -274,24 +276,36 @@ namespace util::test
 {
 	struct test_coclass
 	{
-		bool test_memfn1() noexcept { return false; }
-		bool test_memfn2() const noexcept { return false; }
+		constexpr bool test_memfn1() noexcept { return false; }
+		constexpr bool test_memfn2() const noexcept { return false; }
 	};
 
 	void test_coroutines()
 	{
-		test_coclass cocl1{};
-		corepeat_as<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn1);
+		constexpr auto ptr1 = &test_coclass::test_memfn1;
+		constexpr auto ptr2 = &test_coclass::test_memfn2;
 
-		test_coclass cocl2{};
-		corepeat_as<coexecution::Now>(cocl2, &test_coclass::test_memfn1);
+		using ftype1 = decltype(ptr1);
+		using ftype2 = decltype(ptr2);
+
+		test_coclass cocl1{};
+		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn1);
+		corepeat_as_by<coexecution::Now>(cocl1, &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn1);
+		corepeat_as_by<coexecution::Now>(std::move(cocl1), &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn1);
+		corepeat_as_by<coexecution::Now>(test_coclass{}, &test_coclass::test_memfn2);
+
+		const test_coclass cocl2{};
+		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn1);
+		corepeat_as_by<coexecution::Now>(cocl2, &test_coclass::test_memfn2);
 
 		constexpr test_coclass cocl3{};
-		corepeat_as<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
-		corepeat_as<coexecution::Now>(cocl3, &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn1); //
+		corepeat_as_by<coexecution::Now>(cocl3, &test_coclass::test_memfn2);
 
-		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
-		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
+		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn1); //
+		corepeat_as_by<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
 	}
 }
 #pragma warning(pop)
