@@ -172,19 +172,18 @@
     <ClCompile Include="..\Object.cc" />
     <ClCompile Include="..\Serialization.ixx" />
     <ClCompile Include="..\Testbed.cpp" />
-    <ClCompile Include="..\ThreadUnit.ixx" />
-    <ClCompile Include="..\Time.ixx" />
     <ClCompile Include="concurrency\CoIterator.ixx" />
     <ClCompile Include="concurrency\CoPromise.ixx" />
+    <ClCompile Include="concurrency\Coroutine.ixx" />
     <ClCompile Include="concurrency\CoTask.ixx" />
     <ClCompile Include="concurrency\Enumerator.ixx" />
     <ClCompile Include="concurrency\Generator.ixx" />
     <ClCompile Include="concurrency\Locks.ixx" />
     <ClCompile Include="concurrency\Spinlock.ixx" />
     <ClCompile Include="concurrency\Thread.ixx" />
+    <ClCompile Include="concurrency\ThreadUnit.ixx" />
     <ClCompile Include="containers\Array.ixx" />
     <ClCompile Include="containers\Union.ixx" />
-    <ClCompile Include="Coroutine.ixx" />
     <ClCompile Include="functional\Expected.ixx" />
     <ClCompile Include="functional\Identity.ixx" />
     <ClCompile Include="functional\LooseMonad.ixx" />
@@ -206,6 +205,7 @@
     <ClCompile Include="Tools\Error.ixx" />
     <ClCompile Include="Tools\Print.ixx" />
     <ClCompile Include="Tools\Utility.ixx" />
+    <ClCompile Include="Tools\Time.ixx" />
     <ClCompile Include="wrappers\String.ixx" />
   </ItemGroup>
   <ItemGroup>

@@ -53,9 +53,6 @@
     <ClCompile Include="Tools\Utility.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="..\Time.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="..\DataPacker.ixx">
       <Filter>헤더 파일\Specifics</Filter>
     </ClCompile>
@@ -71,9 +68,6 @@
     <ClCompile Include="..\Testbed.cpp">
       <Filter>헤더 파일\Specifics</Filter>
     </ClCompile>
-    <ClCompile Include="..\ThreadUnit.ixx">
-      <Filter>헤더 파일\Concurrency</Filter>
-    </ClCompile>
     <ClCompile Include="concurrency\Thread.ixx">
       <Filter>헤더 파일\Concurrency</Filter>
     </ClCompile>
@@ -87,9 +81,6 @@
       <Filter>헤더 파일\Coroutine</Filter>
     </ClCompile>
     <ClCompile Include="concurrency\CoPromise.ixx">
-      <Filter>헤더 파일\Coroutine</Filter>
-    </ClCompile>
-    <ClCompile Include="Coroutine.ixx">
       <Filter>헤더 파일\Coroutine</Filter>
     </ClCompile>
     <ClCompile Include="concurrency\CoTask.ixx">
@@ -157,6 +148,15 @@
     </ClCompile>
     <ClCompile Include="containers\Union.ixx">
       <Filter>헤더 파일\Container</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\Coroutine.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\ThreadUnit.ixx">
+      <Filter>헤더 파일</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Time.ixx">
+      <Filter>헤더 파일</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
