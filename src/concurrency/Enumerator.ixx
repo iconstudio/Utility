@@ -41,6 +41,9 @@ namespace util::coroutine
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
+		using iterator = CoIterator<Enumerator<Rng, Ref>>;
+		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
+
 		using internal_iterator = std::ranges::iterator_t<Rng>;
 		using internal_const_iterator = std::ranges::const_iterator_t<Rng>;
 		using type = Enumerator<Rng, Ref>;
@@ -102,9 +105,6 @@ namespace util::coroutine
 
 			internal_iterator myValue;
 		};
-
-		using iterator = CoIterator<Enumerator<Rng, Ref>>;
-		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
 
 		constexpr Enumerator()
 			noexcept(nothrow_default_constructibles<Rng>)
