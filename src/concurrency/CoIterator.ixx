@@ -37,7 +37,7 @@ export namespace util::coroutine
 			: coHandle(std::move(coroutine))
 		{}
 
-		inline ConstCoIterator& operator++()
+		inline ConstCoIterator& operator++() noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -47,7 +47,7 @@ export namespace util::coroutine
 			return *this;
 		}
 
-		inline void operator++(int)
+		inline void operator++(int) noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -55,7 +55,7 @@ export namespace util::coroutine
 			}
 		}
 
-		inline const ConstCoIterator& operator++() const
+		inline const ConstCoIterator& operator++() const noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -65,7 +65,7 @@ export namespace util::coroutine
 			return *this;
 		}
 
-		inline void operator++(int) const
+		inline void operator++(int) const noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -73,7 +73,7 @@ export namespace util::coroutine
 			}
 		}
 
-		inline const_reference operator*() const&
+		inline const_reference operator*() const& noexcept
 		{
 			return coHandle.promise().value();
 		}
@@ -85,7 +85,7 @@ export namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		inline bool operator==(default_sentinel_t) const
+		inline bool operator==(default_sentinel_t) const noexcept
 		{
 			return !coHandle || coHandle.done();
 		}
@@ -124,7 +124,7 @@ export namespace util::coroutine
 			: coHandle(std::move(coroutine))
 		{}
 
-		inline CoIterator& operator++()
+		inline CoIterator& operator++() noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -134,7 +134,7 @@ export namespace util::coroutine
 			return *this;
 		}
 
-		inline void operator++(int)
+		inline void operator++(int) noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -142,7 +142,7 @@ export namespace util::coroutine
 			}
 		}
 
-		inline const CoIterator& operator++() const
+		inline const CoIterator& operator++() const noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -152,7 +152,7 @@ export namespace util::coroutine
 			return *this;
 		}
 
-		inline void operator++(int) const
+		inline void operator++(int) const noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -183,7 +183,7 @@ export namespace util::coroutine
 		}
 
 		[[nodiscard]]
-		inline bool operator==(default_sentinel_t) const
+		inline bool operator==(default_sentinel_t) const noexcept
 		{
 			return !coHandle || coHandle.done();
 		}
