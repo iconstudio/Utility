@@ -20,7 +20,7 @@ export namespace util::coroutine
 		using promise_type = DeferredValuePromise<type, value_type>;
 		using handle_type = promise_type::handle_type;
 
-		using iterator = ConstCoIterator<type>;
+		using iterator = CoConstIterator<type>;
 		using const_iterator = iterator;
 
 		inline Generator() noexcept = default;

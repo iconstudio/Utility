@@ -8,7 +8,7 @@ export namespace util::coroutine
 	using ::std::default_sentinel_t;
 
 	template<typename Coroutine>
-	class ConstCoIterator
+	class CoConstIterator
 	{
 	public:
 		using coro_type = Coroutine;
@@ -24,20 +24,20 @@ export namespace util::coroutine
 		using size_type = coro_type::size_type;
 		using difference_type = coro_type::difference_type;
 
-		constexpr ConstCoIterator()
+		constexpr CoConstIterator()
 			noexcept(nothrow_default_constructibles<handle_type>)
 			requires default_initializables<handle_type> = default;
-		constexpr ~ConstCoIterator() noexcept(nothrow_destructibles<handle_type>) = default;
+		constexpr ~CoConstIterator() noexcept(nothrow_destructibles<handle_type>) = default;
 
-		explicit constexpr ConstCoIterator(const handle_type& coroutine) noexcept
+		explicit constexpr CoConstIterator(const handle_type& coroutine) noexcept
 			: coHandle(coroutine)
 		{}
 
-		explicit constexpr ConstCoIterator(handle_type&& coroutine) noexcept
+		explicit constexpr CoConstIterator(handle_type&& coroutine) noexcept
 			: coHandle(std::move(coroutine))
 		{}
 
-		inline ConstCoIterator& operator++() noexcept
+		inline CoConstIterator& operator++() noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -55,7 +55,7 @@ export namespace util::coroutine
 			}
 		}
 
-		inline const ConstCoIterator& operator++() const noexcept
+		inline const CoConstIterator& operator++() const noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -95,7 +95,7 @@ export namespace util::coroutine
 	};
 
 	template<typename Coroutine>
-	class CoIterator
+	class CoForwardIterator
 	{
 	public:
 		using coro_type = Coroutine;
@@ -111,20 +111,20 @@ export namespace util::coroutine
 		using size_type = coro_type::size_type;
 		using difference_type = coro_type::difference_type;
 
-		constexpr CoIterator()
+		constexpr CoForwardIterator()
 			noexcept(nothrow_default_constructibles<handle_type>)
 			requires default_initializables<handle_type> = default;
-		constexpr ~CoIterator() noexcept(nothrow_destructibles<handle_type>) = default;
+		constexpr ~CoForwardIterator() noexcept(nothrow_destructibles<handle_type>) = default;
 
-		explicit constexpr CoIterator(const handle_type& coroutine) noexcept
+		explicit constexpr CoForwardIterator(const handle_type& coroutine) noexcept
 			: coHandle(coroutine)
 		{}
 
-		explicit constexpr CoIterator(handle_type&& coroutine) noexcept
+		explicit constexpr CoForwardIterator(handle_type&& coroutine) noexcept
 			: coHandle(std::move(coroutine))
 		{}
 
-		inline CoIterator& operator++() noexcept
+		inline CoForwardIterator& operator++() noexcept
 		{
 			if (!coHandle.done())
 			{
@@ -142,7 +142,7 @@ export namespace util::coroutine
 			}
 		}
 
-		inline const CoIterator& operator++() const noexcept
+		inline const CoForwardIterator& operator++() const noexcept
 		{
 			if (!coHandle.done())
 			{

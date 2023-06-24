@@ -39,8 +39,8 @@ namespace util::coroutine
 		using size_type = size_t;
 		using difference_type = ptrdiff_t;
 
-		using iterator = CoIterator<Enumerator<Rng, Ref>>;
-		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
+		using iterator = CoForwardIterator<Enumerator<Rng, Ref>>;
+		using const_iterator = CoConstIterator<Enumerator<Rng, Ref>>;
 
 		using internal_iterator = std::ranges::iterator_t<Rng>;
 		using internal_const_iterator = std::ranges::const_iterator_t<Rng>;
