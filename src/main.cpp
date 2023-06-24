@@ -5,6 +5,7 @@ import Utility.Print;
 import Utility.Coroutine;
 import Utility.Coroutine.Generator;
 import Utility.Coroutine.Enumerator;
+import Utility.Coroutine.Logic;
 
 int main()
 {
