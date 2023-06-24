@@ -21,79 +21,28 @@
     <Filter Include="헤더 파일\Concurrency">
       <UniqueIdentifier>{e233f24c-61ed-42b7-97e4-d99db5ad6a36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Meta">
+      <UniqueIdentifier>{dbb035d6-32d5-4c47-8967-c0d85255f47d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Generic">
+      <UniqueIdentifier>{7add4b30-078b-4a4f-abe1-3f4e38f38e7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Functional">
+      <UniqueIdentifier>{68c18d2f-00ad-4bb5-8237-aa62d90894a8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Memory">
+      <UniqueIdentifier>{0342b122-1baa-47c8-ae14-2e7f4ce35e51}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Container">
+      <UniqueIdentifier>{12270362-3779-4b7e-9446-6ed9a47fe29e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="functional\Expected.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="functional\Identity.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="functional\LooseMonad.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="functional\Monad.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="functional\Option.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="concurrency\Locks.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="concurrency\Spinlock.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="concurrency\Thread.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="containers\Array.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="memory\Atomic.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="memory\Memory.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="memory\MemoryWatcher.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\Classifier.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\Indexer.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\Named.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\Reflection.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="reflection\Singleton.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="wrappers\String.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>소스 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="containers\Union.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="generic\Constraints.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="generic\Traits.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="meta\FixedString.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="meta\Meta.ixx">
-      <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="Tools\Error.ixx">
       <Filter>헤더 파일</Filter>
@@ -102,9 +51,6 @@
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="Tools\Utility.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="..\ThreadUnit.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
     <ClCompile Include="..\Time.ixx">
@@ -125,23 +71,92 @@
     <ClCompile Include="..\Testbed.cpp">
       <Filter>헤더 파일\Specifics</Filter>
     </ClCompile>
-    <ClCompile Include="Coroutine.ixx">
-      <Filter>헤더 파일</Filter>
+    <ClCompile Include="..\ThreadUnit.ixx">
+      <Filter>헤더 파일\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="concurrency\CoPromise.ixx">
-      <Filter>헤더 파일</Filter>
+    <ClCompile Include="concurrency\Thread.ixx">
+      <Filter>헤더 파일\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="concurrency\Generator.ixx">
-      <Filter>헤더 파일</Filter>
+    <ClCompile Include="concurrency\Spinlock.ixx">
+      <Filter>헤더 파일\Concurrency</Filter>
     </ClCompile>
-    <ClCompile Include="concurrency\Enumerator.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
-    <ClCompile Include="concurrency\CoTask.ixx">
-      <Filter>헤더 파일</Filter>
+    <ClCompile Include="concurrency\Locks.ixx">
+      <Filter>헤더 파일\Concurrency</Filter>
     </ClCompile>
     <ClCompile Include="concurrency\CoIterator.ixx">
-      <Filter>헤더 파일</Filter>
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\CoPromise.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="Coroutine.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\CoTask.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\Enumerator.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="concurrency\Generator.ixx">
+      <Filter>헤더 파일\Coroutine</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\Reflection.ixx">
+      <Filter>헤더 파일\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\Singleton.ixx">
+      <Filter>헤더 파일\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\Named.ixx">
+      <Filter>헤더 파일\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\Indexer.ixx">
+      <Filter>헤더 파일\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="reflection\Classifier.ixx">
+      <Filter>헤더 파일\Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="meta\FixedString.ixx">
+      <Filter>헤더 파일\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="meta\Meta.ixx">
+      <Filter>헤더 파일\Meta</Filter>
+    </ClCompile>
+    <ClCompile Include="generic\Constraints.ixx">
+      <Filter>헤더 파일\Generic</Filter>
+    </ClCompile>
+    <ClCompile Include="generic\Traits.ixx">
+      <Filter>헤더 파일\Generic</Filter>
+    </ClCompile>
+    <ClCompile Include="functional\Identity.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
+    <ClCompile Include="functional\Expected.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
+    <ClCompile Include="functional\LooseMonad.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
+    <ClCompile Include="functional\Monad.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
+    <ClCompile Include="functional\Option.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\Atomic.ixx">
+      <Filter>헤더 파일\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\Memory.ixx">
+      <Filter>헤더 파일\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="memory\MemoryWatcher.ixx">
+      <Filter>헤더 파일\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="containers\Array.ixx">
+      <Filter>헤더 파일\Container</Filter>
+    </ClCompile>
+    <ClCompile Include="containers\Union.ixx">
+      <Filter>헤더 파일\Container</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
