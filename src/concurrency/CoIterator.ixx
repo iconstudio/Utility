@@ -1,6 +1,7 @@
 export module Utility.Coroutine:CoIterator;
 export import <algorithm>;
 export import <iterator>;
+export import Utility;
 export import Utility.Constraints;
 
 export namespace util::coroutine
@@ -34,43 +35,31 @@ export namespace util::coroutine
 		{}
 
 		explicit constexpr CoConstIterator(handle_type&& coroutine) noexcept
-			: coHandle(std::move(coroutine))
+			: coHandle(util::move(coroutine))
 		{}
 
 		inline CoConstIterator& operator++() noexcept
 		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
+			Resume();
 
 			return *this;
 		}
 
 		inline void operator++(int) noexcept
 		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
+			Resume();
 		}
 
 		inline const CoConstIterator& operator++() const noexcept
 		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
+			Resume();
 
 			return *this;
 		}
 
 		inline void operator++(int) const noexcept
 		{
-			if (!coHandle.done())
-			{
-				coHandle.resume();
-			}
+			Resume();
 		}
 
 		inline const_reference operator*() const& noexcept
@@ -88,6 +77,34 @@ export namespace util::coroutine
 		inline bool operator==(default_sentinel_t) const noexcept
 		{
 			return !coHandle || coHandle.done();
+		}
+
+		[[nodiscard]]
+		inline bool operator==(const CoConstIterator& other) const noexcept
+		{
+			return coHandle == other.coHandle;
+		}
+
+		constexpr CoConstIterator(const CoConstIterator& other)
+			noexcept(nothrow_copy_constructibles<handle_type>)
+			requires copyable<handle_type> = default;
+		constexpr CoConstIterator(CoConstIterator&& other)
+			noexcept(nothrow_move_constructibles<handle_type>)
+			requires movable<handle_type> = default;
+		constexpr CoConstIterator& operator=(const CoConstIterator& other)
+			noexcept(nothrow_copy_assignables<handle_type>)
+			requires copyable<handle_type> = default;
+		constexpr CoConstIterator& operator=(CoConstIterator&& other)
+			noexcept(nothrow_move_assignables<handle_type>)
+			requires movable<handle_type> = default;
+
+	protected:
+		inline void Resume() const noexcept
+		{
+			if (!coHandle.done())
+			{
+				coHandle.resume();
+			}
 		}
 
 	private:

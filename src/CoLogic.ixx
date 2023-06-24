@@ -6,7 +6,11 @@ import Utility;
 import Utility.Coroutine;
 import Utility.Coroutine.Enumerator;
 
-export using ::std::operator|;
+namespace util
+{
+	export using ::std::operator|;
+
+}
 
 export namespace util
 {
@@ -31,7 +35,7 @@ export namespace util
 	template<coexecution Policy, invocables Fn, invocables Pred>
 		requires convertible_to<invoke_result_t<Pred>, bool>
 	inline
-		coroutine::RelaxedTask
+		coroutine::Cowork<Policy>
 		corepeat_as_if(Fn&& fn, Pred&& pred)
 		noexcept(nothrow_invocables<Fn>&& nothrow_invocables<Pred>)
 	{
@@ -40,22 +44,15 @@ export namespace util
 
 		while (predicate())
 		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
 			functor();
+
+			co_await coroutine::suspend_always{};
 		}
 	}
 
 	template<coexecution Policy, functions Fn, typename Pred, typename... Args>
 	inline
-		coroutine::RelaxedTask
+		coroutine::Cowork<Policy>
 		corepeat_as_if(Fn&& fn, Pred&& pred, Args&&... args)
 		noexcept(noexcept(forward<Pred>(pred)()) && noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
 	{
@@ -65,16 +62,9 @@ export namespace util
 
 		while (predicate())
 		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
 			std::apply(functor, arguments);
+
+			co_await coroutine::suspend_always{};
 		}
 	}
 
@@ -108,7 +98,7 @@ export namespace util
 
 	template<coexecution Policy, r_invocables<bool> Fn>
 	inline
-		coroutine::RelaxedTask
+		coroutine::Cowork<Policy>
 		corepeat_as(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
@@ -116,25 +106,18 @@ export namespace util
 
 		while (true)
 		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
 			if (!functor())
 			{
 				co_return;
 			}
+
+			co_await coroutine::suspend_always{};
 		}
 	}
 
 	template<coexecution Policy, classes Host, typename Method>
 	inline
-		coroutine::RelaxedTask
+		coroutine::Cowork<Policy>
 		corepeat_as(Host&& host, Method&& fn)
 		noexcept(CheckMethodException<Host&&, Method&&>())
 	{
@@ -142,25 +125,18 @@ export namespace util
 
 		while (true)
 		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
 			if (!(forward<Host>(host).*forward<Method>(fn))())
 			{
 				co_return;
 			}
+
+			co_await coroutine::suspend_always{};
 		}
 	}
 
 	template<coexecution Policy, functions Fn, typename... Args>
 	inline
-		coroutine::RelaxedTask
+		coroutine::Cowork<Policy>
 		corepeat_as(Fn&& fn, Args&&... args)
 		noexcept(noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
 	{
@@ -169,25 +145,18 @@ export namespace util
 
 		while (true)
 		{
-			if constexpr (Policy == coexecution::Now)
-			{
-				co_await coroutine::suspend_never{};
-			}
-			else
-			{
-				co_await coroutine::suspend_always{};
-			}
-
 			if (!std::apply(functor, arguments))
 			{
 				co_return;
 			}
+
+			co_await coroutine::suspend_always{};
 		}
 	}
 
 	template<r_invocables<bool> Fn>
 	inline
-		coroutine::RelaxedTask
+		auto
 		corepeat(Fn&& fn)
 		noexcept(nothrow_invocables<Fn>)
 	{
@@ -196,7 +165,7 @@ export namespace util
 
 	template<functions Fn, typename... Args>
 	inline
-		coroutine::RelaxedTask
+		auto
 		corepeat(Fn&& fn, Args&&... args)
 		noexcept(noexcept(forward<Fn>(fn)(forward<Args>(args)...)))
 	{
