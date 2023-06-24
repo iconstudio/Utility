@@ -20,9 +20,22 @@ namespace util::coroutine
 		: public std::ranges::view_interface<Enumerator<Rng, Ref>>
 	{
 	public:
-		using value_type = std::ranges::range_value_t<Rng>;
-		using reference = std::ranges::range_reference_t<Rng>;
-		using const_reference = std::ranges::range_reference_t<const Rng>;
+		static constexpr bool IsConstant = std::is_const_v<remove_reference_t<Ref>>;
+		static constexpr bool IsBorrowed = std::is_lvalue_reference_v<Ref&&>;
+		static constexpr bool IsTemporary = std::is_rvalue_reference_v<Ref&&>;
+
+		static constexpr bool IsLReference = IsBorrowed && !IsConstant;
+		static constexpr bool IsConstLReference = IsBorrowed && IsConstant;
+		static constexpr bool IsRReference = IsTemporary && !IsConstant;
+		static constexpr bool IsConstRReference = IsTemporary && IsConstant;
+
+		using value_type = conditional_t<IsBorrowed
+			, std::ranges::range_reference_t<Rng>
+			, std::ranges::range_value_t<Rng>>;
+
+		using reference = conditional_t<IsTemporary, std::ranges::range_rvalue_reference_t<Rng>, std::ranges::range_reference_t<Rng>>;
+		using const_reference = conditional_t<IsTemporary, std::ranges::range_rvalue_reference_t<const Rng>, std::ranges::range_reference_t<const Rng>>;
+
 		using rvalue_reference = std::ranges::range_rvalue_reference_t<Rng>;
 		using const_rvalue_reference = std::ranges::range_rvalue_reference_t<const Rng>;
 		using size_type = size_t;
@@ -47,7 +60,7 @@ namespace util::coroutine
 			constexpr std::suspend_always yield_value(U&& it)
 				noexcept(nothrow_assignables<internal_iterator, U&&>)
 			{
-				static_assert(assignable_from<internal_iterator, U&&>, "Cannot assign value to iterator");
+				static_assert(!assignable_from<internal_iterator, U&&>, "Cannot assign value to iterator");
 
 				myValue = forward<U>(it);
 
@@ -56,28 +69,29 @@ namespace util::coroutine
 
 			[[nodiscard]]
 			constexpr reference value() & noexcept
-				requires (!std::is_const_v<value_type>)
+				requires (!IsConstant)
 			{
-				return *myValue;
+				if constexpr (IsTemporary)
+				{
+					return static_cast<reference>(*myValue);
+				}
+				else
+				{
+					return *myValue;
+				}
 			}
 
 			[[nodiscard]]
 			constexpr const_reference value() const& noexcept
 			{
-				return *myValue;
-			}
-
-			[[nodiscard]]
-			constexpr rvalue_reference value() && noexcept
-				requires (!std::is_const_v<value_type>)
-			{
-				return move(*myValue);
-			}
-
-			[[nodiscard]]
-			constexpr const_rvalue_reference value() const&& noexcept
-			{
-				return move(*myValue);
+				if constexpr (IsTemporary)
+				{
+					return static_cast<const_reference>(*myValue);
+				}
+				else
+				{
+					return *myValue;
+				}
 			}
 
 			[[nodiscard]]
@@ -91,8 +105,6 @@ namespace util::coroutine
 
 		using iterator = CoIterator<Enumerator<Rng, Ref>>;
 		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
-		//class iterator;
-		//using const_iterator = const iterator;
 
 		constexpr Enumerator()
 			noexcept(nothrow_default_constructibles<Rng>)
@@ -219,9 +231,10 @@ namespace util::test
 
 		for (auto&& val : aa)
 		{
+			val = 450;
 		}
 
-		std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
+		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
 		auto bb = coenumerate(vb);
 
 		for (auto&& val : vb)
