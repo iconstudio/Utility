@@ -211,7 +211,9 @@ export namespace util
 	using coroutine::enumerable;
 
 	template<enumerable Rng>
-	inline coroutine::Enumerator<Rng, Rng&&> coenumerate(Rng&& rng) noexcept
+	inline coroutine::Enumerator<Rng, Rng&&>
+		coenumerate(Rng&& rng)
+		noexcept
 	{
 		auto&& range = forward<Rng>(rng);
 		auto it = std::ranges::begin(range);
@@ -221,6 +223,19 @@ export namespace util
 		while (it != range.end())
 		{
 			co_yield (it++);
+		}
+	}
+
+	template<enumerable Rng, typename Pred>
+	inline coroutine::DeferredTask
+		co_each(Rng&& rng, Pred&& predicate)
+		noexcept
+	{
+		auto&& pred = forward<Pred>(predicate);
+
+		for (auto&& value : coenumerate(forward<Rng>(rng)))
+		{
+			co_await pred(value);
 		}
 	}
 }
