@@ -12,6 +12,15 @@
     <Filter Include="헤더 파일\Specifics">
       <UniqueIdentifier>{397eb9da-6c73-420a-b219-e61052e08b1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\Reflection">
+      <UniqueIdentifier>{20f6e1b3-15c8-4806-bfdf-08dcb7c6fd44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Coroutine">
+      <UniqueIdentifier>{629532e1-7f55-4d12-aab9-693aa140b846}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="헤더 파일\Concurrency">
+      <UniqueIdentifier>{e233f24c-61ed-42b7-97e4-d99db5ad6a36}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="functional\Expected.ixx">
