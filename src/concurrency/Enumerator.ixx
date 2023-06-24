@@ -33,64 +33,51 @@ namespace util::coroutine
 		using type = Enumerator<Rng, Ref>;
 		using interface = std::ranges::view_interface<Enumerator<Rng, Ref>>;
 
-		class promise_type : public BasicPromise<Enumerator<Rng>::promise_type>
+		class promise_type;
+		using handle_type = std::coroutine_handle<promise_type>;
+
+		class promise_type
+			: public BasicPromise<promise_type>
+			, public Suspender<std::suspend_always, std::suspend_always>
 		{
 		public:
-			using coro_t = Enumerator<Rng>;
-			using handle_type = typename coro_t::handle_type;
-			using iterator = typename coro_t::internal_iterator;
+			using coro_t = Enumerator<Rng, Ref>;
 
-			static constexpr std::suspend_always initial_suspend() noexcept
+			template<typename U>
+			constexpr std::suspend_always yield_value(U&& it)
+				noexcept(nothrow_assignables<internal_iterator, U&&>)
 			{
-				return {};
-			}
+				static_assert(assignable_from<internal_iterator, U&&>, "Cannot assign value to iterator");
 
-			static constexpr std::suspend_always final_suspend() noexcept
-			{
-				return {};
-			}
-
-			//constexpr std::suspend_always yield_value(iterator it) noexcept
-			constexpr std::suspend_always yield_value(const coro_t::value_type& value)
-				noexcept(nothrow_copy_assignables<coro_t::value_type>)
-				requires(copy_assignables<coro_t::value_type>)
-			{
-				//underlyingIter = it;
-				current = value;
+				myValue = forward<U>(it);
 
 				return {};
-			}
-
-			constexpr std::suspend_always yield_value(coro_t::value_type&& value)
-				noexcept(nothrow_move_assignables<coro_t::value_type>)
-				requires(move_assignables<coro_t::value_type>)
-			{
-				current = move(value);
-
-				return {};
-			}
-
-			coro_t::value_type& value() & noexcept
-			{
-				return current;
 			}
 
 			[[nodiscard]]
-			const coro_t::value_type& value() const& noexcept
+			constexpr reference value() & noexcept
+				requires (!std::is_const_v<value_type>)
 			{
-				return current;
+				return *myValue;
 			}
 
 			[[nodiscard]]
-			coro_t::value_type&& value() && noexcept
+			constexpr const_reference value() const& noexcept
 			{
-				return move(current);
+				return *myValue;
 			}
 
 			[[nodiscard]]
-			const coro_t::value_type&& value() const&& noexcept
+			constexpr rvalue_reference value() && noexcept
+				requires (!std::is_const_v<value_type>)
 			{
-				return move(current);
+				return move(*myValue);
+			}
+
+			[[nodiscard]]
+			constexpr const_rvalue_reference value() const&& noexcept
+			{
+				return move(*myValue);
 			}
 
 			[[nodiscard]]
@@ -99,10 +86,8 @@ namespace util::coroutine
 				return coro_t{ handle_type::from_promise(*this) };
 			}
 
-			//iterator underlyingIter;
-			coro_t::value_type current;
+			internal_iterator myValue;
 		};
-		using handle_type = std::coroutine_handle<promise_type>;
 
 		using iterator = CoIterator<Enumerator<Rng, Ref>>;
 		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
@@ -121,7 +106,7 @@ namespace util::coroutine
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(move(other.myHandle))
 		{
-			myHandle.promise().current = move(other.myHandle.promise().current);
+			myHandle.promise().value() = move(other.myHandle.promise().value());
 		}
 
 		template<enumerable Sng, typename Sref>
@@ -130,7 +115,7 @@ namespace util::coroutine
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
 		{
-			myHandle.promise().current = other.myHandle.promise().current;
+			myHandle.promise().value() = other.myHandle.promise().value();
 		}
 
 		explicit constexpr Enumerator(const handle_type& handle)
