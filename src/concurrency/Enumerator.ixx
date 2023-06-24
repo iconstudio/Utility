@@ -208,11 +208,15 @@ inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumer
 
 export namespace util
 {
-	template<std::ranges::forward_range Rng>
+	using coroutine::enumerable;
+
+	template<enumerable Rng>
 	inline coroutine::Enumerator<Rng, Rng&&> coenumerate(Rng&& rng) noexcept
 	{
 		auto&& range = forward<Rng>(rng);
 		auto it = std::ranges::begin(range);
+
+		static_assert(std::forward_iterator<decltype(it)>);
 
 		while (it != range.end())
 		{
