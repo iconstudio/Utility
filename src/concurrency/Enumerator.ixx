@@ -215,11 +215,11 @@ export namespace util
 	inline coroutine::Enumerator<Rng, Rng&&> coenumerate(Rng&& rng) noexcept
 	{
 		auto&& range = forward<Rng>(rng);
-		auto it = std::ranges::cbegin(range);
+		auto it = std::ranges::begin(range);
 
-		while (it != range.cend())
+		while (it != range.end())
 		{
-			co_yield *(it++);
+			co_yield (it++);
 		}
 	}
 }
