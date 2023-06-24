@@ -15,8 +15,9 @@ namespace util::coroutine
 	export template<typename Rng>
 		concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
 
-	export template<enumerable Rng>
-	class [[nodiscard]] Enumerator : public std::ranges::view_interface<Enumerator<Rng>>
+	export template<enumerable Rng, typename Ref>
+		class [[nodiscard]] Enumerator
+		: public std::ranges::view_interface<Enumerator<Rng, Ref>>
 	{
 	public:
 		using value_type = std::ranges::range_value_t<Rng>;
@@ -28,8 +29,9 @@ namespace util::coroutine
 		using difference_type = ptrdiff_t;
 
 		using internal_iterator = std::ranges::iterator_t<Rng>;
-		using type = Enumerator<Rng>;
-		using interface = std::ranges::view_interface<Enumerator<Rng>>;
+		using internal_const_iterator = std::ranges::const_iterator_t<Rng>;
+		using type = Enumerator<Rng, Ref>;
+		using interface = std::ranges::view_interface<Enumerator<Rng, Ref>>;
 
 		class promise_type : public BasicPromise<Enumerator<Rng>::promise_type>
 		{
@@ -102,8 +104,8 @@ namespace util::coroutine
 		};
 		using handle_type = std::coroutine_handle<promise_type>;
 
-		using iterator = CoIterator<Enumerator<Rng>>;
-		using const_iterator = ConstCoIterator<Enumerator<Rng>>;
+		using iterator = CoIterator<Enumerator<Rng, Ref>>;
+		using const_iterator = ConstCoIterator<Enumerator<Rng, Ref>>;
 		//class iterator;
 		//using const_iterator = const iterator;
 
@@ -113,18 +115,18 @@ namespace util::coroutine
 		constexpr ~Enumerator()
 			noexcept(nothrow_destructibles<Rng>) = default;
 
-		template<enumerable Sng>
+		template<enumerable Sng, typename Sref>
 			requires constructible_from<Rng, Sng>
-		constexpr Enumerator(Enumerator<Sng>&& other)
+		constexpr Enumerator(Enumerator<Sng, Sref>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(move(other.myHandle))
 		{
 			myHandle.promise().current = move(other.myHandle.promise().current);
 		}
 
-		template<enumerable Sng>
+		template<enumerable Sng, typename Sref>
 			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng>
-		constexpr Enumerator(const Enumerator<Sng>& other)
+		constexpr Enumerator(const Enumerator<Sng, Sref>& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
 		{
@@ -201,16 +203,16 @@ namespace util::coroutine
 	};
 
 	template<std::ranges::forward_range Rng>
-	Enumerator(Rng&&) -> Enumerator<Rng>;
+	Enumerator(Rng&&) -> Enumerator<Rng, Rng&&>;
 }
 
-export template<typename Rng>
-inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumerator<Rng>> = std::ranges::enable_borrowed_range<Rng>;
+export template<typename Rng, typename Ref>
+inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumerator<Rng, Ref>> = std::ranges::enable_borrowed_range<Rng>;
 
 export namespace util
 {
 	template<std::ranges::forward_range Rng>
-	inline coroutine::Enumerator<Rng> coenumerate(Rng&& rng) noexcept
+	inline coroutine::Enumerator<Rng, Rng&&> coenumerate(Rng&& rng) noexcept
 	{
 		auto&& range = forward<Rng>(rng);
 		auto it = std::ranges::cbegin(range);
