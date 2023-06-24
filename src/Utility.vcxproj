@@ -172,6 +172,7 @@
     <ClCompile Include="..\Object.cc" />
     <ClCompile Include="..\Serialization.ixx" />
     <ClCompile Include="..\Testbed.cpp" />
+    <ClCompile Include="CoLogic.ixx" />
     <ClCompile Include="concurrency\CoIterator.ixx" />
     <ClCompile Include="concurrency\CoPromise.ixx" />
     <ClCompile Include="concurrency\Coroutine.ixx" />

@@ -1,10 +1,8 @@
-module;
-#include <ranges>
-#include <vector>
-#include <stack>
-#include <coroutine>
-
 export module Utility.Coroutine.Enumerator;
+import <algorithm>;
+import <ranges>;
+import <vector>;
+import <coroutine>;
 import Utility;
 import Utility.Constraints;
 import Utility.Monad;
@@ -226,17 +224,12 @@ export namespace util
 		}
 	}
 
-	template<enumerable Rng, typename Pred>
-	inline coroutine::DeferredTask
-		co_each(Rng&& rng, Pred&& predicate)
+	template<std::forward_iterator It, std::sentinel_for<It> End>
+	inline auto
+		coenumerate(It it, const End end)
 		noexcept
 	{
-		auto&& pred = forward<Pred>(predicate);
-
-		for (auto&& value : coenumerate(forward<Rng>(rng)))
-		{
-			co_await pred(value);
-		}
+		return coenumerate(std::ranges::subrange{ it, end });
 	}
 }
 
