@@ -214,13 +214,14 @@ export namespace util
 		noexcept
 	{
 		auto&& range = forward<Rng>(rng);
-		auto it = std::ranges::begin(range);
+		auto it = range.begin();
 
 		static_assert(std::forward_iterator<decltype(it)>);
 
 		while (it != range.end())
 		{
-			co_yield (it++);
+			co_yield it;
+			it++;
 		}
 	}
 
@@ -234,7 +235,6 @@ export namespace util
 }
 
 #pragma warning(push, 1)
-
 namespace util::test
 {
 	void test_enum_coroutine()

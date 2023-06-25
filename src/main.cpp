@@ -1,4 +1,5 @@
 #include <vector>
+#include <initializer_list>
 
 import Utility;
 import Utility.Print;
@@ -68,7 +69,33 @@ int main()
 	const std::vector<int> test3_vec({ 131233, 4, 5, 6, 7, 8, 353463 });
 	const auto task3 = util::coenumerate(test3_vec);
 
+	util::Println("Const Left value");
 	for (auto&& vv : util::coenumerate(test3_vec))
+	{
+		util::Print("{} ", vv);
+	}
+	util::Println("");
+
+	util::Println("Right value");
+	std::vector<int> test3_vec2({ 131233, 4, 5, 6, 7, 8, 353463 });
+	for (auto&& vv : util::coenumerate(test3_vec2))
+	{
+		//vv += 40;
+
+		util::Print("{} ", vv);
+	}
+	util::Println("");
+
+	util::Println("Pure Right value");
+	// ???
+	for (auto&& vv : util::coenumerate(std::vector{ 131233, 4, 5, 6, 7, 8, 353463 }))
+	{
+		util::Print("{} ", vv);
+	}
+	util::Println("");
+
+	util::Println("Const Right value");
+	for (auto&& vv : util::coenumerate(std::move(test3_vec)))
 	{
 		util::Print("{} ", vv);
 	}
