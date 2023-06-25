@@ -1,11 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Intrinsic Category="Method" Name="__UnwrapTy" Expression="&quot;$T1&quot;"/>
+
 	<Type Name="util::Singleton&lt;*&gt;">
 		<DisplayString>싱글톤 객체 {&quot;$T1&quot;}</DisplayString>
 	</Type>
 
-	<Intrinsic Category="Method" Name="__UnwrapTy" Expression="&quot;$T1&quot;"/>
-	
+	<Type Name="util::coroutine::CoConstIterator&lt;*&gt;">
+		<DisplayString>상수 코루틴 반복자 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::coroutine::CoForwardIterator&lt;*&gt;">
+		<DisplayString>전진 코루틴 반복자 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::coroutine::Suspender&lt;*&gt;">
+		<DisplayString>코루틴 상태 지정자 &lt;{&quot;$T1&quot;}, {&quot;$T2&quot;}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Synthetic Name="[초기 상태]">
+				<DisplayString>{&quot;$T1&quot;}</DisplayString>
+			</Synthetic>
+			<Synthetic Name="[후기 상태]">
+				<DisplayString>{&quot;$T2&quot;}</DisplayString>
+			</Synthetic>
+		</Expand>
+	</Type>
+
+	<Type Name="util::coroutine::BasicPromise&lt;*&gt;" Priority="Low">
+		<DisplayString>기본 코루틴 프로미스 &lt;{&quot;$T1&quot;}&gt;</DisplayString>
+	</Type>
+
+	<Type Name="util::coroutine::CoForwardIterator&lt;*&gt;">
+		<DisplayString>전진 코루틴 반복자 {&quot;$T1&quot;}</DisplayString>
+	</Type>
+
+	<Type Name="util::coroutine::Enumerator&lt;*&gt;">
+		<DisplayString>열거 코루틴 &lt;{&quot;$T1&quot;}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="[핸들]">myHandle</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="util::coroutine::Generator&lt;*&gt;">
+		<DisplayString>생성 코루틴 &lt;{&quot;$T1&quot;}&gt;</DisplayString>
+
+		<Expand HideRawView="true">
+			<Item Name="[핸들]">myHandle</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="util::coroutine::Enumerator&lt;*&gt;::promise_type" Priority="MediumLow">
+		<DisplayString>열거 코루틴 프로미스 &lt;{&quot;$T1&quot;}&gt;</DisplayString>
+	</Type>
+
 	<Type Name="util::Array&lt;*&gt;">
 		<Intrinsic Category="Property" Name="__AcqType" Expression="__UnwrapTy()"/>
 		<Intrinsic Category="Property" Name="__AcqLen" Expression="static_cast&lt;size_t&gt;($T2)"/>
@@ -121,7 +170,7 @@
 
 	<Type Name="util::detail::PlacedVariant&lt;std::integral_constant&lt;*&gt;, util::Identity&lt;*&gt;,*&gt;">
 		<AlternativeType Name="util::detail::PlacedVariant&lt;std::integral_constant&lt;*&gt;,*&gt;"/>
-		
+
 		<Intrinsic Category="Property" Name="__AcqType" Expression="&quot;$T3&quot;"/>
 		<Intrinsic Category="Property" Name="__AcqPlace" Expression="$T2 + 1"/>
 		<Intrinsic Category="Property" Name="__AcqValue" Expression="myValue"/>
@@ -172,7 +221,7 @@
 			<ExpandedItem>myStorage</ExpandedItem>
 		</Expand>
 	</Type>
-	
+
 	<Type Name="util::LooseMonad&lt;*&gt;">
 		<DisplayString Condition="myStorage.mySize == 1">느슨한 모나드 {{ {"$T1"} }}</DisplayString>
 		<DisplayString Condition="myStorage.mySize == 2">느슨한 모나드 {{ {"$T1"}, {"$T2"} }}</DisplayString>
@@ -186,14 +235,6 @@
 
 		<Expand HideRawView="true">
 			<Item Name="값">myOption</Item>
-			<Item Name="이벤트 처리기">myHandlers</Item>
-		</Expand>
-	</Type>
-	
-	<Type Name="util::Option&lt;*&amp;&gt;">
-		<DisplayString>선택지 &lt;{"$T1"}&amp;&gt;</DisplayString>
-		
-		<Expand HideRawView="true">
 			<Item Name="이벤트 처리기">myHandlers</Item>
 		</Expand>
 	</Type>
