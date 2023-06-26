@@ -175,6 +175,23 @@ namespace util::coroutine
 		}
 
 		[[nodiscard]]
+		const_iterator cbegin() const noexcept
+		{
+			if (!myHandle.done())
+			{
+				myHandle.resume();
+			}
+
+			return const_iterator{ myHandle };
+		}
+
+		[[nodiscard]]
+		constexpr std::default_sentinel_t cend() const noexcept
+		{
+			return {};
+		}
+
+		[[nodiscard]]
 		bool done() const noexcept
 		{
 			return myHandle.done();
