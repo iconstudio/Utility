@@ -180,12 +180,6 @@ namespace util::coroutine
 			return myHandle.done();
 		}
 
-		[[nodiscard]]
-		bool empty() const noexcept
-		{
-			return !myHandle || myHandle.done();
-		}
-
 		Enumerator(const Enumerator& other) = delete;
 		constexpr Enumerator(Enumerator&& other)
 			noexcept(nothrow_move_constructibles<Rng>) = default;
