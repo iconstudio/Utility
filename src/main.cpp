@@ -1,4 +1,5 @@
 #include <vector>
+#include <array>
 #include <initializer_list>
 
 import Utility;
@@ -88,7 +89,20 @@ int main()
 
 	util::Println("Pure Right value");
 	// ???
-	for (auto&& vv : util::coenumerate(std::vector{ 131233, 4, 5, 6, 7, 8, 353463 }))
+	for (auto&& vv : util::coenumerate(std::vector<int>({ 131233, 4, 5, 6, 7, 8, 353463 })))
+	{
+		util::Print("{} ", vv);
+	}
+	util::Println("");
+	for (auto&& vv : util::coenumerate(std::array<int, 50>{ 131233, 4, 5, 6, 7, 8, 353463 }))
+	{
+		util::Print("{} ", vv);
+	}
+	util::Println("");
+
+	util::Println("Copied Pure Right value");
+	// ???
+	for (auto&& vv : util::coenumerate(std::vector(test3_vec2)))
 	{
 		util::Print("{} ", vv);
 	}
