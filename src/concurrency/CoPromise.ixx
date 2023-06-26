@@ -19,7 +19,7 @@ export namespace util::coroutine
 	template<typename T>
 	concept awaitable = requires(T t)
 	{
-		t.await_ready();
+		{ t.await_ready() } -> same_as<bool>;
 		t.await_suspend(coroutine_handle<>{});
 		t.await_resume();
 	};
