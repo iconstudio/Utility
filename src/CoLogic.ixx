@@ -292,7 +292,7 @@ namespace util::test
 
 		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
 
-		auto io_range1 = coiota(0, 10);
+		auto io_range1 = coiota(0, 15);
 		auto io_range2 = coiota(0, [](const int& curr) {
 			return curr * 2;
 		});
@@ -302,6 +302,8 @@ namespace util::test
 
 		for (auto&& val : io_range2)
 		{}
+
+		auto bb = io_range1 | std::views::take(10);
 	}
 }
 #pragma warning(pop)
