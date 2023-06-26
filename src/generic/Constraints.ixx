@@ -114,8 +114,8 @@ export namespace util
 	template<typename... Ts>
 	concept trivially_move_assignables = make_conjunction<std::is_trivially_move_assignable, Ts...>;
 
-	template<typename T>
-	concept nothrow_default_constructibles = std::is_nothrow_default_constructible_v<T>;
+	template<typename... Ts>
+	concept nothrow_default_constructibles = make_conjunction<std::is_nothrow_default_constructible, Ts...>;
 
 	template<typename T, typename... Args>
 	concept nothrow_constructibles = std::is_nothrow_constructible_v<T, Args...>;
