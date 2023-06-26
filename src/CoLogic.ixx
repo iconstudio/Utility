@@ -5,6 +5,7 @@ import <vector>;
 import Utility;
 import Utility.Coroutine;
 import Utility.Coroutine.Enumerator;
+import Utility.Coroutine.Generator;
 
 namespace util
 {
@@ -14,7 +15,7 @@ export namespace util
 {
 	using coroutine::coexecution;
 
-	template<coexecution Policy, enumerable Rng, typename Pred>
+	template<coexecution Policy, coroutine::enumerable Rng, typename Pred>
 	inline
 		coroutine::Cowork<Policy>
 		co_each_as(Rng&& rng, Pred&& predicate)
@@ -31,7 +32,7 @@ export namespace util
 		const auto filter = coenumerate(vb) | std::views::filter([](auto&& val) { return val > 50; });
 	}
 
-	template<enumerable Rng, typename Pred>
+	template<coroutine::enumerable Rng, typename Pred>
 	inline
 		auto
 		co_each(Rng&& rng, Pred&& predicate)
@@ -179,6 +180,50 @@ export namespace util
 	{
 		return corepeat_as<coexecution::Later>(forward<Fn>(fn), forward<Args>(args)...);
 	}
+
+	template<movable T>
+	inline coroutine::Generator<T>
+		coiota(T&& first)
+		noexcept(nothrow_constructibles<T, T&&>)
+	{
+		T val = first;
+
+		co_yield val++;
+	}
+
+	template<movable T, typename Predicate, typename... Args>
+		requires invocables<Predicate, T, Args...>
+	inline coroutine::Generator<T>
+		coiota(Predicate&& predicate, Args&&... args)
+		noexcept(nothrow_default_constructibles<T>&& nothrow_constructibles<T, T&&>)
+	{
+		T val = {};
+		auto&& pred = forward<Predicate>(predicate);
+
+		do
+		{
+			co_yield val;
+
+			val = pred();
+		}
+		while (true);
+	}
+
+	template<movable T, typename Predicate, typename... Args>
+		requires invocables<Predicate, T, Args...>
+	inline coroutine::Generator<T>
+		coiota(T&& first, Predicate&& pred, Args&&... args)
+		noexcept(nothrow_constructibles<T, T&&>)
+	{
+		T val = first;
+
+		co_yield val++;
+
+		while (invoke(pred, val, args...))
+		{
+			co_yield val++;
+		}
+	}
 }
 
 #pragma warning(push, 1)
@@ -236,6 +281,11 @@ namespace util::test
 		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn2);
 		//corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn3); //!
 		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn4);
+
+		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
+		for (auto&& ch : coenumerate(vb) | std::views::take(4))
+		{
+		}
 	}
 }
 #pragma warning(pop)
