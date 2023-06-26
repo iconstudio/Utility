@@ -11,7 +11,7 @@ import Utility.Coroutine;
 namespace util::coroutine
 {
 	export template<typename Rng>
-		concept enumerable = std::ranges::forward_range<Rng> && notvoids<std::ranges::range_value_t<Rng>>;
+		concept enumerable = std::ranges::forward_range<Rng>;
 
 	export template<enumerable Rng, typename Ref>
 		class [[nodiscard]] Enumerator
@@ -215,34 +215,42 @@ namespace util::coroutine
 export template<typename Rng, typename Ref>
 inline constexpr bool std::ranges::enable_borrowed_range<util::coroutine::Enumerator<Rng, Ref>> = std::ranges::enable_borrowed_range<Rng>;
 
-export namespace util
+namespace util
 {
-	using coroutine::enumerable;
+	export using coroutine::enumerable;
 
-	template<enumerable Rng>
-	inline coroutine::Enumerator<Rng, Rng&&>
-		coenumerate(Rng&& rng)
-		noexcept(nothrow_incrementable<std::ranges::iterator_t<Rng>> && nothrow_assignables<Rng&&, Rng>)
+	struct coenumerate_fn
 	{
-		auto&& range = forward<Rng>(rng);
-		auto it = range.begin();
-
-		static_assert(std::forward_iterator<decltype(it)>);
-
-		while (it != range.end())
+		template<enumerable Rng>
+		inline auto
+			operator()(Rng&& rng)
+			const
+			noexcept(nothrow_incrementable<std::ranges::iterator_t<Rng>>&& nothrow_assignables<Rng&&, Rng>)
+			-> coroutine::Enumerator<Rng, Rng&&>
 		{
-			co_yield it;
-			it++;
-		}
-	}
+			auto&& range = forward<Rng>(rng);
+			auto it = range.begin();
 
-	template<std::forward_iterator It, std::sentinel_for<It> End>
-	inline auto
-		coenumerate(It it, const End end)
-		noexcept(nothrow_incrementable<It>)
-	{
-		return coenumerate(std::ranges::subrange{ it, end });
-	}
+			static_assert(std::forward_iterator<decltype(it)>);
+
+			while (it != range.end())
+			{
+				co_yield it;
+				it++;
+			}
+		}
+
+		template<std::forward_iterator It, std::sentinel_for<It> End>
+		inline auto
+			operator()(It it, const End& end)
+			const
+			noexcept(nothrow_incrementable<It>)
+		{
+			return (*this)(std::ranges::subrange{ it, end });
+		}
+	};
+
+	export inline constexpr coenumerate_fn coenumerate{};
 }
 
 #pragma warning(push, 1)
@@ -250,17 +258,15 @@ namespace util::test
 {
 	void test_enum_coroutine()
 	{
-		auto aa = coenumerate(std::vector{ 0, 2, 34, 54, 56, 654, 75 });
+		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
 
+		auto aa = coenumerate(vb);
 		for (auto&& val : aa)
 		{
-			val = 450;
+			//val = 450;
 		}
 
-		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
-		auto bb = coenumerate(vb);
-
-		for (auto&& val : vb)
+		for (auto&& val : coenumerate(vb))
 		{
 		}
 	}
