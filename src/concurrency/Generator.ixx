@@ -135,25 +135,24 @@ export namespace util
 		}
 	}
 
-	template<typename Fn, movable T>
-		requires r_invocables<Fn, T>
+	template<movable T, std::equality_comparable_with<T> Last>
+		requires movable<Last>
 	inline coroutine::Generator<T>
-		cogenerate(Fn&& fn)
-		noexcept(noexcept(forward<Fn>(fn)()))
+		cogenerate(T first, const Last& last)
+		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<T>)
 	{
-		Fn&& functor = forward<Fn>(fn);
-
-		while (true)
+		while (last != first)
 		{
-			co_yield functor();
+			co_yield first++;
 		}
 	}
 
-	template<movable T, typename Fn, typename... Args>
-		requires invocables<Fn, T, Args...>
-	inline coroutine::Generator<T>
+	template<typename Fn, typename... Args>
+		requires invocables<Fn, Args...>
+	inline auto
 		cogenerate(Fn&& fn, Args&&... args)
-		noexcept(nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
+		noexcept(nothrow_invocables<Fn, Args...>)
+		-> coroutine::Generator<invoke_result_t<Fn, Args...>>
 	{
 		auto&& functor = forward<Fn>(fn);
 
@@ -188,6 +187,11 @@ namespace util::test
 		const coroutine::Generator aa = cogenerate(1);
 
 		for (auto&& val : aa)
+		{
+		}
+
+		int first = 40;
+		for (auto&& val : cogenerate([&]() noexcept -> int { return first++; }))
 		{
 		}
 	}
