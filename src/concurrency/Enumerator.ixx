@@ -222,7 +222,7 @@ export namespace util
 	template<enumerable Rng>
 	inline coroutine::Enumerator<Rng, Rng&&>
 		coenumerate(Rng&& rng)
-		noexcept
+		noexcept(nothrow_incrementable<std::ranges::iterator_t<Rng>> && nothrow_assignables<Rng&&, Rng>)
 	{
 		auto&& range = forward<Rng>(rng);
 		auto it = range.begin();
@@ -239,7 +239,7 @@ export namespace util
 	template<std::forward_iterator It, std::sentinel_for<It> End>
 	inline auto
 		coenumerate(It it, const End end)
-		noexcept
+		noexcept(nothrow_incrementable<It>)
 	{
 		return coenumerate(std::ranges::subrange{ it, end });
 	}

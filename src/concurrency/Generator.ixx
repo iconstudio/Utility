@@ -126,8 +126,8 @@ export namespace util
 {
 	template<movable T>
 	inline coroutine::Generator<T>
-		cogenerate(T&& first)
-		noexcept(nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
+		cogenerate(T first)
+		noexcept(nothrow_incrementable<T> && nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
 	{
 		while (true)
 		{

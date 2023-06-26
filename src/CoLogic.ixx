@@ -3,6 +3,7 @@ import <algorithm>;
 import <ranges>;
 import <vector>;
 import Utility;
+import Utility.Constraints;
 import Utility.Coroutine;
 import Utility.Coroutine.Enumerator;
 import Utility.Coroutine.Generator;
@@ -191,7 +192,7 @@ export namespace util
 	template<movable T, movable Last>
 	inline coroutine::Generator<T>
 		coiota(T&& first, const Last& last)
-		noexcept(nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<Last>)
+		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<Last>)
 	{
 		T val = forward<T>(first);
 
@@ -205,7 +206,7 @@ export namespace util
 		requires invocables<Fn, T, Args...>
 	inline coroutine::Generator<T>
 		coiota(T&& first, Fn&& fn, Args&&... args)
-		noexcept(nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
+		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
 	{
 		auto&& pred = forward<Fn>(fn);
 		T val = forward<T>(first);
