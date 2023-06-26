@@ -130,6 +130,16 @@ export namespace util
 	{
 		co_yield first++;
 	}
+
+	template<typename Fn, movable T>
+		requires r_invocables<Fn, T>
+	inline coroutine::Generator<T>
+		cogenerate(Fn&& fn)
+		noexcept(noexcept(forward<Fn>(fn)()))
+	{
+		Fn&& functor = forward<Fn>(fn);
+		co_yield functor();
+	}
 }
 
 export template<typename T>
