@@ -1,4 +1,5 @@
 export module Utility.Coroutine.Generator;
+import <tuple>;
 import Utility.Constraints;
 import Utility.Coroutine;
 
@@ -128,7 +129,10 @@ export namespace util
 		cogenerate(T&& first)
 		noexcept(nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
 	{
-		co_yield first++;
+		while (true)
+		{
+			co_yield first++;
+		}
 	}
 
 	template<typename Fn, movable T>
@@ -138,7 +142,27 @@ export namespace util
 		noexcept(noexcept(forward<Fn>(fn)()))
 	{
 		Fn&& functor = forward<Fn>(fn);
-		co_yield functor();
+
+		while (true)
+		{
+			co_yield functor();
+		}
+	}
+
+	template<movable T, typename Fn, typename... Args>
+		requires invocables<Fn, T, Args...>
+	inline coroutine::Generator<T>
+		cogenerate(Fn&& fn, Args&&... args)
+		noexcept(nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
+	{
+		auto&& functor = forward<Fn>(fn);
+		const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+
+		do
+		{
+			co_yield std::apply(functor, arguments);
+		}
+		while (true);
 	}
 }
 
