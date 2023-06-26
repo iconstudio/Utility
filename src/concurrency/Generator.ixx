@@ -156,13 +156,24 @@ export namespace util
 		noexcept(nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
 	{
 		auto&& functor = forward<Fn>(fn);
-		const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
 
-		do
+		if constexpr (0 < sizeof...(Args))
 		{
-			co_yield std::apply(functor, arguments);
+			const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+			do
+			{
+				co_yield std::apply(functor, arguments);
+			}
+			while (true);
 		}
-		while (true);
+		else
+		{
+			do
+			{
+				co_yield functor();
+			}
+			while (true);
+		}
 	}
 }
 
