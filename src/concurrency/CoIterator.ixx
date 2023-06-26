@@ -1,5 +1,4 @@
 export module Utility.Coroutine:CoIterator;
-export import <algorithm>;
 export import <iterator>;
 export import Utility;
 export import Utility.Constraints;

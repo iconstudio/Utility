@@ -3,7 +3,6 @@ import <iterator>;
 import <coroutine>;
 import Utility;
 import Utility.Constraints;
-import Utility.Monad;
 
 export namespace util::coroutine
 {

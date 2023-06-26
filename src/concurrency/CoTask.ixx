@@ -1,6 +1,5 @@
 export module Utility.Coroutine:Task;
 import <coroutine>;
-import Utility.Constraints;
 import :Promise;
 
 export namespace util::coroutine
