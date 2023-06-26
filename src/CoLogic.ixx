@@ -1,7 +1,8 @@
 export module Utility.Coroutine.Logic;
+import <tuple>;
+import <vector>;
 import <algorithm>;
 import <ranges>;
-import <vector>;
 import Utility;
 import Utility.Constraints;
 import Utility.Coroutine;
@@ -182,7 +183,7 @@ export namespace util
 	template<movable T>
 	inline coroutine::Generator<T>
 		coiota(T&& first)
-		noexcept(nothrow_constructibles<T, T&&>)
+		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>)
 	{
 		T val = forward<T>(first);
 
