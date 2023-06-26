@@ -25,7 +25,7 @@ int main()
 	constexpr auto sqrt4 = util::sqrt(16.0f);
 	util::Println("Testing square roots: {}, {}, {}, {}", sqrt1, sqrt2, sqrt3, sqrt4);
 
-	for (auto&& val : util::cogenerate('A', 'Z' + 1))
+	for (auto&& val : util::coiota('A', 'Z' + 1))
 	{
 		util::Print("{} ", val);
 	}

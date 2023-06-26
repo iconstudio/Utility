@@ -27,9 +27,6 @@ export namespace util
 		{
 			co_await pred(value);
 		}
-
-		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
-		const auto filter = coenumerate(vb) | std::views::filter([](auto&& val) { return val > 50; });
 	}
 
 	template<coroutine::enumerable Rng, typename Pred>
@@ -186,42 +183,53 @@ export namespace util
 		coiota(T&& first)
 		noexcept(nothrow_constructibles<T, T&&>)
 	{
-		T val = first;
+		T val = forward<T>(first);
 
 		co_yield val++;
 	}
 
-	template<movable T, typename Predicate, typename... Args>
-		requires invocables<Predicate, T, Args...>
+	template<movable T, movable Last>
 	inline coroutine::Generator<T>
-		coiota(Predicate&& predicate, Args&&... args)
-		noexcept(nothrow_default_constructibles<T>&& nothrow_constructibles<T, T&&>)
+		coiota(T&& first, const Last& last)
+		noexcept(nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<Last>)
 	{
-		T val = {};
-		auto&& pred = forward<Predicate>(predicate);
+		T val = forward<T>(first);
 
-		do
-		{
-			co_yield val;
-
-			val = pred();
-		}
-		while (true);
-	}
-
-	template<movable T, typename Predicate, typename... Args>
-		requires invocables<Predicate, T, Args...>
-	inline coroutine::Generator<T>
-		coiota(T&& first, Predicate&& pred, Args&&... args)
-		noexcept(nothrow_constructibles<T, T&&>)
-	{
-		T val = first;
-
-		co_yield val++;
-
-		while (invoke(pred, val, args...))
+		while (last != val)
 		{
 			co_yield val++;
+		}
+	}
+
+	template<movable T, typename Fn, typename... Args>
+		requires invocables<Fn, T, Args...>
+	inline coroutine::Generator<T>
+		coiota(T&& first, Fn&& fn, Args&&... args)
+		noexcept(nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
+	{
+		auto&& pred = forward<Fn>(fn);
+		T val = forward<T>(first);
+
+		if constexpr (0 < sizeof...(Args))
+		{
+			const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+			do
+			{
+				co_yield val;
+
+				val = std::apply(pred, std::tuple_cat(std::forward_as_tuple(val), arguments));
+			}
+			while (true);
+		}
+		else
+		{
+			do
+			{
+				co_yield val;
+
+				val = pred(val);
+			}
+			while (true);
 		}
 	}
 }
@@ -283,9 +291,17 @@ namespace util::test
 		corepeat_as<coexecution::Now>(std::move(cocl3), &test_coclass::test_memfn4);
 
 		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
-		for (auto&& ch : coenumerate(vb) | std::views::take(4))
-		{
-		}
+
+		auto io_range1 = coiota(0, 10);
+		auto io_range2 = coiota(0, [](const int& curr) {
+			return curr * 2;
+		});
+
+		for (auto&& val : io_range1)
+		{}
+
+		for (auto&& val : io_range2)
+		{}
 	}
 }
 #pragma warning(pop)
