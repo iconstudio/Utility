@@ -180,46 +180,55 @@ export namespace util
 		return corepeat_as<coexecution::Later>(forward<Fn>(fn), forward<Args>(args)...);
 	}
 
-	template<movable T>
-	inline coroutine::Generator<T>
-		coiota(T&& first)
-		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>)
+	template<movable V>
+	inline coroutine::Generator<V>
+		coiota(V init)
+		noexcept(nothrow_incrementable<V>&& nothrow_constructibles<V, V&&>)
 	{
-		T val = forward<T>(first);
-
-		co_yield val++;
-	}
-
-	template<movable T, movable Last>
-	inline coroutine::Generator<T>
-		coiota(T&& first, const Last& last)
-		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<Last>)
-	{
-		T val = forward<T>(first);
-
-		while (last != val)
+		while (true)
 		{
-			co_yield val++;
+			co_yield init++;
 		}
 	}
 
+	/// <summary>
+	/// For iterators
+	/// </summary>
+	template<movable V, std::forward_iterator It, typename Fn>
+	inline auto
+		coccumulate(V init, It it, Fn&& op)
+		noexcept(nothrow_incrementable<It>&& nothrow_constructibles<V, V&&>&& nothrow_invocables<Fn, V, V>)
+		-> coroutine::Generator<V>
+	{
+		Fn&& fn = forward<Fn>(op);
+
+		while (true)
+		{
+			co_yield init;
+
+			init = fn(move(init), *it++);
+		}
+	}
+
+	/// <summary>
+	/// For non-iterators
+	/// </summary>
 	template<movable T, typename Fn, typename... Args>
 		requires invocables<Fn, T, Args...>
 	inline coroutine::Generator<T>
-		coiota(T&& first, Fn&& fn, Args&&... args)
+		coccumulate(T first, Fn&& fn, Args&&... args)
 		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_invocables<Fn, T, Args...>)
 	{
 		auto&& pred = forward<Fn>(fn);
-		T val = forward<T>(first);
 
 		if constexpr (0 < sizeof...(Args))
 		{
-			const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+			std::tuple<T&, Args&&...> arguments = std::forward_as_tuple(first, forward<Args>(args)...);
 			do
 			{
-				co_yield val;
+				co_yield first;
 
-				val = std::apply(pred, std::tuple_cat(std::forward_as_tuple(val), arguments));
+				std::get<0>(arguments) = std::apply(pred, arguments);
 			}
 			while (true);
 		}
@@ -227,9 +236,9 @@ export namespace util
 		{
 			do
 			{
-				co_yield val;
+				co_yield first;
 
-				val = pred(val);
+				first = pred(first);
 			}
 			while (true);
 		}
@@ -294,8 +303,8 @@ namespace util::test
 
 		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
 
-		auto io_range1 = coiota(0, 15);
-		auto io_range2 = coiota(0, [](const int& curr) {
+		auto io_range1 = cogenerate(0, 15);
+		auto io_range2 = coccumulate(0, [](const int& curr) {
 			return curr * 2;
 		});
 
