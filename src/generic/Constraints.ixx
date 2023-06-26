@@ -151,6 +151,30 @@ export namespace util
 	concept nothrow_r_invocables = std::is_nothrow_invocable_r_v<Result, T, Args...>;
 
 	template<typename T>
+	concept nothrow_incrementable = requires(T t)
+	{
+		{ ++t } noexcept;
+		{ t++ } noexcept;
+	};
+
+	template<typename T>
+	concept nothrow_decrementable = requires(T t)
+	{
+		{ --t } noexcept;
+		{ t-- } noexcept;
+	};
+
+	template<typename T>
+	concept nothrow_aritmetic = requires(T t)
+	{
+		{ t + t } noexcept;
+		{ t - t } noexcept;
+		{ t * t } noexcept;
+		{ t / t } noexcept;
+		{ t % t } noexcept;
+	};
+
+	template<typename T>
 	concept basic_arithmeticals = std::is_arithmetic_v<clean_t<T>>;
 
 	template<typename... Args>
