@@ -105,10 +105,10 @@ namespace util::coroutine
 		};
 
 		constexpr Enumerator()
-			noexcept(nothrow_default_constructibles<Rng>)
-			requires(default_initializable<Rng>) = default;
+			noexcept(nothrow_default_constructibles<handle_type, Rng>)
+			requires(default_initializable<handle_type>) = default;
 		constexpr ~Enumerator()
-			noexcept(nothrow_destructibles<Rng>) = default;
+			noexcept(nothrow_destructibles<handle_type>) = default;
 
 		template<enumerable Sng, typename Sref>
 			requires constructible_from<Rng, Sng>
@@ -182,10 +182,10 @@ namespace util::coroutine
 
 		Enumerator(const Enumerator& other) = delete;
 		constexpr Enumerator(Enumerator&& other)
-			noexcept(nothrow_move_constructibles<Rng>) = default;
+			noexcept(nothrow_move_constructibles<handle_type, Rng>) = default;
 		Enumerator& operator=(const Enumerator& other) = delete;
 		constexpr Enumerator& operator=(Enumerator&& other)
-			noexcept(nothrow_move_assignables<Rng>) = default;
+			noexcept(nothrow_move_assignables<handle_type, Rng>) = default;
 
 	private:
 		handle_type myHandle;
