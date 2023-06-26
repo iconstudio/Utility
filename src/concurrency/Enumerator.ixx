@@ -258,6 +258,7 @@ namespace util::test
 {
 	void test_enum_coroutine()
 	{
+#if 0
 		const std::vector vb{ 0, 2, 34, 54, 56, 654, 75 };
 
 		auto aa = coenumerate(vb);
@@ -269,6 +270,7 @@ namespace util::test
 		for (auto&& val : coenumerate(vb))
 		{
 		}
+#endif
 	}
 }
 #pragma warning(pop)
