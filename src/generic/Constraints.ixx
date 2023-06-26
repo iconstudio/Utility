@@ -168,7 +168,18 @@ export namespace util
 	namespace detail
 	{
 		template<typename T, typename Oty>
-		struct same_as_t : std::bool_constant<std::same_as<T, Oty>>
+		struct same_as_t
+			: public std::bool_constant<std::same_as<T, Oty>>
+		{};
+
+		template<typename Oty>
+		struct same_as_t<void, Oty>
+			: public is_same<void, Oty>
+		{};
+
+		template<typename T>
+		struct same_as_t<T, void>
+			: public is_same<T, void>
 		{};
 
 		template<typename T>
