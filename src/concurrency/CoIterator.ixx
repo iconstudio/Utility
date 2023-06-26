@@ -149,8 +149,31 @@ export namespace util::coroutine
 			noexcept(nothrow_destructibles<handle_type>) = default;
 
 		using base::base;
-		using base::operator++;
 		using base::operator==;
+
+		inline CoForwardIterator& operator++() noexcept
+		{
+			base::Resume();
+
+			return *this;
+		}
+
+		inline void operator++(int) noexcept
+		{
+			base::Resume();
+		}
+
+		inline const CoForwardIterator& operator++() const noexcept
+		{
+			base::Resume();
+
+			return *this;
+		}
+
+		inline void operator++(int) const noexcept
+		{
+			base::Resume();
+		}
 
 		inline reference operator*() & noexcept
 		{
@@ -176,5 +199,6 @@ export namespace util::coroutine
 
 	protected:
 		using base::Handle;
+		using base::Resume;
 	};
 }
