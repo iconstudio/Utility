@@ -25,7 +25,7 @@ int main()
 	constexpr auto sqrt4 = util::sqrt(16.0f);
 	util::Println("Testing square roots: {}, {}, {}, {}", sqrt1, sqrt2, sqrt3, sqrt4);
 
-	for (auto&& val : util::coiota('A', 'Z' + 1))
+	for (auto&& val : util::cogenerate('A', 'Z' + 1))
 	{
 		util::Print("{} ", val);
 	}
@@ -74,7 +74,7 @@ int main()
 
 	auto task3_rngbegin = std::ranges::begin(task3);
 	auto task3_rngend = std::ranges::end(task3);
-	
+
 	using task3_type = decltype(task3);
 	//using task3_iter_type = std::ranges::iterator_t<decltype(task3)>;
 	using task3_iter_type = task3_type::iterator;
@@ -147,9 +147,29 @@ int main()
 	util::Println("\n");
 
 	// test 4
+	util::Println("Co-Generate");
+	const util::coroutine::Generator aa = util::cogenerate(1);
+
+	util::Print("from 1 to {}: ", 30);
+	for (auto&& val : aa | std::views::take(30))
+	{
+		util::Print("{} ", val);
+	}
+	util::Println("");
+
+	int cogen_first = 10;
+	int cogen_addition = 30;
+	util::Print("from {} plus 30: ", cogen_first, cogen_addition);
+	for (auto&& val : util::cogenerate([&](const int& add) noexcept -> int { return add + cogen_first++; }, cogen_addition) | std::views::take(20))
+	{
+		util::Print("{} ", val);
+	}
+	util::Println("\n");
+
+	// test 5
 	util::Println("Algorithm 1 - iota");
-	auto io_range1 = util::coiota(0, 15);
-	auto io_range2 = util::coiota(1ULL
+	auto io_range1 = util::cogenerate(0, 15);
+	auto io_range2 = util::coccumulate(1ULL
 		, [](const unsigned long long& curr) {
 		return curr * 2;
 	});
@@ -160,7 +180,7 @@ int main()
 	}
 	util::Println("");
 
-	for (auto&& val : util::coiota(10, 50) | std::views::take(20))
+	for (auto&& val : util::cogenerate(10, 50) | std::views::take(20))
 	{
 		util::Print("{} ", val);
 	}
@@ -170,6 +190,8 @@ int main()
 		util::Print("{} ", val);
 	}
 	util::Println("\n");
+
+	// test 5
 
 	return 0;
 }
