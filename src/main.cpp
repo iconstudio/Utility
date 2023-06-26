@@ -68,7 +68,25 @@ int main()
 
 	// test 3
 	const std::vector<int> test3_vec({ 131233, 4, 5, 6, 7, 8, 353463 });
-	const auto task3 = util::coenumerate(test3_vec);
+	auto task3 = util::coenumerate(test3_vec);
+	auto task3_begin = std::begin(task3);
+	auto task3_end = std::end(task3);
+
+	auto task3_rngbegin = std::ranges::begin(task3);
+	auto task3_rngend = std::ranges::end(task3);
+	
+	using task3_type = decltype(task3);
+	//using task3_iter_type = std::ranges::iterator_t<decltype(task3)>;
+	using task3_iter_type = task3_type::iterator;
+
+	constexpr bool is_range_tk3 = std::ranges::range<task3_type>;
+	constexpr bool has_adl_tk3 = std::ranges::_Begin::_Has_ADL<task3_type>;
+	constexpr bool has_mem_tk3 = std::ranges::_Begin::_Has_member<task3_type>;
+
+	constexpr bool it_tk3 = std::input_or_output_iterator<task3_iter_type>;
+	constexpr bool it_tk3_incr = std::weakly_incrementable<task3_iter_type>;
+	//constexpr bool has_iter_adl_tk3 = std::ranges::_Begin::_Has_ADL<task3_iter_type>;
+	//constexpr bool has_mem_iter_tk3 = std::ranges::_Begin::_Has_member<task3_iter_type>;
 
 	util::Println("Const Left value");
 	for (auto&& vv : util::coenumerate(test3_vec))
@@ -78,6 +96,7 @@ int main()
 	util::Println("");
 
 	util::Println("Right value");
+	util::Print("ref: ");
 	std::vector<int> test3_vec2({ 131233, 4, 5, 6, 7, 8, 353463 });
 	for (auto&& vv : util::coenumerate(test3_vec2))
 	{
@@ -87,13 +106,25 @@ int main()
 	}
 	util::Println("");
 
+	util::Print("with view: ");
+	//for (auto&& vv : util::coenumerate(test3_vec2) | std::views::take(5))
+	{
+		//vv += 40;
+
+		//util::Print("{} ", vv);
+	}
+	util::Println("");
+
 	util::Println("Pure Right value");
 	// ???
+	util::Print("vector: ");
 	for (auto&& vv : util::coenumerate(std::vector<int>({ 131233, 4, 5, 6, 7, 8, 353463 })))
 	{
 		util::Print("{} ", vv);
 	}
 	util::Println("");
+
+	util::Print("array: ");
 	for (auto&& vv : util::coenumerate(std::array<int, 50>{ 131233, 4, 5, 6, 7, 8, 353463 }))
 	{
 		util::Print("{} ", vv);
@@ -116,6 +147,29 @@ int main()
 	util::Println("");
 
 	// test 4
+	util::Println("Algorithm 1 - iota");
+	auto io_range1 = util::coiota(0, 15);
+	auto io_range2 = util::coiota(1ULL
+		, [](const unsigned long long& curr) {
+		return curr * 2;
+	});
+
+	for (auto&& val : io_range1)
+	{
+		util::Print("{} ", val);
+	}
+	util::Println("");
+
+	for (auto&& val : util::coiota(10, 50) | std::views::take(20))
+	{
+		util::Print("{} ", val);
+	}
+	util::Println("");
+	for (auto&& val : io_range2 | std::views::take(20))
+	{
+		util::Print("{} ", val);
+	}
+	util::Println("");
 
 	return 0;
 }
