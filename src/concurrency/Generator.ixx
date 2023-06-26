@@ -123,14 +123,12 @@ export namespace util::coroutine
 
 export namespace util
 {
-	template<movable T, equality_comparable_with<T> Guard>
-	inline coroutine::Generator<T> cogenerate(T first, const Guard last)
-		noexcept(nothrow_copy_constructibles<T>)
+	template<movable T>
+	inline coroutine::Generator<T>
+		cogenerate(T&& first)
+		noexcept(nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
 	{
-		while (first != last)
-		{
-			co_yield first++;
-		}
+		co_yield first++;
 	}
 }
 
@@ -142,7 +140,7 @@ namespace util::test
 {
 	void test_gen_coroutine()
 	{
-		const coroutine::Generator aa = cogenerate(1, 10);
+		const coroutine::Generator aa = cogenerate(1);
 
 		for (auto&& val : aa)
 		{
