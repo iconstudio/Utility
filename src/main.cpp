@@ -93,7 +93,7 @@ int main()
 	{
 		util::Print("{} ", vv);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	util::Println("Right value");
 	util::Print("ref: ");
@@ -106,14 +106,14 @@ int main()
 	}
 	util::Println("");
 
-	util::Print("with view: ");
-	//for (auto&& vv : util::coenumerate(test3_vec2) | std::views::take(5))
+	util::Print("with view({}): ", 5);
+	for (auto&& vv : util::coenumerate(test3_vec2) | std::views::take(5))
 	{
-		//vv += 40;
+		vv += 40;
 
-		//util::Print("{} ", vv);
+		util::Print("{} ", vv);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	util::Println("Pure Right value");
 	// ???
@@ -129,7 +129,7 @@ int main()
 	{
 		util::Print("{} ", vv);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	util::Println("Copied Pure Right value");
 	// ???
@@ -137,14 +137,14 @@ int main()
 	{
 		util::Print("{} ", vv);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	util::Println("Const Right value");
 	for (auto&& vv : util::coenumerate(std::move(test3_vec)))
 	{
 		util::Print("{} ", vv);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	// test 4
 	util::Println("Algorithm 1 - iota");
@@ -169,7 +169,7 @@ int main()
 	{
 		util::Print("{} ", val);
 	}
-	util::Println("");
+	util::Println("\n");
 
 	return 0;
 }
