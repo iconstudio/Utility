@@ -114,7 +114,7 @@ namespace util::coroutine
 			requires constructible_from<Rng, Sng>
 		constexpr Enumerator(Enumerator<Sng, Sref>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
-			: myHandle(move(other.myHandle))
+			: myHandle(other.myHandle)
 		{
 			myHandle.promise().value() = move(other.myHandle.promise().value());
 		}
