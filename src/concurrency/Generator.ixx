@@ -122,58 +122,66 @@ export namespace util::coroutine
 	};
 }
 
-export namespace util
+namespace util
 {
-	template<movable T>
-	inline coroutine::Generator<T>
-		cogenerate(T first)
-		noexcept(nothrow_incrementable<T> && nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
+	struct cogenerate_fn
 	{
-		while (true)
+		template<movable T>
+		inline coroutine::Generator<T>
+			operator()(T first)
+			const
+			noexcept(nothrow_incrementable<T>&& nothrow_copy_constructibles<T>&& nothrow_move_constructibles<T>)
 		{
-			co_yield first++;
-		}
-	}
-
-	template<movable T, std::equality_comparable_with<T> Last>
-		requires movable<Last>
-	inline coroutine::Generator<T>
-		cogenerate(T first, const Last& last)
-		noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<T>)
-	{
-		while (last != first)
-		{
-			co_yield first++;
-		}
-	}
-
-	template<typename Fn, typename... Args>
-		requires invocables<Fn, Args...>
-	inline auto
-		cogenerate(Fn&& fn, Args&&... args)
-		noexcept(nothrow_invocables<Fn, Args...>)
-		-> coroutine::Generator<invoke_result_t<Fn, Args...>>
-	{
-		auto&& functor = forward<Fn>(fn);
-
-		if constexpr (0 < sizeof...(Args))
-		{
-			const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
-			do
+			while (true)
 			{
-				co_yield std::apply(functor, arguments);
+				co_yield first++;
 			}
-			while (true);
 		}
-		else
+
+		template<movable T, std::equality_comparable_with<T> Last>
+			requires movable<Last>
+		inline coroutine::Generator<T>
+			operator()(T first, const Last& last)
+			const
+			noexcept(nothrow_incrementable<T>&& nothrow_constructibles<T, T&&>&& nothrow_copy_constructibles<T>)
 		{
-			do
+			while (last != first)
 			{
-				co_yield functor();
+				co_yield first++;
 			}
-			while (true);
 		}
-	}
+
+		template<typename Fn, typename... Args>
+			requires invocables<Fn, Args...>
+		inline auto
+			operator()(Fn&& fn, Args&&... args)
+			const
+			noexcept(nothrow_invocables<Fn, Args...>)
+			-> coroutine::Generator<invoke_result_t<Fn, Args...>>
+		{
+			auto&& functor = forward<Fn>(fn);
+
+			if constexpr (0 < sizeof...(Args))
+			{
+				const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
+				do
+				{
+					co_yield std::apply(functor, arguments);
+				}
+				while (true);
+			}
+			else
+			{
+				do
+				{
+					co_yield functor();
+				}
+				while (true);
+			}
+		}
+	};
+
+	export extern "C" inline constexpr cogenerate_fn cogenerate{};
 }
 
 export template<typename T>
