@@ -222,10 +222,10 @@ namespace util
 	struct coenumerate_fn
 	{
 		template<enumerable Rng>
-		inline auto
-			operator()(Rng&& rng)
+			inline auto
+			operator()(Rng && rng)
 			const
-			noexcept(nothrow_incrementable<std::ranges::iterator_t<Rng>>&& nothrow_assignables<Rng&&, Rng>)
+			noexcept(nothrow_incrementable<std::ranges::iterator_t<Rng>> && nothrow_assignables<Rng&&, Rng>)
 			-> coroutine::Enumerator<Rng, Rng&&>
 		{
 			auto&& range = forward<Rng>(rng);
@@ -241,8 +241,8 @@ namespace util
 		}
 
 		template<std::forward_iterator It, std::sentinel_for<It> End>
-		inline auto
-			operator()(It it, const End& end)
+			inline auto
+			operator()(It it, const End & end)
 			const
 			noexcept(nothrow_incrementable<It>)
 		{
@@ -250,7 +250,7 @@ namespace util
 		}
 	};
 
-	export inline constexpr coenumerate_fn coenumerate{};
+	export extern "C" inline constexpr coenumerate_fn coenumerate{};
 }
 
 #pragma warning(push, 1)
