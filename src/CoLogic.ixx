@@ -8,8 +8,6 @@ import Utility.Coroutine.Enumerator;
 
 namespace util
 {
-	export using ::std::operator|;
-
 }
 
 export namespace util
