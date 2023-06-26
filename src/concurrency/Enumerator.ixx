@@ -112,7 +112,7 @@ namespace util::coroutine
 
 		template<enumerable Sng, typename Sref>
 			requires constructible_from<Rng, Sng>
-		constexpr Enumerator(Enumerator<Sng, Sref>&& other)
+		explicit constexpr Enumerator(Enumerator<Sng, Sref>&& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
 		{
@@ -121,7 +121,7 @@ namespace util::coroutine
 
 		template<enumerable Sng, typename Sref>
 			requires constructible_from<Rng, Sng>&& copy_constructibles<Rng, Sng>
-		constexpr Enumerator(const Enumerator<Sng, Sref>& other)
+		explicit constexpr Enumerator(const Enumerator<Sng, Sref>& other)
 			noexcept(nothrow_constructibles<Rng, Sng>)
 			: myHandle(other.myHandle)
 		{
