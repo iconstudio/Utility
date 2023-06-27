@@ -15,6 +15,20 @@ export namespace util
 		consteval basic_fixed_string() noexcept = default;
 		constexpr ~basic_fixed_string() noexcept = default;
 
+		consteval basic_fixed_string(const std::basic_string_view<Char>& view) noexcept
+			: intBuffer()
+		{
+			for (size_t i = 0; i < N; ++i)
+			{
+				if (0 == view[i])
+				{
+					break;
+				}
+
+				intBuffer[i] = view[i];
+			}
+		}
+
 		consteval basic_fixed_string(const Char* const& buffer) noexcept
 			: intBuffer()
 		{
