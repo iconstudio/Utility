@@ -50,9 +50,9 @@ export namespace util
 		Fn&& functor = forward<Fn>(fn);
 		Pred&& predicate = forward<Pred>(pred);
 
-		while (predicate())
+		while (invoke(predicate))
 		{
-			functor();
+			invoke(functor);
 
 			co_await coroutine::suspend_always{};
 		}
@@ -68,7 +68,7 @@ export namespace util
 		Pred&& predicate = forward<Pred>(pred);
 		const std::tuple<Args&&...> arguments = std::forward_as_tuple(forward<Args>(args)...);
 
-		while (predicate())
+		while (invoke(predicate))
 		{
 			std::apply(functor, arguments);
 
@@ -114,7 +114,7 @@ export namespace util
 
 		while (true)
 		{
-			if (!functor())
+			if (!invoke(functor))
 			{
 				co_return;
 			}
