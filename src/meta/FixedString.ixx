@@ -19,6 +19,11 @@ export namespace util
 		{
 			for (size_t i = 0; i < N; ++i)
 			{
+				if (0 == buffer[i])
+				{
+					break;
+				}
+
 				const Char& elem = buffer[i];
 				intBuffer[i] = elem;
 			}
