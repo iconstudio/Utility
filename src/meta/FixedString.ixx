@@ -16,6 +16,7 @@ export namespace util
 		constexpr ~basic_fixed_string() noexcept = default;
 
 		consteval basic_fixed_string(const Char* const& buffer) noexcept
+			: intBuffer()
 		{
 			for (size_t i = 0; i < N; ++i)
 			{
