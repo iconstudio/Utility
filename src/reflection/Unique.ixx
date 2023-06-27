@@ -1,5 +1,4 @@
 export module Utility.Reflection.Unique;
-import Utility.Reflection;
 import Utility.Singleton;
 import Utility.FixedString;
 
