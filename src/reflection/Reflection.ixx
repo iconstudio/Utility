@@ -213,10 +213,6 @@ namespace reflex::test
 	{
 		using namespace ::std::literals;
 
-		constexpr fixed_string aaa{ "342" };
-		const fixed_string bbb{ "342" };
-		fixed_string ccc{ "342" };
-
 		constexpr reflect_t<const volatile int> aaa_2 = 0;
 		//constexpr parents<int> bbb_2{};
 		//constexpr children<int> ccc_2{};
