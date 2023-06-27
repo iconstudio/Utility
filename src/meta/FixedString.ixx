@@ -30,6 +30,29 @@ export namespace util
 			}
 		}
 
+		template <size_t Length>
+		consteval basic_fixed_string(const Char* (&buffer)[Length]) noexcept
+			: intBuffer()
+		{
+			static_assert(Length <= N);
+
+			for (size_t i = 0; i < Length; ++i)
+			{
+				const Char& elem = buffer[i];
+				intBuffer[i] = elem;
+			}
+		}
+
+		consteval basic_fixed_string(const Char* const& buffer, const size_t& length) noexcept
+			: intBuffer()
+		{
+			for (size_t i = 0; i < length; ++i)
+			{
+				const Char& elem = buffer[i];
+				intBuffer[i] = elem;
+			}
+		}
+
 		consteval operator std::basic_string_view<Char>() const noexcept
 		{
 			return std::basic_string_view<Char>(intBuffer, N);
