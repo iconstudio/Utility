@@ -201,7 +201,7 @@ export namespace reflex
 	template<typename T, typename U>
 	consteval bool operator==(reflect_traits<T>, reflect_traits<U>) noexcept
 	{
-		return type_id<T> == type_id<U>;
+		return std::is_same_v<T, U>;
 	}
 }
 
