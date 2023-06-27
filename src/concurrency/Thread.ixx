@@ -100,14 +100,6 @@ struct std::default_delete<std::jthread>
 
 	inline void operator()(std::jthread* const handle) const noexcept
 	{
-		try
-		{
-			handle->request_stop();
-			handle->join();
-		}
-		catch (...)
-		{}
-
 		delete handle;
 	}
 };
