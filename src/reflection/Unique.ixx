@@ -15,7 +15,7 @@ export namespace reflex
 			: util::Singleton<Unique<D, Name>>(this)
 		{}
 
-		static consteval auto&& GetUniqueName() { return Name; }
+		static consteval auto&& GetUniqueName() noexcept { return Name; }
 	};
 }
 
@@ -29,11 +29,13 @@ namespace reflex::test
 		const auto ptr = Unique<int, "test">::Instance;
 
 		constexpr auto&& dname = inst.GetUniqueName();
-		constexpr auto dname_0 = dname.intBuffer[0];
-		constexpr auto dname_1 = dname.intBuffer[1];
-		constexpr auto dname_2 = dname.intBuffer[2];
-		constexpr auto dname_3 = dname.intBuffer[3];
-		constexpr auto dname_4 = dname.intBuffer[4];
+		constexpr auto&& dbuffer = dname.data();
+
+		constexpr auto dname_0 = dbuffer[0];
+		constexpr auto dname_1 = dbuffer[1];
+		constexpr auto dname_2 = dbuffer[2];
+		constexpr auto dname_3 = dbuffer[3];
+		constexpr auto dname_4 = dbuffer[4];
 	}
 #endif
 }
