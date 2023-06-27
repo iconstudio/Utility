@@ -58,6 +58,48 @@ export namespace util
 			return std::basic_string_view<Char>(intBuffer, N);
 		}
 
+		[[nodiscard]]
+		constexpr const Char* begin() noexcept
+		{
+			return intBuffer;
+		}
+
+		[[nodiscard]]
+		constexpr const Char* const begin() const noexcept
+		{
+			return intBuffer;
+		}
+
+		[[nodiscard]]
+		constexpr const Char* const end() const noexcept
+		{
+			return intBuffer + N;
+		}
+
+		[[nodiscard]]
+		constexpr const Char* const cbegin() const noexcept
+		{
+			return intBuffer;
+		}
+
+		[[nodiscard]]
+		constexpr const Char* const cend() const noexcept
+		{
+			return intBuffer + N;
+		}
+
+		[[nodiscard]]
+		constexpr auto& (data)() noexcept
+		{
+			return intBuffer;
+		}
+
+		[[nodiscard]]
+		constexpr const auto& data() const noexcept
+		{
+			return intBuffer;
+		}
+
 		Char intBuffer[N];
 	};
 
