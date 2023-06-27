@@ -207,6 +207,7 @@
     <ClCompile Include="reflection\Named.ixx" />
     <ClCompile Include="reflection\Reflection.ixx" />
     <ClCompile Include="reflection\Singleton.ixx" />
+    <ClCompile Include="reflection\Unique.ixx" />
     <ClCompile Include="Tools\Error.ixx" />
     <ClCompile Include="Tools\Print.ixx" />
     <ClCompile Include="Tools\Utility.ixx" />

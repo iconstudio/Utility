@@ -1,13 +1,10 @@
 export module Utility.Reflection;
 import <string>;
+import <string_view>;
 import Utility.Meta;
-import Utility.FixedString;
 
 namespace reflex
 {
-	export using ::util::basic_fixed_string;
-	export using ::util::fixed_string;
-
 	export template<typename... Ts> using tag_types = meta::MetaList<Ts...>;
 
 	template<typename Tag>
