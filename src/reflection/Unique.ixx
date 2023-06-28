@@ -1,5 +1,4 @@
 export module Utility.Reflection.Unique;
-import Utility.Singleton;
 import Utility.FixedString;
 
 export namespace reflex
@@ -7,14 +6,30 @@ export namespace reflex
 	export using ::util::basic_fixed_string;
 
 	template<typename D, basic_fixed_string Name>
-	class Unique : public util::Singleton<Unique<D, Name>>
+	class Unique
 	{
 	public:
-		constexpr Unique() noexcept
-			: util::Singleton<Unique<D, Name>>(this)
-		{}
+		constexpr Unique(D* instance) noexcept
+		{
+			Instance = instance;
+		}
+
+		constexpr ~Unique() noexcept = default;
+
+		[[nodiscard]]
+		static constexpr D* GetInstance() noexcept
+		{
+			return static_cast<D*>(Instance);
+		}
 
 		static consteval auto&& GetUniqueName() noexcept { return Name; }
+
+		Unique(const Unique& other) noexcept = delete;
+		Unique& operator=(const Unique& other) noexcept = delete;
+		Unique(Unique&& other) noexcept = default;
+		Unique& operator=(Unique&& other) noexcept = default;
+
+		static inline D* Instance = nullptr;
 	};
 }
 
@@ -24,8 +39,10 @@ namespace reflex::test
 #if 1
 	void test()
 	{
-		const Unique<int, "test"> inst{};
-		const auto ptr = Unique<int, "test">::Instance;
+		int test = 0;
+
+		const Unique<int, "test"> inst{ &test };
+		const auto ptr = Unique<int, "test">::GetInstance();
 
 		constexpr auto&& dname = inst.GetUniqueName();
 		constexpr auto&& dbuffer = dname.data();
