@@ -12,6 +12,17 @@ export namespace util
 		static_assert(std::is_integral_v<Char>, "Char must be an integral type.");
 		static_assert(0 < N, "Fixed string must have at least one element.");
 
+		using value_type = Char;
+		using reference = std::add_lvalue_reference_t<value_type>;
+		using const_reference = std::add_lvalue_reference_t<const value_type>;
+		using rvalue_reference = std::add_rvalue_reference_t<value_type>;
+		using const_rvalue_reference = std::add_rvalue_reference_t<value_type>;
+		using size_type = size_t;
+		using difference_type = ptrdiff_t;
+
+		using iterator = const Char*;
+		using const_iterator = const Char* const;
+
 		consteval basic_fixed_string() noexcept = default;
 		constexpr ~basic_fixed_string() noexcept = default;
 
@@ -39,8 +50,7 @@ export namespace util
 					break;
 				}
 
-				const Char& elem = buffer[i];
-				intBuffer[i] = elem;
+				intBuffer[i] = buffer[i];
 			}
 		}
 
@@ -52,8 +62,7 @@ export namespace util
 
 			for (size_t i = 0; i < Length; ++i)
 			{
-				const Char& elem = buffer[i];
-				intBuffer[i] = elem;
+				intBuffer[i] = buffer[i];
 			}
 		}
 
@@ -62,8 +71,7 @@ export namespace util
 		{
 			for (size_t i = 0; i < length; ++i)
 			{
-				const Char& elem = buffer[i];
-				intBuffer[i] = elem;
+				intBuffer[i] = buffer[i];
 			}
 		}
 
@@ -73,31 +81,31 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		constexpr const Char* begin() noexcept
+		constexpr iterator begin() noexcept
 		{
 			return intBuffer;
 		}
 
 		[[nodiscard]]
-		constexpr const Char* const begin() const noexcept
+		constexpr const_iterator begin() const noexcept
 		{
 			return intBuffer;
 		}
 
 		[[nodiscard]]
-		constexpr const Char* const end() const noexcept
+		constexpr const_iterator end() const noexcept
 		{
 			return intBuffer + N;
 		}
 
 		[[nodiscard]]
-		constexpr const Char* const cbegin() const noexcept
+		constexpr const_iterator cbegin() const noexcept
 		{
 			return intBuffer;
 		}
 
 		[[nodiscard]]
-		constexpr const Char* const cend() const noexcept
+		constexpr const_iterator cend() const noexcept
 		{
 			return intBuffer + N;
 		}
@@ -109,7 +117,7 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		constexpr const auto& data() const noexcept
+		constexpr const auto& (data)() const noexcept
 		{
 			return intBuffer;
 		}
