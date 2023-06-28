@@ -7,8 +7,6 @@ import Utility;
 import Utility.String;
 import Utility.Concurrency.Locks;
 
-#define FORCEIN __forceinline
-
 #if 1935 <= _MSC_VER
 template<typename Char, typename... Args>
 using basic_format_string = std::basic_format_string<Char, Args...>;
@@ -22,7 +20,7 @@ using format_wstring = std::wformat_string<Args...>;
 
 template<typename Char, typename... Args>
 static
-FORCEIN constexpr
+constexpr
 format_string_view<Char>
 internal_fmt(basic_format_string<Char, Args...> fmt) noexcept
 {
@@ -39,36 +37,34 @@ using format_wstring = std::_Fmt_wstring<Args...>;
 
 using std::FILE;
 template<typename = char>
-FORCEIN void internal_vprint(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprint(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = char>
-FORCEIN void internal_vprintln(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprintln(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = wchar_t>
-FORCEIN void internal_wprint(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprint(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 template<typename = wchar_t>
-FORCEIN void internal_wprintln(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprintln(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 extern "C++" template<bool = false, typename Char, typename ...Args>
-static FORCEIN
 void
 internal_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = false, typename Char, typename ...Args>
-static FORCEIN
 void
 internal_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = true, typename Char, typename ...Args>
-static FORCEIN void
+void
 internal_sync_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = true, typename Char, typename ...Args>
-static FORCEIN void
+void
 internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
@@ -78,7 +74,7 @@ export namespace util
 {
 	namespace print
 	{
-		inline void Initialize() noexcept
+		void Initialize() noexcept
 		{
 			syncedIo = new mutex{};
 		}
@@ -87,113 +83,98 @@ export namespace util
 	using ::std::FILE;
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Print(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
+	void Print(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_print_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Println(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
+	void Println(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_println_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Print(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void Print(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_print_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Println(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void Println(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_println_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Print(format_string<Args...> fmt, Args&& ...args) noexcept
+	void Print(format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Println(format_string<Args...> fmt, Args&& ...args) noexcept
+	void Println(format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Print(format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void Print(format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = false, typename ...Args>
-	FORCEIN
-		void Println(format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void Println(format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintSynced(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
+	void PrintSynced(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_print_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintlnSynced(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
+
+	void PrintlnSynced(FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_println_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintSynced(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void PrintSynced(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_print_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintlnSynced(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void PrintlnSynced(FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_println_format(stream, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintSynced(format_string<Args...> fmt, Args&& ...args) noexcept
+	void PrintSynced(format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintlnSynced(format_string<Args...> fmt, Args&& ...args) noexcept
+	void PrintlnSynced(format_string<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void PrintSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
 	}
 
 	template<bool = true, typename... Args>
-	FORCEIN
-		void PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept
+	void PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept
 	{
 		return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
 	}
@@ -201,7 +182,7 @@ export namespace util
 	namespace debug
 	{
 		template<typename... Args>
-		inline void Print(FILE* stream, format_string<Args...> fmt, Args&&... args)
+		void Print(FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Print(stream, fmt, std::forward<Args>(args)...);
@@ -209,7 +190,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Print(format_string<Args...> fmt, Args&&... args)
+		void Print(format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Print(fmt, std::forward<Args>(args)...);
@@ -217,7 +198,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Println(FILE* stream, format_string<Args...> fmt, Args&&... args)
+		void Println(FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Println(stream, fmt, std::forward<Args>(args)...);
@@ -225,7 +206,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Println(format_string<Args...> fmt, Args&&... args)
+		void Println(format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Println(stdout, fmt, std::forward<Args>(args)...);
@@ -233,7 +214,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Print(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		void Print(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Print(stream, fmt, std::forward<Args>(args)...);
@@ -241,7 +222,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Print(format_wstring<Args...> fmt, Args&&... args)
+		void Print(format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return Print(stdout, fmt, std::forward<Args>(args)...);
@@ -249,7 +230,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Println(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		void Println(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::Println(stream, fmt, std::forward<Args>(args)...);
@@ -257,7 +238,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void Println(format_wstring<Args...> fmt, Args&&... args)
+		void Println(format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return Println(stdout, fmt, std::forward<Args>(args)...);
@@ -265,7 +246,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintSynced(FILE* stream, format_string<Args...> fmt, Args&&... args)
+		void PrintSynced(FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::PrintSynced(stream, fmt, std::forward<Args>(args)...);
@@ -273,7 +254,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintSynced(format_string<Args...> fmt, Args&&... args)
+		void PrintSynced(format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::PrintSynced(fmt, std::forward<Args>(args)...);
@@ -281,7 +262,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintlnSynced(FILE* stream, format_string<Args...> fmt, Args&&... args)
+		void PrintlnSynced(FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...);
@@ -289,7 +270,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintlnSynced(format_string<Args...> fmt, Args&&... args)
+		void PrintlnSynced(format_string<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
@@ -297,7 +278,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintSynced(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		void PrintSynced(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::PrintSynced(stream, fmt, std::forward<Args>(args)...);
@@ -305,7 +286,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintSynced(format_wstring<Args...> fmt, Args&&... args)
+		void PrintSynced(format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return PrintSynced(stdout, fmt, std::forward<Args>(args)...);
@@ -313,7 +294,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintlnSynced(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		void PrintlnSynced(FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...);
@@ -321,7 +302,7 @@ export namespace util
 		}
 
 		template<typename... Args>
-		inline void PrintlnSynced(format_wstring<Args...> fmt, Args&&... args)
+		void PrintlnSynced(format_wstring<Args...> fmt, Args&&... args)
 		{
 #if _DEBUG
 			return PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
@@ -361,7 +342,7 @@ namespace util::test
 #pragma warning(pop)
 
 extern "C++" template<bool, typename Char, typename ...Args>
-static FORCEIN void
+void
 internal_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept
 {
@@ -387,7 +368,6 @@ noexcept
 }
 
 extern "C++" template<bool, typename Char, typename ...Args>
-static FORCEIN
 void
 internal_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept
@@ -432,7 +412,6 @@ noexcept
 }
 
 extern "C++" template<bool, typename Char, typename ...Args>
-static FORCEIN
 void
 internal_sync_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept
@@ -473,7 +452,6 @@ noexcept
 }
 
 extern "C++" template<bool, typename Char, typename ...Args>
-static FORCEIN
 void
 internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args && ...args) noexcept
 {
@@ -515,7 +493,6 @@ internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args
 }
 
 template<typename>
-FORCEIN
 void
 internal_vprint(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept
 {
@@ -523,7 +500,6 @@ internal_vprint(FILE* stream, std::string_view fmt, std::format_args&& args) noe
 }
 
 template<typename>
-FORCEIN
 void
 internal_vprintln(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept
 {
@@ -531,7 +507,6 @@ internal_vprintln(FILE* stream, std::string_view fmt, std::format_args&& args) n
 }
 
 template<typename>
-FORCEIN
 void
 internal_wprint(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept
 {
@@ -539,7 +514,6 @@ internal_wprint(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) n
 }
 
 template<typename>
-FORCEIN
 void
 internal_wprintln(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept
 {
