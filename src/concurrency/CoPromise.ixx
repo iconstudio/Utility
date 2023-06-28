@@ -118,7 +118,7 @@ export namespace util::coroutine
 		constexpr PromiseTemplate()
 			noexcept(nothrow_default_constructibles<value_type>)
 			requires default_initializable<Value&&>
-		: value_type()
+		: myValue()
 		{}
 
 		constexpr PromiseTemplate()
