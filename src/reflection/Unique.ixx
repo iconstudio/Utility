@@ -9,17 +9,23 @@ export namespace reflex
 	class Unique
 	{
 	public:
-		constexpr Unique(D* instance) noexcept
+		constexpr Unique() noexcept = default;
+		constexpr ~Unique() noexcept = default;
+
+		constexpr Unique(D* const& instance) noexcept
 		{
 			Instance = instance;
 		}
 
-		constexpr ~Unique() noexcept = default;
+		static constexpr void SetInstance(D* const& instance) noexcept
+		{
+			Instance = instance;
+		}
 
 		[[nodiscard]]
 		static constexpr D* GetInstance() noexcept
 		{
-			return static_cast<D*>(Instance);
+			return Instance;
 		}
 
 		static consteval auto&& GetUniqueName() noexcept { return Name; }
