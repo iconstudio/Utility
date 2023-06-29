@@ -47,5 +47,5 @@ namespace util
 template<>
 struct util::class_id<util::Object>
 {
-	static constexpr size_t value = static_cast<size_t>(-1);
+	static inline constexpr size_t value = static_cast<size_t>(-1);
 };
