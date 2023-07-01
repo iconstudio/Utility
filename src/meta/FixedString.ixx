@@ -1,4 +1,5 @@
 export module Utility.FixedString;
+import <stdexcept>;
 import <type_traits>;
 import <string_view>;
 
@@ -111,6 +112,40 @@ export namespace util
 		}
 
 		[[nodiscard]]
+		constexpr reference operator[](const size_t& index)
+		{
+			return intBuffer[index];
+		}
+
+		[[nodiscard]]
+		constexpr const_reference operator[](const size_t& index) const
+		{
+			return intBuffer[index];
+		}
+
+		[[nodiscard]]
+		constexpr reference at(const size_t& index)
+		{
+			if (N <= index)
+			{
+				throw std::out_of_range("Index out of range.");
+			}
+
+			return intBuffer[index];
+		}
+
+		[[nodiscard]]
+		constexpr const_reference at(const size_t& index) const
+		{
+			if (N <= index)
+			{
+				throw std::out_of_range("Index out of range.");
+			}
+
+			return intBuffer[index];
+		}
+
+		[[nodiscard]]
 		constexpr auto& (data)() noexcept
 		{
 			return intBuffer;
@@ -120,6 +155,12 @@ export namespace util
 		constexpr const auto& (data)() const noexcept
 		{
 			return intBuffer;
+		}
+
+		[[nodiscard]]
+		static consteval size_t size() noexcept
+		{
+			return N;
 		}
 
 		Char intBuffer[N];
