@@ -164,6 +164,9 @@
     <ClCompile Include="reflection\Unique.ixx">
       <Filter>헤더 파일\Reflection</Filter>
     </ClCompile>
+    <ClCompile Include="functional\Promise.ixx">
+      <Filter>헤더 파일\Functional</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />

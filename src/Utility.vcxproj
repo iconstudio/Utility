@@ -194,6 +194,7 @@
     <ClCompile Include="functional\LooseMonad.ixx" />
     <ClCompile Include="functional\Monad.ixx" />
     <ClCompile Include="functional\Option.ixx" />
+    <ClCompile Include="functional\Promise.ixx" />
     <ClCompile Include="generic\Constraints.ixx" />
     <ClCompile Include="generic\Traits.ixx" />
     <ClCompile Include="main.cpp" />
