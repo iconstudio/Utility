@@ -58,8 +58,7 @@ export namespace util
 
 		template <typename T>
 			requires (meta::included_v<clean_t<T>, Ts...> && !same_as<clean_t<T>, in_place_t> && !is_specialization_v<clean_t<T>, in_place_type_t> && !is_indexed_v<clean_t<T>, in_place_index_t>)
-		explicit(util::is_explicit_constructible_v<T>)
-			constexpr
+		constexpr
 			LooseMonad(T&& object) noexcept
 			: myStorage(in_place_type<clean_t<T>>, static_cast<T&&>(object))
 		{}
