@@ -1,17 +1,14 @@
 export module Utility.Print;
-import <cstdio>;
-export import <string>;
-export import <string_view>;
-export import <format>;
-import Utility;
-import Utility.String;
+import <string>;
+import <string_view>;
+import <format>;
 import Utility.Concurrency.Locks;
 
 #if 1935 <= _MSC_VER
 template<typename Char, typename... Args>
 using basic_format_string = std::basic_format_string<Char, Args...>;
 template<typename Char>
-using format_string_view = util::basic_string_view<Char>;
+using format_string_view = std::basic_string_view<Char>;
 
 template<typename... Args>
 using format_string = std::format_string<Args...>;
@@ -37,16 +34,16 @@ using format_wstring = std::_Fmt_wstring<Args...>;
 
 using std::FILE;
 template<typename = char>
-void internal_vprint(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprint(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = char>
-void internal_vprintln(FILE* stream, util::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprintln(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = wchar_t>
-void internal_wprint(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprint(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 template<typename = wchar_t>
-void internal_wprintln(FILE* stream, util::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprintln(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 extern "C++" template<bool = false, typename Char, typename ...Args>
 void
@@ -319,23 +316,23 @@ namespace util::test
 		Print("Hello, world!\n", 0);
 		Print("Hello, {}!\n", "world");
 
-		Print("Hello, {}!\n", string("world"));
-		Print("Hello, {}!\n", string_view("world"));
-		Print(L"Hello, {}!\n", wstring(L"world"));
-		Print(L"Hello, {}!\n", wstring_view(L"world"));
+		Print("Hello, {}!\n", std::string("world"));
+		Print("Hello, {}!\n", std::string_view("world"));
+		Print(L"Hello, {}!\n", std::wstring(L"world"));
+		Print(L"Hello, {}!\n", std::wstring_view(L"world"));
 
 		Println("Hello, world!");
 		Println("Hello, {}!", "world");
-		Println("Hello, {}!", string("world"));
-		Println("Hello, {}!", string_view("world"));
-		Println(L"Hello, {}!", wstring(L"world"));
-		Println(L"Hello, {}!", wstring_view(L"world"));
+		Println("Hello, {}!", std::string("world"));
+		Println("Hello, {}!", std::string_view("world"));
+		Println(L"Hello, {}!", std::wstring(L"world"));
+		Println(L"Hello, {}!", std::wstring_view(L"world"));
 
 		PrintSynced("Hello, world!\n");
 		PrintSynced("Hello, {}!\n", "world");
-		PrintSynced("Hello, {}!\n", string("world"));
-		PrintSynced("Hello, {}!\n", string_view("world"));
-		PrintSynced(L"Hello, {}!\n", wstring(L"world"));
+		PrintSynced("Hello, {}!\n", std::string("world"));
+		PrintSynced("Hello, {}!\n", std::string_view("world"));
+		PrintSynced(L"Hello, {}!\n", std::wstring(L"world"));
 		PrintSynced(L"Hello, World!\n");
 	}
 }
