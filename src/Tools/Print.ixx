@@ -323,7 +323,7 @@ FORMAT_FN
 util::PrintSynced(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
-	return util::PrintSyncedv(stdout, fmt, std::forward<Args>(args)...);
+	return util::PrintSynced(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
