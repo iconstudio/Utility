@@ -65,52 +65,52 @@ export namespace util
 {
 #pragma region Declarations
 	template<typename ...Args>
-	void Print(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Println(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Print(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Println(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Print(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Println(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Print(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	void Println(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintlnSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	void PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
 #pragma endregion
 
 	namespace debug
@@ -216,7 +216,7 @@ export namespace util
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Print(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -224,7 +224,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Println(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -232,7 +232,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Print(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -240,7 +240,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Println(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -248,7 +248,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Print(format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -256,7 +256,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Println(format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -264,7 +264,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Print(format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -272,7 +272,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::Println(format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -280,7 +280,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -288,7 +288,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -296,7 +296,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -304,7 +304,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -312,7 +312,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintSynced(format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -320,7 +320,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintlnSynced(format_string<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -328,7 +328,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintSynced(format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
@@ -336,7 +336,7 @@ noexcept
 }
 
 template<typename ...Args>
-void
+FORMAT_FN
 util::PrintlnSynced(format_wstring<Args...> fmt, Args && ...args)
 noexcept
 {
