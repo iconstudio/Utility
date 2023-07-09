@@ -34,38 +34,36 @@ using format_wstring = std::_Fmt_wstring<Args...>;
 
 using std::FILE;
 template<typename = char>
-void internal_vprint(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprint(std::FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = char>
-void internal_vprintln(FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
+void internal_vprintln(std::FILE* stream, std::string_view fmt, std::format_args&& args) noexcept;
 
 template<typename = wchar_t>
-void internal_wprint(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprint(std::FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 template<typename = wchar_t>
-void internal_wprintln(FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
+void internal_wprintln(std::FILE* stream, std::wstring_view fmt, std::wformat_args&& args) noexcept;
 
 extern "C++" template<bool = false, typename Char, typename ...Args>
 void
-internal_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
+internal_print_format(std::FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = false, typename Char, typename ...Args>
 void
-internal_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
+internal_println_format(std::FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = true, typename Char, typename ...Args>
 void
-internal_sync_print_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
+internal_sync_print_format(std::FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
 
 extern "C++" template<bool = true, typename Char, typename ...Args>
 void
 internal_sync_println_format(FILE * stream, const basic_format_string<Char, Args...>&fmt, Args&& ...args)
 noexcept;
-
-extern util::mutex* syncedIo{};
 
 export namespace util
 {
