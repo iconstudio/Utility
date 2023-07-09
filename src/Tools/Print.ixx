@@ -33,8 +33,10 @@ using format_wstring = std::_Fmt_wstring<Args...>;
 #define FORMAT_FN void
 #if _DEBUG
 #define FORMAT_DEBG_FN void
+#define ON_DEGUB(statement) statement
 #else // _DEBUG
 #define FORMAT_DEBG_FN constexpr void
+#define ON_DEGUB(statement)
 #endif // !_DEBUG
 
 static util::mutex* syncedIo{};
