@@ -88,7 +88,7 @@ int main()
 	//constexpr bool has_iter_adl_tk3 = std::ranges::_Begin::_Has_ADL<task3_iter_type>;
 	//constexpr bool has_mem_iter_tk3 = std::ranges::_Begin::_Has_member<task3_iter_type>;
 
-	util::Println("Const Left value");
+	util::Println("[{}]", "Const Left value");
 	for (auto&& vv : util::coenumerate(test3_vec))
 	{
 		util::Print("{} ", vv);
