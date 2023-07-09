@@ -5,13 +5,12 @@ import <format>;
 import Utility.Concurrency.Locks;
 
 #if 1935 <= _MSC_VER
-template<typename Char, typename... Args>
-using basic_format_string = std::basic_format_string<Char, Args...>;
+using std::basic_format_string;
 
 template<typename... Args>
-using format_string = std::format_string<Args...>;
+using fmt_str = std::format_string<Args...>;
 template<typename... Args>
-using format_wstring = std::wformat_string<Args...>;
+using fmt_wtr = std::wformat_string<Args...>;
 
 template<typename Char, typename... Args>
 static
@@ -23,9 +22,9 @@ internal_fmt(basic_format_string<Char, Args...> fmt) noexcept
 }
 #else
 template<typename... Args>
-using format_string = std::_Fmt_string<Args...>;
+using fmt_str = std::_Fmt_string<Args...>;
 template<typename... Args>
-using format_wstring = std::_Fmt_wstring<Args...>;
+using fmt_wtr = std::_Fmt_wstring<Args...>;
 
 #define internal_fmt(fmt) fmt._Str
 #endif
@@ -65,149 +64,149 @@ export namespace util
 {
 #pragma region Declarations
 	template<typename ...Args>
-	FORMAT_FN Print(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(std::FILE* stream, fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Println(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(std::FILE* stream, fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Print(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(std::FILE* stream, fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Println(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(std::FILE* stream, fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Print(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Println(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Print(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Print(fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename ...Args>
-	FORMAT_FN Println(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN Println(fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(std::FILE* stream, fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(std::FILE* stream, fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintlnSynced(format_string<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(fmt_str<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintSynced(fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 
 	template<typename... Args>
-	FORMAT_FN PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+	FORMAT_FN PrintlnSynced(fmt_wtr<Args...> fmt, Args&& ...args) noexcept;
 #pragma endregion
 
 	namespace debug
 	{
 #pragma region Debug Declarations
 		template<typename... Args>
-		FORMAT_DEBG_FN Print(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(std::FILE* stream, fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Print(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Print(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Print(fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Println(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(std::FILE* stream, fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Println(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Println(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Println(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Print(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(std::FILE* stream, fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Print(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Print(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Print(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Println(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(std::FILE* stream, fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Println(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN Println(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::Println(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintSynced(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintSynced(fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintlnSynced(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(fmt_str<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintSynced(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		FORMAT_DEBG_FN PrintlnSynced(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(fmt_wtr<Args...> fmt, Args&&... args)
 		{
 			ON_DEBUG(util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
@@ -217,7 +216,7 @@ export namespace util
 
 template<typename ...Args>
 FORMAT_FN
-util::Print(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
+util::Print(std::FILE* stream, fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_print_format(stream, fmt, std::forward<Args>(args)...);
@@ -225,7 +224,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Println(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
+util::Println(std::FILE* stream, fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_println_format(stream, fmt, std::forward<Args>(args)...);
@@ -233,7 +232,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Print(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
+util::Print(std::FILE* stream, fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_print_format(stream, fmt, std::forward<Args>(args)...);
@@ -241,7 +240,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Println(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
+util::Println(std::FILE* stream, fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_println_format(stream, fmt, std::forward<Args>(args)...);
@@ -249,7 +248,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Print(format_string<Args...> fmt, Args && ...args)
+util::Print(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
@@ -257,7 +256,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Println(format_string<Args...> fmt, Args && ...args)
+util::Println(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
@@ -265,7 +264,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Print(format_wstring<Args...> fmt, Args && ...args)
+util::Print(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
@@ -273,7 +272,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::Println(format_wstring<Args...> fmt, Args && ...args)
+util::Println(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
@@ -281,7 +280,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
+util::PrintSynced(std::FILE* stream, fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_print_format(stream, fmt, std::forward<Args>(args)...);
@@ -289,7 +288,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args && ...args)
+util::PrintlnSynced(std::FILE* stream, fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_println_format(stream, fmt, std::forward<Args>(args)...);
@@ -297,7 +296,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
+util::PrintSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_print_format(stream, fmt, std::forward<Args>(args)...);
@@ -305,7 +304,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args && ...args)
+util::PrintlnSynced(std::FILE* stream, fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_println_format(stream, fmt, std::forward<Args>(args)...);
@@ -313,7 +312,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintSynced(format_string<Args...> fmt, Args && ...args)
+util::PrintSynced(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
@@ -321,7 +320,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintlnSynced(format_string<Args...> fmt, Args && ...args)
+util::PrintlnSynced(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
@@ -329,7 +328,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintSynced(format_wstring<Args...> fmt, Args && ...args)
+util::PrintSynced(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
@@ -337,7 +336,7 @@ noexcept
 
 template<typename ...Args>
 FORMAT_FN
-util::PrintlnSynced(format_wstring<Args...> fmt, Args && ...args)
+util::PrintlnSynced(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
 	return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
