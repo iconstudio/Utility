@@ -1,4 +1,5 @@
 module;
+#include <cstdio>
 #include <string>
 #include <string_view>
 #include <format>
@@ -40,7 +41,12 @@ using fmt_wtr = std::_Fmt_wstring<Args...>;
 #define ON_DEBUG(statement)
 #endif // !_DEBUG
 
-static util::mutex* syncedIo{};
+util::mutex& GetMutex() noexcept
+{
+	static util::mutex syncer{};
+
+	return syncer;
+}
 
 template<typename Char, typename ...Args>
 void
@@ -463,14 +469,14 @@ noexcept
 		{
 			std::string_view buffer = fmt.get();
 
-			util::lock_guard guard{ *syncedIo };
+			util::lock_guard guard{ GetMutex() };
 			std::fputs(buffer.data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
 		{
 			std::wstring_view buffer = fmt.get();
 
-			util::lock_guard guard{ *syncedIo };
+			util::lock_guard guard{ GetMutex() };
 			std::fputws(buffer.data(), stream);
 		}
 	}
@@ -479,7 +485,7 @@ noexcept
 		std::string_view buff = fmt.get();
 		std::format_args pack = std::make_format_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ *syncedIo };
+		util::lock_guard guard{ GetMutex() };
 		return internal_vprint(stream, buff, std::move(pack));
 	}
 	else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -487,7 +493,7 @@ noexcept
 		std::wstring_view buff = fmt.get();
 		std::wformat_args pack = std::make_wformat_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ *syncedIo };
+		util::lock_guard guard{ GetMutex() };
 		return internal_wprint(stream, buff, std::move(pack));
 	}
 }
@@ -503,7 +509,7 @@ internal_sync_println_format(std::FILE* stream, const basic_format_string<Char, 
 			std::string_view fwd = fmt.get();
 			const std::string& buffer = std::string{ fwd.cbegin(), fwd.cend() } + '\n';
 
-			util::lock_guard guard{ *syncedIo };
+			util::lock_guard guard{ GetMutex() };
 			std::fputs(buffer.data(), stream);
 		}
 		else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -511,7 +517,7 @@ internal_sync_println_format(std::FILE* stream, const basic_format_string<Char, 
 			std::wstring_view fwd = fmt.get();
 			const std::wstring& buffer = std::wstring{ fwd.cbegin(), fwd.cend() } + L'\n';
 
-			util::lock_guard guard{ *syncedIo };
+			util::lock_guard guard{ GetMutex() };
 			std::fputws(buffer.data(), stream);
 		}
 	}
@@ -520,7 +526,7 @@ internal_sync_println_format(std::FILE* stream, const basic_format_string<Char, 
 		std::string_view buff = fmt.get();
 		std::format_args pack = std::make_format_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ *syncedIo };
+		util::lock_guard guard{ GetMutex() };
 		return internal_vprintln(stream, buff, std::move(pack));
 	}
 	else if constexpr (std::is_same_v<Char, wchar_t>)
@@ -528,7 +534,7 @@ internal_sync_println_format(std::FILE* stream, const basic_format_string<Char, 
 		std::wstring_view buff = fmt.get();
 		std::wformat_args pack = std::make_wformat_args(std::forward<Args>(args)...);
 
-		util::lock_guard guard{ *syncedIo };
+		util::lock_guard guard{ GetMutex() };
 		return internal_wprintln(stream, buff, std::move(pack));
 	}
 }
