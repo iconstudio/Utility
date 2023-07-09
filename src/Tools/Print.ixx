@@ -259,7 +259,7 @@ FORMAT_FN
 util::Print(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::Print(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -267,7 +267,7 @@ FORMAT_FN
 util::Println(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::Println(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -275,7 +275,7 @@ FORMAT_FN
 util::Print(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_print_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::Print(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -283,7 +283,7 @@ FORMAT_FN
 util::Println(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_println_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::Println(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -323,7 +323,7 @@ FORMAT_FN
 util::PrintSynced(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::PrintSyncedv(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -331,7 +331,7 @@ FORMAT_FN
 util::PrintlnSynced(fmt_str<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -339,7 +339,7 @@ FORMAT_FN
 util::PrintSynced(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_sync_print_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::PrintSynced(stdout, fmt, std::forward<Args>(args)...);
 }
 
 template<typename ...Args>
@@ -347,7 +347,7 @@ FORMAT_FN
 util::PrintlnSynced(fmt_wtr<Args...> fmt, Args && ...args)
 noexcept
 {
-	return internal_sync_println_format(stdout, fmt, std::forward<Args>(args)...);
+	return util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
 }
 
 #pragma warning(push, 1)
