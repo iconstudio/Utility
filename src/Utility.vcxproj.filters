@@ -167,6 +167,9 @@
     <ClCompile Include="functional\Promise.ixx">
       <Filter>헤더 파일\Functional</Filter>
     </ClCompile>
+    <ClCompile Include="Print.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />

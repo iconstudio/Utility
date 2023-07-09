@@ -203,6 +203,7 @@
     <ClCompile Include="memory\MemoryWatcher.ixx" />
     <ClCompile Include="meta\FixedString.ixx" />
     <ClCompile Include="meta\Meta.ixx" />
+    <ClCompile Include="Print.cpp" />
     <ClCompile Include="reflection\Classifier.ixx" />
     <ClCompile Include="reflection\Indexer.ixx" />
     <ClCompile Include="reflection\Named.ixx" />
