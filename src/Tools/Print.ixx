@@ -33,10 +33,10 @@ using format_wstring = std::_Fmt_wstring<Args...>;
 #define FORMAT_FN void
 #if _DEBUG
 #define FORMAT_DEBG_FN void
-#define ON_DEGUB(statement) statement
+#define ON_DEBUG(statement) statement
 #else // _DEBUG
 #define FORMAT_DEBG_FN constexpr void
-#define ON_DEGUB(statement)
+#define ON_DEBUG(statement)
 #endif // !_DEBUG
 
 static util::mutex* syncedIo{};
@@ -117,131 +117,99 @@ export namespace util
 	{
 #pragma region Debug Declarations
 		template<typename... Args>
-		void Print(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Print(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Print(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Print(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Print(fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Print(fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Println(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Println(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Println(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Println(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Println(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Println(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Print(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Print(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Print(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Print(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Print(format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Print(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Print(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Println(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Println(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Println(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void Println(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN Println(format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::Println(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::Println(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintSynced(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintSynced(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintSynced(fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintSynced(fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintlnSynced(format_string<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(format_string<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintSynced(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintSynced(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintSynced(format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintSynced(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(std::FILE* stream, format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintlnSynced(stream, fmt, std::forward<Args>(args)...));
 		}
 
 		template<typename... Args>
-		void PrintlnSynced(format_wstring<Args...> fmt, Args&&... args)
+		FORMAT_DEBG_FN PrintlnSynced(format_wstring<Args...> fmt, Args&&... args)
 		{
-#if _DEBUG
-			return util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
-#endif
+			ON_DEBUG(util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...));
 		}
 #pragma endregion
 	}
