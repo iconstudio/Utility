@@ -61,6 +61,7 @@ noexcept;
 
 export namespace util
 {
+#pragma region Declarations
 	template<typename ...Args>
 	void Print(std::FILE* stream, format_string<Args...> fmt, Args&& ...args) noexcept;
 
@@ -108,9 +109,11 @@ export namespace util
 
 	template<typename... Args>
 	void PrintlnSynced(format_wstring<Args...> fmt, Args&& ...args) noexcept;
+#pragma endregion
 
 	namespace debug
 	{
+#pragma region Debug Declarations
 		template<typename... Args>
 		void Print(std::FILE* stream, format_string<Args...> fmt, Args&&... args)
 		{
@@ -238,6 +241,7 @@ export namespace util
 			return util::PrintlnSynced(stdout, fmt, std::forward<Args>(args)...);
 #endif
 		}
+#pragma endregion
 	}
 }
 
