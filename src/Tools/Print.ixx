@@ -1,7 +1,9 @@
+module;
+#include <string>
+#include <string_view>
+#include <format>
+
 export module Utility.Print;
-import <string>;
-import <string_view>;
-import <format>;
 import Utility.Concurrency.Locks;
 
 #if 1935 <= _MSC_VER
