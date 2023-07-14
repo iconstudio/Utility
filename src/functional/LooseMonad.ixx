@@ -177,7 +177,7 @@ export namespace util
 
 		template<typename T, invocables<T&&> Fn>
 		inline constexpr
-			LooseMonad&
+			LooseMonad&&
 			if_then(Fn&& action) &&
 			noexcept(noexcept(forward<Fn>(action)(declval<T&&>())))
 		{
@@ -191,7 +191,7 @@ export namespace util
 
 		template<typename T, invocables<const T&&> Fn>
 		inline constexpr
-			LooseMonad&
+			const LooseMonad&&
 			if_then(Fn&& action) const&&
 			noexcept(noexcept(forward<Fn>(action)(declval<const T&&>())))
 		{
