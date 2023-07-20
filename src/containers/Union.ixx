@@ -4,6 +4,8 @@ import Utility;
 import Utility.Constraints;
 import Utility.Meta;
 
+#pragma warning(push)
+#pragma warning(disable: 26495)
 namespace util::detail
 {
 	template <typename Indexer = integral_constant<size_t, 0>, typename... Ts>
@@ -745,6 +747,7 @@ export namespace util
 	template <size_t I, typename... Ts>
 	using DerivedUnion = typename detail::PlacedVariant<integral_constant<size_t, I>, Ts...>;
 }
+#pragma warning(pop)
 
 export namespace std
 {
