@@ -248,5 +248,11 @@ int main()
 	atom00 == atom24;
 	atom22 == atom23;
 
+	// test 9
+	std::shared_ptr<int> atom_value5 = std::make_shared<int>(800);
+	util::Atom<std::shared_ptr<int>> atom28{ atom_value5 };
+	const util::Atom<std::shared_ptr<int>> atom29{ atom_value5 };
+
+
 	return 0;
 }

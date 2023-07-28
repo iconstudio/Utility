@@ -476,6 +476,122 @@ export namespace util
 	};
 
 	template<typename T>
+	struct Atom<std::shared_ptr<T>>
+	{
+		Atom(const std::shared_ptr<T>& value)
+			noexcept(nothrow_copy_constructibles<std::shared_ptr<T>>)
+			: value(value)
+		{}
+
+		Atom(std::shared_ptr<T>&& value)
+			noexcept(nothrow_move_constructibles<std::shared_ptr<T>>)
+			: value(std::move(value))
+		{}
+
+		~Atom() noexcept(nothrow_destructibles<T>) = default;
+
+		constexpr Atom& operator=(std::shared_ptr<T>& ptr)
+		{
+			this->value = value;
+			return *this;
+		}
+
+		constexpr Atom& operator=(const std::shared_ptr<T>& ptr)
+		{
+			this->value = value;
+			return *this;
+		}
+
+		constexpr Atom& operator=(std::shared_ptr<T>&& ptr)
+		{
+			this->value = std::move(value);
+			return *this;
+		}
+
+		constexpr Atom& operator=(const std::shared_ptr<T>&& ptr)
+		{
+			this->value = std::move(value);
+			return *this;
+		}
+
+		constexpr Atom& operator=(const T& value)
+			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
+		{
+			*(this->value) = value;
+			return *this;
+		}
+
+		constexpr Atom& operator=(T&& value)
+			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
+		{
+			*(this->value) = std::move(value);
+			return *this;
+		}
+
+		constexpr operator std::shared_ptr<T>& () & noexcept
+		{
+			return value;
+		}
+
+		constexpr operator const std::shared_ptr<T>& () const& noexcept
+		{
+			return value;
+		}
+
+		constexpr operator std::shared_ptr<T> && () && noexcept
+		{
+			return std::move(value);
+		}
+
+		constexpr operator const std::shared_ptr<T> && () const&& noexcept
+		{
+			return std::move(value);
+		}
+
+		explicit constexpr operator T& () noexcept
+		{
+			return *value;
+		}
+
+		explicit constexpr operator const T& () const noexcept
+		{
+			return *value;
+		}
+
+		constexpr T* & operator->() noexcept
+		{
+			return *value;
+		}
+
+		constexpr T* const& operator->() const noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr T& operator*() noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const noexcept
+		{
+			return *value;
+		}
+
+		constexpr Atom(const Atom&) noexcept = default;
+		constexpr Atom(Atom&&) noexcept = default;
+		constexpr Atom& operator=(const Atom&) noexcept = default;
+		constexpr Atom& operator=(Atom&&) noexcept = default;
+
+	private:
+		std::shared_ptr<T> value;
+	};
+
+	template<typename T>
 	Atom(T) -> Atom<T>;
 
 	template<typename T, typename S>
