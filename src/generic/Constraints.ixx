@@ -177,16 +177,25 @@ export namespace util
 		{ --t } noexcept -> std::same_as<T>;
 		{ t-- } noexcept -> std::same_as<T>;
 	};
+
+	template<typename T>
+	concept aritmetical = requires(T t)
+	{
+		{ t + t } -> std::same_as<T>;
+		{ t - t } -> std::same_as<T>;
+		{ t * t } -> std::same_as<T>;
+		{ t / t } -> std::same_as<T>;
+		{ t % t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_aritmetic = requires(T t)
+	concept nothrow_aritmetical = requires(T t)
 	{
-		{ t + t } noexcept;
-		{ t - t } noexcept;
-		{ t * t } noexcept;
-		{ t / t } noexcept;
-		{ t % t } noexcept;
+		{ t + t } noexcept -> std::same_as<T>;
+		{ t - t } noexcept -> std::same_as<T>;
+		{ t * t } noexcept -> std::same_as<T>;
+		{ t / t } noexcept -> std::same_as<T>;
+		{ t % t } noexcept -> std::same_as<T>;
 	};
 
 	template<typename T>
