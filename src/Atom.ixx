@@ -325,6 +325,20 @@ export namespace util
 	};
 
 	template<typename T>
+	struct [[nodiscard]] Atom<T&>
+	{
+	private:
+		T* value;
+	};
+
+	template<typename T>
+	struct [[nodiscard]] Atom<const T&>
+	{
+	private:
+		const T* value;
+	};
+
+	template<typename T>
 	Atom(T) -> Atom<T>;
 
 	template<typename T, typename S>
