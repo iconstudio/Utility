@@ -500,27 +500,33 @@ export namespace util
 
 		~Atom() noexcept(nothrow_destructibles<T>) = default;
 
-		constexpr Atom& operator=(std::shared_ptr<T>& ptr)
+		Atom& operator=(std::shared_ptr<T>& ptr) noexcept
 		{
-			this->value = value;
+			value = ptr;
 			return *this;
 		}
 
-		constexpr Atom& operator=(const std::shared_ptr<T>& ptr)
+		Atom& operator=(const std::shared_ptr<T>& ptr) noexcept
 		{
-			this->value = value;
+			value = ptr;
 			return *this;
 		}
 
-		constexpr Atom& operator=(std::shared_ptr<T>&& ptr)
+		Atom& operator=(std::shared_ptr<T>&& ptr) noexcept
 		{
-			this->value = std::move(value);
+			value = std::move(ptr);
 			return *this;
 		}
 
-		constexpr Atom& operator=(const std::shared_ptr<T>&& ptr)
+		Atom& operator=(const std::shared_ptr<T>&& ptr) noexcept
 		{
-			this->value = std::move(value);
+			value = std::move(ptr);
+			return *this;
+		}
+
+		Atom& operator=(std::unique_ptr<T>&& ptr)
+		{
+			value = std::move(ptr);
 			return *this;
 		}
 
