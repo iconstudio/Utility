@@ -17,20 +17,6 @@ export namespace util
 		constexpr ~Atom()
 			noexcept(nothrow_destructibles<T>) = default;
 
-		constexpr Atom(const Atom&)
-			noexcept(nothrow_copy_constructibles<T>)
-			requires(copyable<T>) = default;
-		constexpr Atom(Atom&&)
-			noexcept(nothrow_move_constructibles<T>)
-			requires(movable<T>) = default;
-
-		constexpr Atom& operator=(const Atom&)
-			noexcept(nothrow_copy_assignables<T>)
-			requires(copy_assignables<T>) = default;
-		constexpr Atom& operator=(Atom&&)
-			noexcept(nothrow_move_assignables<T>)
-			requires(move_assignables<T>) = default;
-
 		constexpr Atom(const T& value)
 			noexcept(nothrow_copy_constructibles<T>) requires(copyable<T>)
 			: value(value)
@@ -243,6 +229,19 @@ export namespace util
 			return lhs;
 		}
 
+		constexpr Atom(const Atom&)
+			noexcept(nothrow_copy_constructibles<T>)
+			requires(copyable<T>) = default;
+		constexpr Atom(Atom&&)
+			noexcept(nothrow_move_constructibles<T>)
+			requires(movable<T>) = default;
+		constexpr Atom& operator=(const Atom&)
+			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>) = default;
+		constexpr Atom& operator=(Atom&&)
+			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>) = default;
+
 	private:
 		T value;
 	};
@@ -255,16 +254,6 @@ export namespace util
 			requires(default_initializable<T>) = default;
 		constexpr ~Atom()
 			noexcept(nothrow_destructibles<T>) = default;
-
-		constexpr Atom(const Atom&)
-			noexcept(nothrow_copy_constructibles<T>)
-			requires(copyable<T>) = default;
-		constexpr Atom(Atom&&)
-			noexcept(nothrow_move_constructibles<T>)
-			requires(movable<T>) = default;
-
-		Atom& operator=(const Atom&) = delete;
-		Atom& operator=(Atom&&) = delete;
 
 		constexpr Atom(const T& value)
 			noexcept(nothrow_copy_constructibles<T>) requires(copyable<T>)
@@ -320,6 +309,15 @@ export namespace util
 			}
 		}
 
+		constexpr Atom(const Atom&)
+			noexcept(nothrow_copy_constructibles<T>)
+			requires(copyable<T>) = default;
+		constexpr Atom(Atom&&)
+			noexcept(nothrow_move_constructibles<T>)
+			requires(movable<T>) = default;
+		Atom& operator=(const Atom&) = delete;
+		Atom& operator=(Atom&&) = delete;
+
 	private:
 		T value;
 	};
@@ -327,6 +325,89 @@ export namespace util
 	template<typename T>
 	struct [[nodiscard]] Atom<T&>
 	{
+		constexpr Atom(T& value) noexcept
+			: value(std::addressof(value))
+		{}
+
+		Atom(const T&& value) = delete;
+
+		constexpr ~Atom() noexcept = default;
+
+		constexpr Atom& operator=(const T& value)
+			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
+		{
+			*(this->value) = value;
+			return *this;
+		}
+
+		constexpr Atom& operator=(T&& value)
+			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
+		{
+			*(this->value) = std::move(value);
+			return *this;
+		}
+
+		constexpr operator T& () & noexcept
+		{
+			return *value;
+		}
+
+		constexpr operator const T& () const& noexcept
+		{
+			return *value;
+		}
+
+		constexpr operator T && () && noexcept
+		{
+			return std::move(*value);
+		}
+
+		constexpr operator const T && () const&& noexcept
+		{
+			return std::move(*value);
+		}
+
+		constexpr T* operator->() noexcept
+		{
+			return value;
+		}
+
+		constexpr const T* operator->() const noexcept
+		{
+			return value;
+		}
+
+		[[nodiscard]]
+		constexpr T& operator*() & noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const& noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr T&& operator*() && noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr const T&& operator*() const&& noexcept
+		{
+			return *value;
+		}
+
+		constexpr Atom(const Atom&) noexcept = default;
+		constexpr Atom(Atom&&) noexcept = default;
+		constexpr Atom& operator=(const Atom&) noexcept = default;
+		constexpr Atom& operator=(Atom&&) noexcept = default;
+
 	private:
 		T* value;
 	};
@@ -334,6 +415,51 @@ export namespace util
 	template<typename T>
 	struct [[nodiscard]] Atom<const T&>
 	{
+		constexpr Atom(T& value) noexcept
+			: value(std::addressof(value))
+		{}
+
+		constexpr Atom(const T& value) noexcept
+			: value(std::addressof(value))
+		{}
+
+		Atom(T&& value) = delete;
+		Atom(const T&& value) = delete;
+
+		constexpr ~Atom() noexcept = default;
+
+		constexpr operator const T& () const& noexcept
+		{
+			return *value;
+		}
+
+		constexpr operator const T && () const&& noexcept
+		{
+			return std::move(*value);
+		}
+
+		constexpr const T* operator->() const noexcept
+		{
+			return value;
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const& noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr const T&& operator*() const&& noexcept
+		{
+			return *value;
+		}
+
+		constexpr Atom(const Atom&) noexcept = default;
+		constexpr Atom(Atom&&) noexcept = default;
+		Atom& operator=(const Atom&) = delete;
+		Atom& operator=(Atom&&) = delete;
+
 	private:
 		const T* value;
 	};
