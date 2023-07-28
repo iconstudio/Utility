@@ -524,7 +524,9 @@ export namespace util
 			return *this;
 		}
 
-		Atom& operator=(std::unique_ptr<T>&& ptr)
+		template<typename S>
+			requires convertible_to<S*, T*>
+		Atom& operator=(std::unique_ptr<S>&& ptr)
 		{
 			value = std::move(ptr);
 			return *this;
@@ -605,6 +607,150 @@ export namespace util
 
 	private:
 		std::shared_ptr<T> value;
+	};
+
+	template<typename T>
+	struct [[nodiscard]] Atom<std::shared_ptr<const T>>
+	{
+		template<typename S>
+			requires(assignable_from<std::shared_ptr<const T>, const std::shared_ptr<S>&>)
+		Atom(const std::shared_ptr<S>& handle) noexcept
+			: value(handle)
+		{}
+
+		template<typename S>
+			requires(assignable_from<std::shared_ptr<const T>, std::shared_ptr<S>>)
+		Atom(const std::shared_ptr<S>& handle) noexcept
+			: value(std::move(handle))
+		{}
+
+		explicit Atom(const std::weak_ptr<T>& handle) noexcept
+			: value(handle)
+		{}
+
+		explicit Atom(std::weak_ptr<T>&& handle) noexcept
+			: value(std::move(handle))
+		{}
+
+		template<typename S>
+			requires convertible_to<S*, T*>
+		Atom& operator=(std::unique_ptr<S>&& ptr)
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		~Atom() noexcept(nothrow_destructibles<T>) = default;
+
+		template<typename S>
+			requires(assignable_from<std::shared_ptr<const T>, const std::shared_ptr<S>&>)
+		Atom& operator=(std::shared_ptr<S>& ptr) noexcept
+		{
+			value = ptr;
+			return *this;
+		}
+
+		template<typename S>
+			requires(assignable_from<std::shared_ptr<const T>, const std::shared_ptr<S>&>)
+		Atom& operator=(const std::shared_ptr<S>& ptr) noexcept
+		{
+			value = ptr;
+			return *this;
+		}
+
+		Atom& operator=(std::shared_ptr<T>&& ptr) noexcept
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		Atom& operator=(const std::shared_ptr<T>&& ptr) noexcept
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		Atom& operator=(std::unique_ptr<T>&& ptr)
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		constexpr Atom& operator=(const T& value)
+			noexcept(nothrow_copy_assignables<T>)
+			requires(copy_assignables<T>)
+		{
+			*(this->value) = value;
+			return *this;
+		}
+
+		constexpr Atom& operator=(T&& value)
+			noexcept(nothrow_move_assignables<T>)
+			requires(move_assignables<T>)
+		{
+			*(this->value) = std::move(value);
+			return *this;
+		}
+
+		constexpr operator std::shared_ptr<T>& () & noexcept
+		{
+			return value;
+		}
+
+		constexpr operator const std::shared_ptr<T>& () const& noexcept
+		{
+			return value;
+		}
+
+		constexpr operator std::shared_ptr<T> && () && noexcept
+		{
+			return std::move(value);
+		}
+
+		constexpr operator const std::shared_ptr<T> && () const&& noexcept
+		{
+			return std::move(value);
+		}
+
+		explicit constexpr operator T& () noexcept
+		{
+			return *value;
+		}
+
+		explicit constexpr operator const T& () const noexcept
+		{
+			return *value;
+		}
+
+		constexpr T*& operator->() noexcept
+		{
+			return *value;
+		}
+
+		constexpr T* const& operator->() const noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr T& operator*() noexcept
+		{
+			return *value;
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const noexcept
+		{
+			return *value;
+		}
+
+		constexpr Atom(const Atom&) noexcept = default;
+		constexpr Atom(Atom&&) noexcept = default;
+		constexpr Atom& operator=(const Atom&) noexcept = default;
+		constexpr Atom& operator=(Atom&&) noexcept = default;
+
+	private:
+		std::shared_ptr<const T> value;
 	};
 
 	template<typename T, typename Deleter>
