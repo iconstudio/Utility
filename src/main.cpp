@@ -243,16 +243,37 @@ int main()
 	const util::Atom<const int&> atom26{ atom_value4 };
 	constexpr util::Atom<const int&> atom27{ atom_value4 };
 
-	atom00 == atom22;
-	atom00 == atom23;
-	atom00 == atom24;
-	atom22 == atom23;
+	// warnings
+	//atom00 == atom22;
+	//atom00 == atom23;
+	//atom00 == atom24;
+	//atom22 == atom23;
 
 	// test 9
 	std::shared_ptr<int> atom_value5 = std::make_shared<int>(800);
 	util::Atom<std::shared_ptr<int>> atom28{ atom_value5 };
 	const util::Atom<std::shared_ptr<int>> atom29{ atom_value5 };
 
+	// test 10
+	std::unique_ptr<int> atom_value6 = std::make_unique<int>(900);
+	std::unique_ptr<int> atom_value7 = std::make_unique<int>(900);
+	//constexpr std::unique_ptr<int> atom_value8 = std::make_unique<int>(900);
+
+	util::Atom<std::unique_ptr<int>> atom30(std::move(atom_value6));
+	const util::Atom<std::unique_ptr<int>> atom31(std::move(atom_value7));
+	const util::Atom atom32(std::make_unique<int>(900));
+	// it is not an error but cannot compile for this context
+	//constexpr util::Atom atom33(std::make_unique<int>(900));
+
+	atom28 == atom29;
+	//atom28 == atom30;
+	//atom28 == atom31;
+	atom30 == atom31;
+
+	*atom28 == *atom29;
+	*atom28 == *atom30;
+	*atom28 == *atom31;
+	*atom30 == *atom31;
 
 	return 0;
 }

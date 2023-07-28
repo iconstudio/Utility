@@ -607,17 +607,18 @@ export namespace util
 		std::shared_ptr<T> value;
 	};
 
-	template<typename T>
-	struct [[nodiscard]] Atom<std::unique_ptr<T>>
+	template<typename T, typename Deleter>
+	struct [[nodiscard]] Atom<std::unique_ptr<T, Deleter>>
+		: public std::unique_ptr<T, Deleter>
 	{
-		constexpr Atom(std::unique_ptr<T>&& value) noexcept
-			: value(std::move(value))
-		{}
+		using base = std::unique_ptr<T, Deleter>;
 
+		using base::base;
 
-
-	private:
-		std::unique_ptr<T> value;
+		Atom(const Atom&) = delete;
+		constexpr Atom(Atom&&) noexcept = default;
+		Atom& operator=(const Atom&) = delete;
+		constexpr Atom& operator=(Atom&&) noexcept = default;
 	};
 
 	template<typename T>
