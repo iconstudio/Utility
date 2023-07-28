@@ -179,49 +179,49 @@ export namespace util
 	};
 
 	template<typename T>
-	concept addable = requires(T t)
+	concept addable = requires(const T t)
 	{
 		{ t + t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_addable = requires(T t)
+	concept nothrow_addable = requires(const T t)
 	{
 		{ t + t } noexcept;
 	};
 
 	template<typename T>
-	concept subtractable = requires(T t)
+	concept subtractable = requires(const T t)
 	{
 		{ t - t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_subtractable = requires(T t)
+	concept nothrow_subtractable = requires(const T t)
 	{
 		{ t - t } noexcept;
 	};
 
 	template<typename T>
-	concept multipliable = requires(T t)
+	concept multipliable = requires(const T t)
 	{
 		{ t* t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_multipliable = requires(T t)
+	concept nothrow_multipliable = requires(const T t)
 	{
 		{ t* t } noexcept;
 	};
 
 	template<typename T>
-	concept dividable = requires(T t)
+	concept dividable = requires(const T t)
 	{
 		{ t / t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_dividable = requires(T t)
+	concept nothrow_dividable = requires(const T t)
 	{
 		{ t / t } noexcept;
 	};
