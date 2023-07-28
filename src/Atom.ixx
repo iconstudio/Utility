@@ -602,6 +602,19 @@ export namespace util
 	};
 
 	template<typename T>
+	struct [[nodiscard]] Atom<std::unique_ptr<T>>
+	{
+		constexpr Atom(std::unique_ptr<T>&& value) noexcept
+			: value(std::move(value))
+		{}
+
+
+
+	private:
+		std::unique_ptr<T> value;
+	};
+
+	template<typename T>
 	Atom(T) -> Atom<T>;
 
 	template<typename T, typename S>
