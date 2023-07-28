@@ -219,5 +219,34 @@ int main()
 	const bool cmp_atom02_08 = atom02 == atom08;
 	//const bool cmp_atom02_14 = atom02 == atom14;
 
+	// test 6
+	//util::Atom<int&> atom15{ 500 };
+	//const util::Atom<int&> atom16{ 500 };
+	//constexpr util::Atom<int&> atom17{ 500 };
+
+	//int atom_value1 = 500;
+	//util::Atom<int&> atom18{ std::move(atom_value1) };
+
+	// test 7
+	//constexpr int atom_value2 = 600;
+	//util::Atom<int&> atom19{ atom_value2 };
+	//const util::Atom<int&> atom20{ atom_value2 };
+	//constexpr util::Atom<int&> atom21{ atom_value2 };
+
+	// test 8
+	int atom_value3 = 700;
+	constexpr int atom_value4 = 700;
+	util::Atom<const int&> atom22{ atom_value3 };
+	const util::Atom<const int&> atom23{ atom_value3 };
+	constexpr util::Atom<const int&> atom24{ atom_value3 };
+	util::Atom<const int&> atom25{ atom_value4 };
+	const util::Atom<const int&> atom26{ atom_value4 };
+	constexpr util::Atom<const int&> atom27{ atom_value4 };
+
+	atom00 == atom22;
+	atom00 == atom23;
+	atom00 == atom24;
+	atom22 == atom23;
+
 	return 0;
 }

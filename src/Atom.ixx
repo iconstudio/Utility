@@ -1,6 +1,7 @@
 export module Utility.Atom;
 import <utility>;
 import <memory>;
+import Utility;
 import Utility.Constraints;
 
 export namespace util
@@ -329,7 +330,15 @@ export namespace util
 			: value(std::addressof(value))
 		{}
 
-		Atom(const T&& value) = delete;
+		constexpr Atom(const T&) noexcept
+		{
+			static_assert(util::always_false<T>, "Cannot create an Atom of lvalue from const lvalue");
+		}
+
+		constexpr Atom(const T&&) noexcept
+		{
+			static_assert(util::always_false<T>, "Cannot create an Atom of reference from the temporary value");
+		}
 
 		constexpr ~Atom() noexcept = default;
 
@@ -409,7 +418,7 @@ export namespace util
 		constexpr Atom& operator=(Atom&&) noexcept = default;
 
 	private:
-		T* value;
+		T* value = nullptr;
 	};
 
 	template<typename T>
@@ -423,8 +432,10 @@ export namespace util
 			: value(std::addressof(value))
 		{}
 
-		Atom(T&& value) = delete;
-		Atom(const T&& value) = delete;
+		constexpr Atom(const T&&) noexcept
+		{
+			static_assert(util::always_false<T>, "Cannot create an Atom of reference from the temporary value");
+		}
 
 		constexpr ~Atom() noexcept = default;
 
@@ -461,7 +472,7 @@ export namespace util
 		Atom& operator=(Atom&&) = delete;
 
 	private:
-		const T* value;
+		const T* value = nullptr;
 	};
 
 	template<typename T>
