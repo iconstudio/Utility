@@ -336,9 +336,198 @@ export namespace util
 	template<typename T>
 	struct [[nodiscard]] Atom<const T>
 	{
+		constexpr Atom()
+			noexcept(nothrow_default_constructibles<T>)
+			requires(default_initializable<T>) = default;
+		constexpr ~Atom()
+			noexcept(nothrow_destructibles<T>) = default;
 
+		constexpr Atom(const Atom&)
+			noexcept(nothrow_copy_constructibles<T>)
+			requires(copyable<T>) = default;
+		constexpr Atom(Atom&&)
+			noexcept(nothrow_move_constructibles<T>)
+			requires(movable<T>) = default;
+
+		Atom& operator=(const Atom&) = delete;
+		Atom& operator=(Atom&&) = delete;
+
+		constexpr Atom(const T& value)
+			noexcept(nothrow_copy_constructibles<T>) requires(copyable<T>)
+			: value(value)
+		{}
+
+		constexpr Atom(T&& value)
+			noexcept(nothrow_move_constructibles<T>) requires(movable<T>)
+			: value(std::move(value))
+		{}
+
+		constexpr operator const T& () const& noexcept
+		{
+			return value;
+		}
+
+		constexpr operator const T && () const&& noexcept
+		{
+			return std::move(value);
+		}
+
+		constexpr const T* operator->() const noexcept
+		{
+			if constexpr (std::is_pointer_v<T>)
+				return value;
+			else
+				return std::addressof(value);
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const& noexcept
+		{
+			if constexpr (std::is_pointer_v<T>)
+			{
+				return *value;
+			}
+			else
+			{
+				return value;
+			}
+		}
+
+		[[nodiscard]]
+		constexpr const T&& operator*() const&& noexcept
+		{
+			if constexpr (std::is_pointer_v<T>)
+			{
+				return std::move(*value);
+			}
+			else
+			{
+				return std::move(value);
+			}
+		}
+
+		[[nodiscard]]
+		friend constexpr bool operator==(const Atom& lhs, const Atom& rhs)
+			noexcept(noexcept(lhs.value == rhs.value))
+		{
+			return lhs.value == rhs.value;
+		}
+
+		template<typename S>
+		[[nodiscard]]
+		friend constexpr bool operator==(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(noexcept(lhs.value == rhs.value))
+		{
+			static_assert(util::equality_comparable_with<T, S>);
+
+			return lhs.value == rhs.value;
+		}
+
+		[[nodiscard]]
+		friend constexpr auto operator<=>(const Atom& lhs, const Atom& rhs)
+			noexcept(noexcept(lhs.value <=> rhs.value))
+			requires(std::three_way_comparable<T>)
+		{
+			return lhs.value <=> rhs.value;
+		}
+
+		template<typename S>
+		[[nodiscard]]
+		friend constexpr auto operator<=>(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(noexcept(lhs.value <=> rhs.value))
+			requires(std::three_way_comparable_with<T, S>)
+		{
+			return lhs.value <=> rhs.value;
+		}
+
+		friend constexpr Atom operator+(const Atom& lhs, const Atom& rhs)
+			noexcept(nothrow_addable<T>)
+			requires(addable<T>)
+		{
+			return Atom{ lhs.value + rhs.value };
+		}
+
+		template<addable_with<T> S>
+		friend constexpr Atom operator+(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(nothrow_addable_with<T, S>)
+		{
+			return Atom{ lhs.value + rhs.value };
+		}
+
+		friend constexpr Atom operator-(const Atom& lhs, const Atom& rhs)
+			noexcept(nothrow_subtractable<T>)
+			requires(subtractable<T>)
+		{
+			return Atom{ lhs.value - rhs.value };
+		}
+
+		template<subtractable_with<T> S>
+		friend constexpr Atom operator-(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(nothrow_subtractable_with<T, S>)
+		{
+			return Atom{ lhs.value - rhs.value };
+		}
+
+		friend constexpr Atom operator*(const Atom& lhs, const Atom& rhs)
+			noexcept(nothrow_multipliable<T>)
+			requires(multipliable<T>)
+		{
+			return Atom{ lhs.value * rhs.value };
+		}
+
+		template<multipliable_with<T> S>
+		friend constexpr Atom operator*(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(nothrow_multipliable_with<T, S>)
+		{
+			return Atom{ lhs.value * rhs.value };
+		}
+
+		friend constexpr Atom operator/(const Atom& lhs, const Atom& rhs)
+			noexcept(nothrow_dividable<T>)
+			requires(dividable<T>)
+		{
+			return Atom{ lhs.value / rhs.value };
+		}
+
+		template<dividable_with<T> S>
+		friend constexpr Atom operator/(const Atom& lhs, const Atom<S>& rhs)
+			noexcept(nothrow_dividable_with<T, S>)
+		{
+			return Atom{ lhs.value / rhs.value };
+		}
+
+	private:
+		T value;
 	};
 
 	template<typename T>
 	Atom(T) -> Atom<T>;
 }
+
+#pragma warning(push, 1)
+namespace util::test
+{
+	void test_atom() noexcept
+	{
+		Atom atom00{ 400 };
+		const Atom atom01{ 400 };
+		constexpr Atom atom02{ 400 };
+
+		Atom<int> atom03{ 400 };
+		const Atom<int> atom04{ 400 };
+		constexpr Atom<int> atom05{ 400 };
+
+		Atom<const int> atom06{ 400 };
+		const Atom<const int> atom07{ 400 };
+		constexpr Atom<const int> atom08{ 400 };
+
+		Atom<int*> atom09{ nullptr };
+		const Atom<int*> atom10{ nullptr };
+		constexpr Atom<int*> atom11{ nullptr };
+
+		Atom<const int*> atom12{ nullptr };
+		const Atom<const int*> atom13{ nullptr };
+		constexpr Atom<const int*> atom14{ nullptr };
+	}
+}
+#pragma warning(pop)
