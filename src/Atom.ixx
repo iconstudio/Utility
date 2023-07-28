@@ -326,21 +326,21 @@ export namespace util
 	template<typename T, typename S>
 	[[nodiscard]]
 	constexpr bool operator==(const Atom<T>& lhs, const Atom<S>& rhs)
-		noexcept(noexcept(*lhs == *rhs))
+		noexcept(noexcept((*lhs) == (*rhs)))
 	{
 		static_assert(equality_comparable_with<T, S>, "T and S must be equality comparable");
 
-		return *lhs == *rhs;
+		return (*lhs) == (*rhs);
 	}
 
 	template<typename T, typename S>
 	[[nodiscard]]
 	constexpr auto operator<=>(const Atom<T>& lhs, const Atom<S>& rhs)
-		noexcept(noexcept(*lhs <=> *rhs))
+		noexcept(noexcept((*lhs) <=> (*rhs)))
 	{
 		static_assert(std::three_way_comparable_with<T, S>, "T and S must be three way comparable");
 
-		return *lhs <=> *rhs;
+		return (*lhs) <=> (*rhs);
 	}
 
 	template<typename T, typename S>
