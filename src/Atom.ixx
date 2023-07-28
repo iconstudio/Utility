@@ -478,14 +478,24 @@ export namespace util
 	template<typename T>
 	struct [[nodiscard]] Atom<std::shared_ptr<T>>
 	{
-		Atom(const std::shared_ptr<T>& value)
-			noexcept(nothrow_copy_constructibles<std::shared_ptr<T>>)
-			: value(value)
+		Atom(const std::shared_ptr<T>& handle) noexcept
+			: value(handle)
 		{}
 
-		Atom(std::shared_ptr<T>&& value)
-			noexcept(nothrow_move_constructibles<std::shared_ptr<T>>)
-			: value(std::move(value))
+		Atom(std::shared_ptr<T>&& handle) noexcept
+			: value(std::move(handle))
+		{}
+
+		explicit Atom(const std::weak_ptr<T>& handle) noexcept
+			: value(handle)
+		{}
+
+		explicit Atom(std::weak_ptr<T>&& handle) noexcept
+			: value(std::move(handle))
+		{}
+
+		explicit Atom(std::unique_ptr<T>&& handle)
+			: value(std::move(handle))
 		{}
 
 		~Atom() noexcept(nothrow_destructibles<T>) = default;
@@ -560,7 +570,7 @@ export namespace util
 			return *value;
 		}
 
-		constexpr T* & operator->() noexcept
+		constexpr T*& operator->() noexcept
 		{
 			return *value;
 		}
