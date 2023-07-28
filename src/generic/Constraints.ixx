@@ -232,6 +232,68 @@ export namespace util
 	template<typename T>
 	concept nothrow_aritmetical = aritmetical<T> && nothrow_addable<T> && nothrow_subtractable<T> && nothrow_multipliable<T> && nothrow_dividable<T>;
 
+	template<typename T, typename S>
+	concept addable_with = requires(const T t, const S s)
+	{
+		{ t + s };
+		{ s + t };
+	};
+
+	template<typename T, typename S>
+	concept nothrow_addable_with = requires(const T t, const S s)
+	{
+		{ t + s } noexcept;
+		{ s + t } noexcept;
+	};
+
+	template<typename T, typename S>
+	concept subtractable_with = requires(const T t, const S s)
+	{
+		{ t - s };
+		{ s - t };
+	};
+
+	template<typename T, typename S>
+	concept nothrow_subtractable_with = requires(const T t, const S s)
+	{
+		{ t - s } noexcept;
+		{ s - t } noexcept;
+	};
+
+	template<typename T, typename S>
+	concept multipliable_with = requires(const T t, const S s)
+	{
+		{ t* s };
+		{ s* t };
+	};
+
+	template<typename T, typename S>
+	concept nothrow_multipliable_with = requires(const T t, const S s)
+	{
+		{ t* s } noexcept;
+		{ s* t } noexcept;
+	};
+
+	template<typename T, typename S>
+	concept dividable_with = requires(const T t, const S s)
+	{
+		{ t / s };
+		{ s / t };
+	};
+
+	template<typename T, typename S>
+	concept nothrow_dividable_with = requires(const T t, const S s)
+	{
+		{ t / s } noexcept;
+		{ s / t } noexcept;
+	};
+
+	template<typename T, typename S>
+	concept aritmetical_with = addable_with<T, S>&& subtractable_with<T, S>&& multipliable_with<T, S>&& dividable_with<T, S>;
+
+	template<typename T, typename S>
+	concept nothrow_aritmetical_with = nothrow_addable_with<T, S>&& nothrow_subtractable_with<T, S>&& nothrow_multipliable_with<T, S>&& nothrow_dividable_with<T, S>;
+
 	template<typename T>
 	concept basic_arithmeticals = std::is_arithmetic_v<clean_t<T>>;
 
