@@ -145,124 +145,34 @@ export namespace util
 			}
 		}
 
-		[[nodiscard]]
-		friend constexpr bool operator==(const Atom& lhs, const Atom& rhs)
-			noexcept(noexcept(lhs.value == rhs.value))
-		{
-			return lhs.value == rhs.value;
-		}
-
-		template<typename S>
-		[[nodiscard]]
-		friend constexpr bool operator==(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(noexcept(lhs.value == rhs.value))
-		{
-			static_assert(util::equality_comparable_with<T, S>);
-
-			return lhs.value == rhs.value;
-		}
-
-		[[nodiscard]]
-		friend constexpr auto operator<=>(const Atom& lhs, const Atom& rhs)
-			noexcept(noexcept(lhs.value <=> rhs.value))
-			requires(std::three_way_comparable<T>)
-		{
-			return lhs.value <=> rhs.value;
-		}
-
-		template<typename S>
-		[[nodiscard]]
-		friend constexpr auto operator<=>(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(noexcept(lhs.value <=> rhs.value))
-			requires(std::three_way_comparable_with<T, S>)
-		{
-			return lhs.value <=> rhs.value;
-		}
-
-		friend constexpr Atom& operator++(Atom& lhs)
+		constexpr Atom& operator++()
 			noexcept(nothrow_incrementable<T>)
 			requires(incrementable<T>)
 		{
-			++lhs.value;
-			return lhs;
+			++value;
+			return *this;
 		}
 
-		friend constexpr Atom& operator--(Atom& lhs)
+		constexpr Atom& operator--()
 			noexcept(nothrow_decrementable<T>)
 			requires(decrementable<T>)
 		{
-			--lhs.value;
-			return lhs;
+			--value;
+			return *this;
 		}
 
-		friend constexpr Atom operator++(Atom& lhs, int)
+		constexpr Atom operator++(int)
 			noexcept(nothrow_incrementable<T>)
 			requires(incrementable<T>)
 		{
-			return Atom{ lhs.value++ };
+			return Atom{ value++ };
 		}
 
-		friend constexpr Atom operator--(Atom& lhs, int)
+		constexpr Atom operator--(int)
 			noexcept(nothrow_decrementable<T>)
 			requires(decrementable<T>)
 		{
-			return Atom{ lhs.value-- };
-		}
-
-		friend constexpr Atom operator+(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_addable<T>)
-			requires(addable<T>)
-		{
-			return Atom{ lhs.value + rhs.value };
-		}
-
-		template<addable_with<T> S>
-		friend constexpr Atom operator+(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_addable_with<T, S>)
-		{
-			return Atom{ lhs.value + rhs.value };
-		}
-
-		friend constexpr Atom operator-(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_subtractable<T>)
-			requires(subtractable<T>)
-		{
-			return Atom{ lhs.value - rhs.value };
-		}
-
-		template<subtractable_with<T> S>
-		friend constexpr Atom operator-(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_subtractable_with<T, S>)
-		{
-			return Atom{ lhs.value - rhs.value };
-		}
-
-		friend constexpr Atom operator*(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_multipliable<T>)
-			requires(multipliable<T>)
-		{
-			return Atom{ lhs.value * rhs.value };
-		}
-
-		template<multipliable_with<T> S>
-		friend constexpr Atom operator*(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_multipliable_with<T, S>)
-		{
-			return Atom{ lhs.value * rhs.value };
-		}
-
-		friend constexpr Atom operator/(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_dividable<T>)
-			requires(dividable<T>)
-		{
-			return Atom{ lhs.value / rhs.value };
-		}
-
-		template<dividable_with<T> S>
-		friend constexpr Atom operator/(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_dividable_with<T, S>)
-		{
-			return Atom{ lhs.value / rhs.value };
+			return Atom{ value-- };
 		}
 
 		friend constexpr Atom& operator+=(Atom& lhs, const Atom& rhs)
@@ -406,102 +316,72 @@ export namespace util
 			}
 		}
 
-		[[nodiscard]]
-		friend constexpr bool operator==(const Atom& lhs, const Atom& rhs)
-			noexcept(noexcept(lhs.value == rhs.value))
-		{
-			return lhs.value == rhs.value;
-		}
-
-		template<typename S>
-		[[nodiscard]]
-		friend constexpr bool operator==(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(noexcept(lhs.value == rhs.value))
-		{
-			static_assert(util::equality_comparable_with<T, S>);
-
-			return lhs.value == rhs.value;
-		}
-
-		[[nodiscard]]
-		friend constexpr auto operator<=>(const Atom& lhs, const Atom& rhs)
-			noexcept(noexcept(lhs.value <=> rhs.value))
-			requires(std::three_way_comparable<T>)
-		{
-			return lhs.value <=> rhs.value;
-		}
-
-		template<typename S>
-		[[nodiscard]]
-		friend constexpr auto operator<=>(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(noexcept(lhs.value <=> rhs.value))
-			requires(std::three_way_comparable_with<T, S>)
-		{
-			return lhs.value <=> rhs.value;
-		}
-
-		friend constexpr Atom operator+(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_addable<T>)
-			requires(addable<T>)
-		{
-			return Atom{ lhs.value + rhs.value };
-		}
-
-		template<addable_with<T> S>
-		friend constexpr Atom operator+(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_addable_with<T, S>)
-		{
-			return Atom{ lhs.value + rhs.value };
-		}
-
-		friend constexpr Atom operator-(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_subtractable<T>)
-			requires(subtractable<T>)
-		{
-			return Atom{ lhs.value - rhs.value };
-		}
-
-		template<subtractable_with<T> S>
-		friend constexpr Atom operator-(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_subtractable_with<T, S>)
-		{
-			return Atom{ lhs.value - rhs.value };
-		}
-
-		friend constexpr Atom operator*(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_multipliable<T>)
-			requires(multipliable<T>)
-		{
-			return Atom{ lhs.value * rhs.value };
-		}
-
-		template<multipliable_with<T> S>
-		friend constexpr Atom operator*(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_multipliable_with<T, S>)
-		{
-			return Atom{ lhs.value * rhs.value };
-		}
-
-		friend constexpr Atom operator/(const Atom& lhs, const Atom& rhs)
-			noexcept(nothrow_dividable<T>)
-			requires(dividable<T>)
-		{
-			return Atom{ lhs.value / rhs.value };
-		}
-
-		template<dividable_with<T> S>
-		friend constexpr Atom operator/(const Atom& lhs, const Atom<S>& rhs)
-			noexcept(nothrow_dividable_with<T, S>)
-		{
-			return Atom{ lhs.value / rhs.value };
-		}
-
 	private:
 		T value;
 	};
 
 	template<typename T>
 	Atom(T) -> Atom<T>;
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr bool operator==(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(noexcept(*lhs == *rhs))
+	{
+		static_assert(equality_comparable_with<T, S>, "T and S must be equality comparable");
+
+		return *lhs == *rhs;
+	}
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr auto operator<=>(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(noexcept(*lhs <=> *rhs))
+	{
+		static_assert(std::three_way_comparable_with<T, S>, "T and S must be three way comparable");
+
+		return *lhs <=> *rhs;
+	}
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr auto operator+(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(nothrow_addable_with<T, S>)
+	{
+		static_assert(addable_with<T, S>);
+
+		return Atom{ (*lhs) + (*rhs) };
+	}
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr auto operator-(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(nothrow_subtractable_with<T, S>)
+	{
+		static_assert(subtractable_with<T, S>);
+
+		return Atom{ (*lhs) - (*rhs) };
+	}
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr auto operator*(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(nothrow_multipliable_with<T, S>)
+	{
+		static_assert(multipliable_with<T, S>);
+
+		return Atom{ (*lhs) * (*rhs) };
+	}
+
+	template<typename T, typename S>
+	[[nodiscard]]
+	constexpr auto operator/(const Atom<T>& lhs, const Atom<S>& rhs)
+		noexcept(nothrow_dividable_with<T, S>)
+	{
+		static_assert(dividable_with<T, S>);
+
+		return Atom{ (*lhs) / (*rhs) };
+	}
 }
 
 #pragma warning(push, 1)
