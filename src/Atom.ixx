@@ -476,7 +476,7 @@ export namespace util
 	};
 
 	template<typename T>
-	struct Atom<std::shared_ptr<T>>
+	struct [[nodiscard]] Atom<std::shared_ptr<T>>
 	{
 		Atom(const std::shared_ptr<T>& value)
 			noexcept(nothrow_copy_constructibles<std::shared_ptr<T>>)
