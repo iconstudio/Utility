@@ -8,6 +8,7 @@ import Utility.Coroutine;
 import Utility.Coroutine.Generator;
 import Utility.Coroutine.Enumerator;
 import Utility.Coroutine.Logic;
+import Utility.Atom;
 
 int main()
 {
@@ -192,6 +193,31 @@ int main()
 	util::Println("\n");
 
 	// test 5
+	util::Atom atom00{ 400 };
+	const util::Atom atom01{ 400 };
+	const bool cmp_atom00_01 = atom00 == atom01;
+
+	constexpr util::Atom atom02{ 400 };
+	const bool cmp_atom01_02 = atom01 == atom02;
+
+	util::Atom<int> atom03{ 400 };
+	const util::Atom<int> atom04{ 400 };
+	constexpr util::Atom<int> atom05{ 400 };
+
+	util::Atom<const int> atom06{ 400 };
+	const util::Atom<const int> atom07{ 400 };
+	constexpr util::Atom<const int> atom08{ 400 };
+
+	util::Atom<int*> atom09{ nullptr };
+	const util::Atom<int*> atom10{ nullptr };
+	constexpr util::Atom<int*> atom11{ nullptr };
+
+	util::Atom<const int*> atom12{ nullptr };
+	const util::Atom<const int*> atom13{ nullptr };
+	constexpr util::Atom<const int*> atom14{ nullptr };
+
+	const bool cmp_atom02_08 = atom02 == atom08;
+	//const bool cmp_atom02_14 = atom02 == atom14;
 
 	return 0;
 }

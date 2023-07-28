@@ -219,6 +219,8 @@ export namespace util
 		friend constexpr Atom& operator*=(Atom& lhs, const Atom<S>& rhs)
 			noexcept(nothrow_multipliable_with<T, S>)
 		{
+			static_assert(not std::is_pointer_v<S>);
+
 			lhs.value *= rhs.value;
 			return lhs;
 		}
@@ -235,6 +237,8 @@ export namespace util
 		friend constexpr Atom& operator/=(Atom& lhs, const Atom<S>& rhs)
 			noexcept(nothrow_dividable_with<T, S>)
 		{
+			static_assert(not std::is_pointer_v<S>);
+
 			lhs.value /= rhs.value;
 			return lhs;
 		}
@@ -369,6 +373,7 @@ export namespace util
 		noexcept(nothrow_multipliable_with<T, S>)
 	{
 		static_assert(multipliable_with<T, S>);
+		static_assert(not std::is_pointer_v<S>);
 
 		return Atom{ (*lhs) * (*rhs) };
 	}
@@ -379,6 +384,7 @@ export namespace util
 		noexcept(nothrow_dividable_with<T, S>)
 	{
 		static_assert(dividable_with<T, S>);
+		static_assert(not std::is_pointer_v<S>);
 
 		return Atom{ (*lhs) / (*rhs) };
 	}
