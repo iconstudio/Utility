@@ -179,24 +179,58 @@ export namespace util
 	};
 
 	template<typename T>
-	concept aritmetical = requires(T t)
+	concept addable = requires(T t)
 	{
 		{ t + t } -> std::same_as<T>;
-		{ t - t } -> std::same_as<T>;
-		{ t * t } -> std::same_as<T>;
-		{ t / t } -> std::same_as<T>;
-		{ t % t } -> std::same_as<T>;
 	};
 
 	template<typename T>
-	concept nothrow_aritmetical = requires(T t)
+	concept nothrow_addable = requires(T t)
 	{
 		{ t + t } noexcept -> std::same_as<T>;
-		{ t - t } noexcept -> std::same_as<T>;
-		{ t * t } noexcept -> std::same_as<T>;
-		{ t / t } noexcept -> std::same_as<T>;
-		{ t % t } noexcept -> std::same_as<T>;
 	};
+
+	template<typename T>
+	concept subtractable = requires(T t)
+	{
+		{ t - t } -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept nothrow_subtractable = requires(T t)
+	{
+		{ t - t } noexcept -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept multipliable = requires(T t)
+	{
+		{ t* t } -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept nothrow_multipliable = requires(T t)
+	{
+		{ t* t } noexcept -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept dividable = requires(T t)
+	{
+		{ t / t } -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept nothrow_dividable = requires(T t)
+	{
+		{ t / t } noexcept -> std::same_as<T>;
+	};
+
+	template<typename T>
+	concept aritmetical = addable<T> && subtractable<T> && multipliable<T> && dividable<T>;
+
+	template<typename T>
+	concept nothrow_aritmetical = nothrow_addable<T> && nothrow_subtractable<T> && nothrow_multipliable<T> && nothrow_dividable<T>;
 
 	template<typename T>
 	concept basic_arithmeticals = std::is_arithmetic_v<clean_t<T>>;
