@@ -181,8 +181,8 @@ export namespace util
 	template<typename T, typename S>
 	concept addable_with = requires(const T t, const S s)
 	{
-		{ t + s };
-		{ s + t };
+		{ t + s } -> std::same_as<std::common_type_t<T, S>>;
+		{ s + t } -> std::same_as<std::common_type_t<T, S>>;
 	};
 
 	template<typename T, typename S>
@@ -195,8 +195,8 @@ export namespace util
 	template<typename T, typename S>
 	concept subtractable_with = requires(const T t, const S s)
 	{
-		{ t - s };
-		{ s - t };
+		{ t - s } -> std::same_as<std::common_type_t<T, S>>;
+		{ s - t } -> std::same_as<std::common_type_t<T, S>>;
 	};
 
 	template<typename T, typename S>
@@ -209,8 +209,8 @@ export namespace util
 	template<typename T, typename S>
 	concept multipliable_with = requires(const T t, const S s)
 	{
-		{ t* s };
-		{ s* t };
+		{ t* s } -> std::same_as<std::common_type_t<T, S>>;
+		{ s* t } -> std::same_as<std::common_type_t<T, S>>;
 	};
 
 	template<typename T, typename S>
@@ -223,8 +223,8 @@ export namespace util
 	template<typename T, typename S>
 	concept dividable_with = requires(const T t, const S s)
 	{
-		{ t / s };
-		{ s / t };
+		{ t / s } -> std::same_as<std::common_type_t<T, S>>;
+		{ s / t } -> std::same_as<std::common_type_t<T, S>>;
 	};
 
 	template<typename T, typename S>
@@ -235,10 +235,17 @@ export namespace util
 	};
 
 	template<typename T, typename S>
-	concept arithmetical_with = addable_with<T, S>&& subtractable_with<T, S>&& multipliable_with<T, S>&& dividable_with<T, S>;
+	concept arithmetical_with = addable_with<T, S>
+		&& subtractable_with<T, S>
+		&& multipliable_with<T, S>
+		&& dividable_with<T, S>;
 
 	template<typename T, typename S>
-	concept nothrow_arithmetical_with = nothrow_addable_with<T, S>&& nothrow_subtractable_with<T, S>&& nothrow_multipliable_with<T, S>&& nothrow_dividable_with<T, S>;
+	concept nothrow_arithmetical_with = arithmetical_with<T, S>
+		&& nothrow_addable_with<T, S>
+		&& nothrow_subtractable_with<T, S>
+		&& nothrow_multipliable_with<T, S>
+		&& nothrow_dividable_with<T, S>;
 
 	template<typename T>
 	concept addable = addable_with<T, T>;
