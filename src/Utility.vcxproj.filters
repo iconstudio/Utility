@@ -36,6 +36,9 @@
     <Filter Include="헤더 파일\Container">
       <UniqueIdentifier>{12270362-3779-4b7e-9446-6ed9a47fe29e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="헤더 파일\IO">
+      <UniqueIdentifier>{7905174f-9c32-4c73-8f7c-944a2cef7c10}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="wrappers\String.ixx">
