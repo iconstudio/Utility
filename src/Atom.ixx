@@ -544,7 +544,7 @@ export namespace util
 			return *this;
 		}
 
-		constexpr Atom& operator=(const T& value)
+		Atom& operator=(const T& value)
 			noexcept(nothrow_copy_assignables<T>)
 			requires(copy_assignables<T>)
 		{
@@ -552,7 +552,7 @@ export namespace util
 			return *this;
 		}
 
-		constexpr Atom& operator=(T&& value)
+		Atom& operator=(T&& value)
 			noexcept(nothrow_move_assignables<T>)
 			requires(move_assignables<T>)
 		{
@@ -580,12 +580,12 @@ export namespace util
 			return std::move(value);
 		}
 
-		explicit constexpr operator T& () noexcept
+		explicit operator T& () noexcept
 		{
 			return *value;
 		}
 
-		explicit constexpr operator const T& () const noexcept
+		explicit operator const T& () const noexcept
 		{
 			return *value;
 		}
@@ -601,13 +601,13 @@ export namespace util
 		}
 
 		[[nodiscard]]
-		constexpr T& operator*() noexcept
+		T& operator*() noexcept
 		{
 			return *value;
 		}
 
 		[[nodiscard]]
-		constexpr const T& operator*() const noexcept
+		const T& operator*() const noexcept
 		{
 			return *value;
 		}
