@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClCompile Include="..\DataPacker.ixx" />
     <ClCompile Include="..\Deserialization.ixx" />
+    <ClCompile Include="..\File.ixx" />
     <ClCompile Include="..\Object.cc" />
     <ClCompile Include="..\Serialization.ixx" />
     <ClCompile Include="..\Testbed.cpp" />
