@@ -500,7 +500,14 @@ export namespace util
 			: value(std::move(handle))
 		{}
 
-		explicit Atom(std::unique_ptr<T>&& handle)
+		template<typename Deleter>
+		explicit Atom(std::unique_ptr<T, Deleter>&& handle)
+			: value(std::move(handle))
+		{}
+
+		template<typename S, typename Deleter>
+			requires convertible_to<S*, T*>
+		explicit Atom(std::unique_ptr<S, Deleter>&& handle)
 			: value(std::move(handle))
 		{}
 
@@ -536,9 +543,9 @@ export namespace util
 			return *this;
 		}
 
-		template<typename S>
+		template<typename S, typename Deleter>
 			requires convertible_to<S*, T*>
-		Atom& operator=(std::unique_ptr<S>&& ptr)
+		Atom& operator=(std::unique_ptr<S, Deleter>&& ptr)
 		{
 			value = std::move(ptr);
 			return *this;
