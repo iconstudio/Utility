@@ -506,6 +506,12 @@ export namespace util
 
 		~Atom() noexcept(nothrow_destructibles<T>&& trivially_destructibles<T>) = default;
 
+		Atom& operator=(nullptr_t)
+		{
+			value = nullptr;
+			return *this;
+		}
+
 		Atom& operator=(std::shared_ptr<T>& ptr) noexcept
 		{
 			value = ptr;
