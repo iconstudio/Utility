@@ -50,9 +50,6 @@
     <ClCompile Include="Tools\Error.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
-    <ClCompile Include="Tools\Print.ixx">
-      <Filter>헤더 파일</Filter>
-    </ClCompile>
     <ClCompile Include="Tools\Utility.ixx">
       <Filter>헤더 파일</Filter>
     </ClCompile>
@@ -177,6 +174,9 @@
       <Filter>헤더 파일\Functional</Filter>
     </ClCompile>
     <ClCompile Include="..\File.ixx">
+      <Filter>헤더 파일\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Tools\Print.ixx">
       <Filter>헤더 파일\IO</Filter>
     </ClCompile>
   </ItemGroup>
