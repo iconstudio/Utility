@@ -504,7 +504,7 @@ export namespace util
 			: value(std::move(handle))
 		{}
 
-		~Atom() noexcept(nothrow_destructibles<T>) = default;
+		~Atom() noexcept(nothrow_destructibles<T>&& trivially_destructibles<T>) = default;
 
 		Atom& operator=(std::shared_ptr<T>& ptr) noexcept
 		{
