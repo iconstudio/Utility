@@ -659,6 +659,27 @@ export namespace util
 			: value(std::move(ptr))
 		{}
 
+		Atom& operator=(std::unique_ptr<T, Deleter>&& ptr)
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		template<convertible_to<Deleter> Deleter2>
+		Atom& operator=(std::unique_ptr<T, Deleter2>&& ptr)
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
+		template<typename S, convertible_to<Deleter> Deleter2>
+			requires convertible_to<S*, T*>
+		Atom& operator=(std::unique_ptr<S, Deleter2>&& ptr)
+		{
+			value = std::move(ptr);
+			return *this;
+		}
+
 		explicit constexpr operator T& () noexcept
 		{
 			return *value;
