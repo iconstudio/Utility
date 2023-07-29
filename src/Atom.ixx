@@ -463,7 +463,7 @@ export namespace util
 		[[nodiscard]]
 		constexpr const T&& operator*() const&& noexcept
 		{
-			return *value;
+			return std::move(*value);
 		}
 
 		constexpr Atom(const Atom&) noexcept = default;
