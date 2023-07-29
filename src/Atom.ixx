@@ -621,19 +621,76 @@ export namespace util
 		std::shared_ptr<T> value;
 	};
 
-	template<typename T>
 	template<typename T, typename Deleter>
 	struct [[nodiscard]] Atom<std::unique_ptr<T, Deleter>>
-		: public std::unique_ptr<T, Deleter>
 	{
-		using base = std::unique_ptr<T, Deleter>;
+		constexpr Atom() noexcept = default;
+		constexpr ~Atom() noexcept = default;
 
-		using base::base;
+		constexpr Atom(nullptr_t) noexcept
+			: value(nullptr)
+		{}
+
+		constexpr Atom(std::unique_ptr<T, Deleter>&& ptr) noexcept
+			: value(std::move(ptr))
+		{}
+
+		template<convertible_to<Deleter> Deleter2>
+		constexpr Atom(std::unique_ptr<T, Deleter2>&& ptr) noexcept
+			: value(std::move(ptr))
+		{}
+
+		template<typename S>
+			requires convertible_to<S*, T*>
+		constexpr Atom(std::unique_ptr<S, Deleter>&& ptr) noexcept
+			: value(std::move(ptr))
+		{}
+
+		template<typename S, convertible_to<Deleter> Deleter2>
+			requires convertible_to<S*, T*>
+		constexpr Atom(std::unique_ptr<S, Deleter2>&& ptr) noexcept
+			: value(std::move(ptr))
+		{}
+
+		explicit constexpr operator T& () noexcept
+		{
+			return *value;
+		}
+
+		explicit constexpr operator const T& () const noexcept
+		{
+			return *value;
+		}
+
+		constexpr T*& operator->() noexcept
+		{
+			return value.get();
+		}
+
+		constexpr T* const& operator->() const noexcept
+		{
+			return value.get();
+		}
+
+		[[nodiscard]]
+		constexpr T& operator*() noexcept
+		{
+			return *value.get();
+		}
+
+		[[nodiscard]]
+		constexpr const T& operator*() const noexcept
+		{
+			return *value.get();
+		}
 
 		Atom(const Atom&) = delete;
 		constexpr Atom(Atom&&) noexcept = default;
 		Atom& operator=(const Atom&) = delete;
 		constexpr Atom& operator=(Atom&&) noexcept = default;
+
+	private:
+		std::unique_ptr<T, Deleter> value;
 	};
 
 	template<typename T>
