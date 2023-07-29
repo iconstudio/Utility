@@ -478,6 +478,12 @@ export namespace util
 	template<typename T>
 	struct [[nodiscard]] Atom<std::shared_ptr<T>>
 	{
+		constexpr Atom() noexcept = default;
+
+		constexpr Atom(nullptr_t) noexcept
+			: value(nullptr)
+		{}
+
 		Atom(const std::shared_ptr<T>& handle) noexcept
 			: value(handle)
 		{}
