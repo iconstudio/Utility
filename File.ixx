@@ -187,7 +187,7 @@ export namespace util::io
 			{
 				while (true)
 				{
-					const file::ResultCode result = std::fgetc(myHandle);
+					const int result = std::fgetc(myHandle);
 					if (result == file::ResultCode::EndOfFile)
 					{
 						break;
