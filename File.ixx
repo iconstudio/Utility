@@ -78,9 +78,14 @@ export namespace util::io
 			Close();
 		}
 
-		bool Open(std::string_view filename) noexcept
+		bool Open(const FilePath& filename, file::OpenModes mode) noexcept
 		{
-			return Open(filename, "rb");
+			return Open(filename.string(), mode);
+		}
+
+		bool Open(const FilePath& filename) noexcept
+		{
+			return Open(filename.string(), "rb");
 		}
 
 		bool Open(std::string_view filename, std::string_view mode) noexcept
