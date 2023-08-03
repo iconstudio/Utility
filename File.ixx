@@ -4,9 +4,12 @@ import <cstdio>;
 import <span>;
 import <string>;
 import <string_view>;
+import <filesystem>;
 
 export namespace util::io
 {
+	using FilePath = std::filesystem::path;
+
 	namespace file
 	{
 		enum [[nodiscard]] ResultCode : std::int32_t
@@ -56,6 +59,10 @@ export namespace util::io
 	{
 	public:
 		File() noexcept = default;
+
+		File(const FilePath& filepath, file::OpenModes mode) noexcept
+			: File(filepath.string(), file::ModeStrings[static_cast<std::size_t>(mode)])
+		{}
 
 		File(std::string_view filepath, file::OpenModes mode) noexcept
 			: File(filepath, file::ModeStrings[static_cast<std::size_t>(mode)])
