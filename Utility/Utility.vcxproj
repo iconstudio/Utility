@@ -32,7 +32,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
-    <EnableFuzzer>false</EnableFuzzer>
+    <EnableFuzzer>true</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -49,7 +49,7 @@
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
     <EnableASAN>false</EnableASAN>
-    <EnableFuzzer>false</EnableFuzzer>
+    <EnableFuzzer>true</EnableFuzzer>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -81,18 +81,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
     <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+    <PublicIncludeDirectories>$(SolutionDir)inc;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(SolutionDir)inc;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
     <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+    <PublicIncludeDirectories>$(SolutionDir)inc;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(SolutionDir)inc;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
     <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+    <PublicIncludeDirectories>$(SolutionDir)inc;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(SolutionDir)inc;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AllProjectIncludesArePublic>true</AllProjectIncludesArePublic>
     <AllProjectBMIsArePublic>true</AllProjectBMIsArePublic>
+    <PublicIncludeDirectories>$(SolutionDir)inc;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(SolutionDir)inc;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -171,60 +179,57 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\DataPacker.ixx" />
-    <ClCompile Include="..\Deserialization.ixx" />
-    <ClCompile Include="..\File.ixx" />
-    <ClCompile Include="..\Object.cc" />
-    <ClCompile Include="..\Serialization.ixx" />
-    <ClCompile Include="..\Testbed.cpp" />
-    <ClCompile Include="Atom.ixx" />
-    <ClCompile Include="CoLogic.ixx" />
-    <ClCompile Include="concurrency\CoIterator.ixx" />
-    <ClCompile Include="concurrency\CoPromise.ixx" />
-    <ClCompile Include="concurrency\Coroutine.ixx" />
-    <ClCompile Include="concurrency\CoTask.ixx" />
-    <ClCompile Include="concurrency\Enumerator.ixx" />
-    <ClCompile Include="concurrency\Generator.ixx" />
-    <ClCompile Include="concurrency\Locks.ixx" />
-    <ClCompile Include="concurrency\Spinlock.ixx" />
-    <ClCompile Include="concurrency\Thread.ixx" />
-    <ClCompile Include="concurrency\ThreadUnit.ixx" />
-    <ClCompile Include="containers\Array.ixx" />
-    <ClCompile Include="containers\Union.ixx" />
-    <ClCompile Include="functional\Expected.ixx" />
-    <ClCompile Include="functional\Identity.ixx" />
-    <ClCompile Include="functional\LooseMonad.ixx" />
-    <ClCompile Include="functional\Monad.ixx" />
-    <ClCompile Include="functional\Option.ixx" />
-    <ClCompile Include="functional\Promise.ixx" />
-    <ClCompile Include="generic\Constraints.ixx" />
-    <ClCompile Include="generic\Traits.ixx" />
-    <ClCompile Include="io\File.cpp" />
+    <ClCompile Include="inc\Array.ixx" />
+    <ClCompile Include="inc\Atom.ixx" />
+    <ClCompile Include="inc\Atomic.ixx" />
+    <ClCompile Include="inc\Classifier.ixx" />
+    <ClCompile Include="inc\CoIterator.ixx" />
+    <ClCompile Include="inc\CoLogic.ixx" />
+    <ClCompile Include="inc\Constraints.ixx" />
+    <ClCompile Include="inc\CoPromise.ixx" />
+    <ClCompile Include="inc\Coroutine.ixx" />
+    <ClCompile Include="inc\CoTask.ixx" />
+    <ClCompile Include="inc\DataPacker.ixx" />
+    <ClCompile Include="inc\DataUnit.ixx" />
+    <ClCompile Include="inc\Deserialization.ixx" />
+    <ClCompile Include="inc\Enumerator.ixx" />
+    <ClCompile Include="inc\Error.ixx" />
+    <ClCompile Include="inc\Expected.ixx" />
+    <ClCompile Include="inc\File.ixx" />
+    <ClCompile Include="inc\FixedString.ixx" />
+    <ClCompile Include="inc\Generator.ixx" />
+    <ClCompile Include="inc\Identity.ixx" />
+    <ClCompile Include="inc\Indexer.ixx" />
+    <ClCompile Include="inc\Locks.ixx" />
+    <ClCompile Include="inc\LooseMonad.ixx" />
+    <ClCompile Include="inc\Memory.ixx" />
+    <ClCompile Include="inc\MemoryWatcher.ixx" />
+    <ClCompile Include="inc\Meta.ixx" />
+    <ClCompile Include="inc\Monad.ixx" />
+    <ClCompile Include="inc\Named.ixx" />
+    <ClCompile Include="inc\Option.ixx" />
+    <ClCompile Include="inc\Print.ixx" />
+    <ClCompile Include="inc\Promise.ixx" />
+    <ClCompile Include="inc\Reflection.ixx" />
+    <ClCompile Include="inc\Serialization.ixx" />
+    <ClCompile Include="inc\Singleton.ixx" />
+    <ClCompile Include="inc\Spinlock.ixx" />
+    <ClCompile Include="inc\String.ixx" />
+    <ClCompile Include="inc\Thread.ixx" />
+    <ClCompile Include="inc\ThreadUnit.ixx" />
+    <ClCompile Include="inc\Time.ixx" />
+    <ClCompile Include="inc\Traits.ixx" />
+    <ClCompile Include="inc\Union.ixx" />
+    <ClCompile Include="inc\Unique.ixx" />
+    <ClCompile Include="inc\Utility.ixx" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="memory\Atomic.ixx" />
-    <ClCompile Include="memory\Memory.ixx" />
-    <ClCompile Include="memory\MemoryWatcher.ixx" />
-    <ClCompile Include="meta\FixedString.ixx" />
-    <ClCompile Include="meta\Meta.ixx" />
-    <ClCompile Include="Print.cpp" />
-    <ClCompile Include="reflection\Classifier.ixx" />
-    <ClCompile Include="reflection\Indexer.ixx" />
-    <ClCompile Include="reflection\Named.ixx" />
-    <ClCompile Include="reflection\Reflection.ixx" />
-    <ClCompile Include="reflection\Singleton.ixx" />
-    <ClCompile Include="reflection\Unique.ixx" />
-    <ClCompile Include="Tools\Error.ixx" />
-    <ClCompile Include="Tools\Print.ixx" />
-    <ClCompile Include="Tools\Utility.ixx" />
-    <ClCompile Include="Tools\Time.ixx" />
-    <ClCompile Include="wrappers\String.ixx" />
+    <ClCompile Include="src\Testbed.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="..\Utility.natvis" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\Deserialization.inl" />
-    <None Include="..\Serialization.inl" />
+    <None Include="inc\Serialization.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
