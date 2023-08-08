@@ -1,0 +1,157 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Sources">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Includes">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{7cc966ff-fd80-45d0-a26f-18f95d0cb063}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="inc\Array.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Atom.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Atomic.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Classifier.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\CoIterator.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\CoLogic.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Constraints.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\CoPromise.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Coroutine.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\CoTask.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\DataPacker.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\DataUnit.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Deserialization.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Enumerator.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Error.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Expected.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\File.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\FixedString.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Generator.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Identity.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Indexer.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Locks.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\LooseMonad.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Memory.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\MemoryWatcher.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Meta.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Monad.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Named.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Option.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Print.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Promise.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Reflection.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Serialization.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Singleton.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Spinlock.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\String.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Thread.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\ThreadUnit.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Time.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Traits.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Union.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Unique.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+    <ClCompile Include="inc\Utility.ixx">
+      <Filter>Includes</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="inc\Serialization.inl">
+      <Filter>Includes</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="Utility.natvis">
+      <Filter>Resources</Filter>
+    </Natvis>
+  </ItemGroup>
+</Project>
