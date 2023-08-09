@@ -50,11 +50,19 @@ export namespace util
 		constexpr Array(Array&& other)
 			noexcept(nothrow_move_assignables<value_type>) requires movable<value_type> = default;
 
-		explicit(!trivials<value_type>)
+		explicit
 			constexpr Array(const initializer_list<value_type> elements)
 			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type>
 		{
-			std::copy(elements.begin(), elements.end(), begin());
+			iterator it = begin();
+
+			for (const value_type& elemement : elements)
+			{
+				*it = elemement;
+
+				if (++it == end())
+					break;
+			}
 		}
 
 		template<size_t L2>
