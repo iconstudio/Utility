@@ -45,9 +45,9 @@ export namespace util
 			noexcept(nothrow_constructibles<value_type>) requires(default_initializable<value_type>) = default;
 		constexpr ~Array()
 			noexcept(nothrow_destructibles<value_type>) = default;
-		constexpr Array(const Array& other)
+		constexpr Array(const Array&)
 			noexcept(nothrow_copy_assignables<value_type>) requires copyable<value_type> = default;
-		constexpr Array(Array&& other)
+		constexpr Array(Array&&)
 			noexcept(nothrow_move_assignables<value_type>) requires movable<value_type> = default;
 
 		explicit
@@ -107,10 +107,10 @@ export namespace util
 		}
 
 		template<std::input_iterator It, std::sentinel_for<It> Guard>
-		explicit constexpr Array(It ibegin, const Guard iend)
+		explicit constexpr Array(It it, const Guard guard)
 			noexcept(nothrow_convertibles<std::iter_value_t<It>, value_type>)
 		{
-			std::copy(ibegin, iend, begin());
+			std::copy(it, guard, begin());
 		}
 
 		constexpr Array& operator=(const Array& other)
