@@ -116,7 +116,7 @@ export namespace util
 		constexpr Array& operator=(const Array& other)
 			noexcept(nothrow_copy_assignables<value_type>) requires std::movable<value_type>
 		{
-			if (&other == static_cast<const Array* const&>(this))
+			if (std::addressof(other) == static_cast<const Array* const&>(this))
 			{
 				return *this;
 			}
