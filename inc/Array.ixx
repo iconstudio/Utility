@@ -14,10 +14,10 @@ export namespace util
 	using ::std::initializer_list;
 
 	template<typename T, size_t Length>
-	using array_iterator = std::_Array_iterator<T, Length>;
+	using array_iterator = std::array<T, Length>::iterator;
 
 	template<typename T, size_t Length>
-	using array_const_iterator = std::_Array_const_iterator<T, Length>;
+	using array_const_iterator = std::array<T, Length>::const_iterator;
 
 	struct empty_array_elemement { constexpr explicit empty_array_elemement() = default; };
 
