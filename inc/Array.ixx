@@ -1,7 +1,7 @@
 export module Utility.Array;
 import <system_error>;
 import <utility>;
-export import <array>;
+import <array>;
 import <algorithm>;
 import <ranges>;
 import Utility;
